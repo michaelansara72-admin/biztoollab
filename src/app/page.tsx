@@ -39,6 +39,7 @@ const tools = [
     description:
       "Compare your investment against expected gains and calculate your estimated return.",
     category: "Finance Tool",
+    href: "/calculators/roi-calculator",
   },
 ];
 
