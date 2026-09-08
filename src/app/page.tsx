@@ -32,6 +32,7 @@ const tools = [
     description:
       "Quickly calculate gross profit, margin percentage, markup, and selling price.",
     category: "Business Calculator",
+    href: "/calculators/profit-margin-calculator",
   },
   {
     title: "ROI Calculator",
