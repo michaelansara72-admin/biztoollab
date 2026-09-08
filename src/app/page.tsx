@@ -18,6 +18,7 @@ const tools = [
     description:
       "Organize one-time startup expenses and estimate how much capital you may need before launch.",
     category: "Startup Tool",
+    href: "/calculators/startup-cost-calculator",
   },
   {
     title: "Break-Even Calculator",
