@@ -261,19 +261,19 @@ export default function Home() {
             </div>
 
             <div className="flex flex-wrap gap-6 text-sm">
-              <a href="#" className="hover:text-white">
-                About
-              </a>
-              <a href="#" className="hover:text-white">
-                Privacy
-              </a>
-              <a href="#" className="hover:text-white">
-                Terms
-              </a>
-              <a href="#" className="hover:text-white">
-                Contact
-              </a>
-            </div>
+  <a href="/about" className="hover:text-white">
+    About
+  </a>
+  <a href="/privacy" className="hover:text-white">
+    Privacy
+  </a>
+  <a href="/terms" className="hover:text-white">
+    Terms
+  </a>
+  <a href="/contact" className="hover:text-white">
+    Contact
+  </a>
+</div>
           </div>
 
           <div className="mt-8 border-t border-slate-800 pt-6 text-sm text-slate-500">
