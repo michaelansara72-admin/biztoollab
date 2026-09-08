@@ -696,15 +696,26 @@ function Input({
         )}
 
         <input
-          type="number"
-          value={value}
-          step={step}
-          min="0"
-          onChange={(event) =>
-            onChange(Number(event.target.value))
-          }
-          className="w-full px-4 py-3 outline-none"
-        />
+  type="number"
+  defaultValue={value}
+  step={step}
+  min="0"
+  onBlur={(event) => {
+    const newValue = Math.max(
+      0,
+      Number(event.target.value) || 0
+    );
+
+    onChange(newValue);
+    event.target.value = String(newValue);
+  }}
+  onKeyDown={(event) => {
+    if (event.key === "Enter") {
+      event.currentTarget.blur();
+    }
+  }}
+  className="w-full px-4 py-3 outline-none"
+/>
 
         {suffix && (
           <span className="flex items-center border-l border-slate-200 bg-slate-50 px-3 text-slate-500">
