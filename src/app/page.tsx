@@ -11,6 +11,7 @@ const tools = [
     description:
       "Estimate sales, product costs, commissions, operating expenses, and expected monthly profit.",
     category: "Industry Calculator",
+    href: "/calculators/vending-machine-profit-calculator",
   },
   {
     title: "Startup Cost Calculator",
