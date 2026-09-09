@@ -636,7 +636,244 @@ export default function LaundromatProfitCalculator() {
             </p>
 
           </div>
+          {/* HOW TO USE */}
 
+          <section className="mt-12 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+
+            <h2 className="text-2xl font-bold text-slate-900">
+              How to Use the Laundromat Profit Calculator
+            </h2>
+
+            <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
+
+              <p>
+                Start by entering the number of washers and dryers in the
+                laundromat, along with the average price customers pay for
+                each wash and dry cycle.
+              </p>
+
+              <p>
+                Next, estimate the average number of turns each machine
+                completes per day and the number of days the laundromat is
+                open each month. These values are used to estimate monthly
+                machine revenue.
+              </p>
+
+              <p>
+                Add any additional revenue from services such as
+                wash-dry-fold, vending machines, detergent sales, or other
+                sources of income.
+              </p>
+
+              <p>
+                Enter your monthly operating expenses, including rent,
+                utilities, labor, maintenance, insurance, payment processing,
+                loan payments, and other recurring costs.
+              </p>
+
+              <p>
+                Finally, enter your estimated startup investment. The
+                calculator will use these assumptions to estimate monthly
+                profit, annual profit, profit margin, return on investment,
+                and investment payback time.
+              </p>
+
+            </div>
+
+          </section>
+
+
+          {/* EXAMPLE CALCULATION */}
+
+          <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+
+            <h2 className="text-2xl font-bold text-slate-900">
+              Laundromat Profit Example
+            </h2>
+
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              Consider a laundromat with 20 washers and 20 dryers. Assume an
+              average wash price of $4.00, an average dry price of $3.00,
+              approximately 4.5 machine turns per day, and 30 operating days
+              per month.
+            </p>
+
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              If the business also earns revenue from wash-dry-fold services
+              and vending, total monthly revenue may be significantly higher
+              than machine revenue alone. After subtracting rent, utilities,
+              labor, maintenance, insurance, processing fees, and financing
+              costs, the remaining amount represents estimated monthly profit.
+            </p>
+
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              The calculator then compares that profit with the original
+              startup investment to estimate annual ROI and how long it may
+              take to recover the initial investment.
+            </p>
+
+          </section>
+
+
+          {/* FAQ */}
+
+          <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+
+            <h2 className="text-2xl font-bold text-slate-900">
+              Frequently Asked Questions
+            </h2>
+
+            <div className="mt-6 space-y-7">
+
+              <div>
+                <h3 className="font-semibold text-slate-900">
+                  What is a machine turn in a laundromat?
+                </h3>
+
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  A turn represents one completed paid use of a washer or
+                  dryer. For example, if a washer is used five times during
+                  the day, that machine completed five turns.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-slate-900">
+                  How do I estimate laundromat monthly revenue?
+                </h3>
+
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Machine revenue can be estimated using the number of
+                  machines, average price per cycle, average daily turns, and
+                  operating days. Additional services such as wash-dry-fold
+                  and vending should be added separately.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-slate-900">
+                  What expenses should I include?
+                </h3>
+
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Common expenses include rent, water, sewer, electricity,
+                  gas, payroll, repairs, maintenance, insurance, payment
+                  processing fees, supplies, financing payments, and other
+                  recurring operating costs.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-slate-900">
+                  What is a good laundromat profit margin?
+                </h3>
+
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Profit margins vary widely depending on location, utility
+                  costs, rent, machine efficiency, customer volume, staffing,
+                  financing, and competition. The calculator is most useful
+                  for comparing different operating assumptions rather than
+                  relying on a single target percentage.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-slate-900">
+                  Does this calculator include loan payments?
+                </h3>
+
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Yes. You can enter a monthly loan payment so financing costs
+                  are included when estimating monthly profit and cash flow.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-slate-900">
+                  Can I use this calculator before buying a laundromat?
+                </h3>
+
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Yes. It can be used to model a potential acquisition or new
+                  laundromat by entering estimated revenue, expenses, machine
+                  usage, and startup investment. The results should still be
+                  verified against actual financial records and operating
+                  information before making a purchase decision.
+                </p>
+              </div>
+
+            </div>
+
+          </section>
+
+
+          {/* RELATED CALCULATORS */}
+
+          <section className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
+
+            <h2 className="text-xl font-bold text-slate-900">
+              Related Business Calculators
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Use these additional BizToolLab calculators to evaluate startup
+              costs, profitability, break-even requirements, and investment
+              returns.
+            </p>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+
+              <a
+                href="/calculators/startup-cost-calculator"
+                className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+              >
+                <div className="font-semibold text-slate-900">
+                  Startup Cost Calculator
+                </div>
+                <div className="mt-1 text-sm text-slate-500">
+                  Estimate the capital needed to start a business.
+                </div>
+              </a>
+
+              <a
+                href="/calculators/break-even-calculator"
+                className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+              >
+                <div className="font-semibold text-slate-900">
+                  Break-Even Calculator
+                </div>
+                <div className="mt-1 text-sm text-slate-500">
+                  Estimate the sales needed to cover business costs.
+                </div>
+              </a>
+
+              <a
+                href="/calculators/profit-margin-calculator"
+                className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+              >
+                <div className="font-semibold text-slate-900">
+                  Profit Margin Calculator
+                </div>
+                <div className="mt-1 text-sm text-slate-500">
+                  Calculate gross and net profit margins.
+                </div>
+              </a>
+
+              <a
+                href="/calculators/roi-calculator"
+                className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+              >
+                <div className="font-semibold text-slate-900">
+                  ROI Calculator
+                </div>
+                <div className="mt-1 text-sm text-slate-500">
+                  Measure return on investment and annualized return.
+                </div>
+              </a>
+
+            </div>
+
+          </section>
           {/* IMPORTANT NOTE */}
 
           <div className="mt-12 rounded-2xl border border-amber-200 bg-amber-50 p-6">

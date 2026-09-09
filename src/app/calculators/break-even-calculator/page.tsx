@@ -377,7 +377,217 @@ export default function BreakEvenCalculator() {
               costs before calculating the required unit sales and revenue.
             </p>
           </div>
+          {/* HOW TO USE */}
 
+          <section className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h2 className="text-2xl font-bold text-slate-900">
+              How to Use the Break-Even Calculator
+            </h2>
+
+            <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
+              <p>
+                Start by entering your total fixed costs. These are expenses
+                that generally stay the same regardless of how many units you
+                sell, such as rent, insurance, software, administrative
+                salaries, and other overhead.
+              </p>
+
+              <p>
+                Next, enter the selling price for one unit of your product or
+                service and the variable cost associated with producing or
+                delivering one unit.
+              </p>
+
+              <p>
+                The difference between selling price and variable cost is your
+                contribution margin per unit. This is the amount each sale
+                contributes toward covering fixed costs and eventually
+                producing profit.
+              </p>
+
+              <p>
+                You can also enter a target profit amount. The calculator will
+                estimate how many units you need to sell and how much revenue
+                you need to generate to reach that profit goal.
+              </p>
+
+              <p>
+                Use the results to compare different pricing, cost, and sales
+                scenarios before making business decisions.
+              </p>
+            </div>
+          </section>
+
+
+          {/* EXAMPLE CALCULATION */}
+
+          <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h2 className="text-2xl font-bold text-slate-900">
+              Break-Even Example
+            </h2>
+
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              Suppose a business has $10,000 in fixed costs, sells a product
+              for $50, and has a variable cost of $20 per unit.
+            </p>
+
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              The contribution margin is $30 per unit. Dividing $10,000 in
+              fixed costs by the $30 contribution margin means the business
+              needs to sell approximately 334 units to break even.
+            </p>
+
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              At a $50 selling price, break-even revenue would be about
+              $16,667. If the business wants to earn a $5,000 target profit,
+              it would need to sell approximately 500 units, producing about
+              $25,000 in revenue.
+            </p>
+          </section>
+
+
+          {/* FAQ */}
+
+          <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h2 className="text-2xl font-bold text-slate-900">
+              Frequently Asked Questions
+            </h2>
+
+            <div className="mt-6 space-y-7">
+              <div>
+                <h3 className="font-semibold text-slate-900">
+                  What is the break-even point?
+                </h3>
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  The break-even point is the level of sales where total
+                  revenue equals total costs. At that point, the business is
+                  neither making a profit nor operating at a loss.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-slate-900">
+                  What are fixed costs?
+                </h3>
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Fixed costs are expenses that generally do not change
+                  directly with sales volume, such as rent, insurance,
+                  software subscriptions, administrative salaries, and certain
+                  other overhead expenses.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-slate-900">
+                  What are variable costs?
+                </h3>
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Variable costs change with the number of units sold or
+                  produced. Examples may include product materials, packaging,
+                  sales commissions, shipping, and transaction costs.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-slate-900">
+                  What is contribution margin?
+                </h3>
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Contribution margin is the selling price per unit minus the
+                  variable cost per unit. It represents the amount from each
+                  sale that is available to cover fixed costs and profit.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-slate-900">
+                  Why does the selling price need to be higher than variable cost?
+                </h3>
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  If the variable cost of each unit equals or exceeds the
+                  selling price, each additional sale does not contribute
+                  toward covering fixed costs. A positive contribution margin
+                  is required to calculate a practical break-even point.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-slate-900">
+                  Can I use break-even analysis for a service business?
+                </h3>
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Yes. A service business can treat one appointment, project,
+                  billable hour, subscription, or other service unit as the
+                  unit being sold. The same fixed-cost and variable-cost
+                  principles can then be applied.
+                </p>
+              </div>
+            </div>
+          </section>
+
+
+          {/* RELATED CALCULATORS */}
+
+          <section className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
+            <h2 className="text-xl font-bold text-slate-900">
+              Related Business Calculators
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Use these additional BizToolLab calculators to evaluate startup
+              costs, margins, business profitability, and investment returns.
+            </p>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <a
+                href="/calculators/profit-margin-calculator"
+                className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+              >
+                <div className="font-semibold text-slate-900">
+                  Profit Margin Calculator
+                </div>
+                <div className="mt-1 text-sm text-slate-500">
+                  Calculate gross profit and net profit margins.
+                </div>
+              </a>
+
+              <a
+                href="/calculators/startup-cost-calculator"
+                className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+              >
+                <div className="font-semibold text-slate-900">
+                  Startup Cost Calculator
+                </div>
+                <div className="mt-1 text-sm text-slate-500">
+                  Estimate the capital needed to start a business.
+                </div>
+              </a>
+
+              <a
+                href="/calculators/roi-calculator"
+                className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+              >
+                <div className="font-semibold text-slate-900">
+                  ROI Calculator
+                </div>
+                <div className="mt-1 text-sm text-slate-500">
+                  Measure return on investment and annualized return.
+                </div>
+              </a>
+
+              <a
+                href="/calculators/laundromat-profit-calculator"
+                className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+              >
+                <div className="font-semibold text-slate-900">
+                  Laundromat Profit Calculator
+                </div>
+                <div className="mt-1 text-sm text-slate-500">
+                  Model laundromat revenue, expenses, profit, and payback.
+                </div>
+              </a>
+            </div>
+          </section>
           <div className="mt-10 rounded-2xl bg-slate-100 p-6">
             <h3 className="font-semibold">Important</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">

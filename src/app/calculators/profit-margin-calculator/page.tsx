@@ -318,7 +318,219 @@ export default function ProfitMarginCalculatorPage() {
             </p>
           </div>
         </section>
+        {/* HOW TO USE */}
 
+        <section className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="text-2xl font-bold text-slate-900">
+            How to Use the Profit Margin Calculator
+          </h2>
+
+          <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
+            <p>
+              Start by entering your total business revenue for the period you
+              want to analyze.
+            </p>
+
+            <p>
+              Next, enter your cost of goods sold. This should include the
+              direct costs associated with producing or purchasing the products
+              or services you sell.
+            </p>
+
+            <p>
+              Then enter operating expenses such as rent, payroll, insurance,
+              software, marketing, utilities, and other overhead expenses.
+            </p>
+
+            <p>
+              The calculator will estimate gross profit, gross profit margin,
+              net profit, and net profit margin. It will also show what
+              percentage of revenue is being used for direct costs and
+              operating expenses.
+            </p>
+
+            <p>
+              You can change the values to compare different pricing, cost,
+              expense, and revenue scenarios.
+            </p>
+          </div>
+        </section>
+
+
+        {/* EXAMPLE CALCULATION */}
+
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="text-2xl font-bold text-slate-900">
+            Profit Margin Example
+          </h2>
+
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            Suppose a business generates $25,000 in revenue, has $12,000 in
+            cost of goods sold, and has $5,000 in operating expenses.
+          </p>
+
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            Gross profit would be $13,000, which produces a gross profit margin
+            of 52%.
+          </p>
+
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            After subtracting the $5,000 in operating expenses, net profit
+            would be $8,000. That produces a net profit margin of 32%.
+          </p>
+
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            In this example, 48% of revenue is being used for cost of goods
+            sold and 20% is being used for operating expenses.
+          </p>
+        </section>
+
+
+        {/* FAQ */}
+
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="text-2xl font-bold text-slate-900">
+            Frequently Asked Questions
+          </h2>
+
+          <div className="mt-6 space-y-7">
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                What is profit margin?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Profit margin measures how much profit remains from revenue
+                after certain business costs are deducted. It is usually
+                expressed as a percentage of revenue.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                What is gross profit margin?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Gross profit margin shows the percentage of revenue remaining
+                after subtracting the direct cost of goods sold. It does not
+                include operating expenses such as rent, payroll, insurance,
+                and marketing.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                What is net profit margin?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Net profit margin shows the percentage of revenue remaining
+                after subtracting both cost of goods sold and the operating
+                expenses included in the calculator.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                What should I include in cost of goods sold?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Cost of goods sold generally includes direct costs tied to
+                producing or purchasing what your business sells. Examples may
+                include materials, wholesale inventory, manufacturing costs,
+                and certain direct labor costs.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                What is a good profit margin?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                There is no single profit margin that is considered good for
+                every business. Margins vary by industry, pricing strategy,
+                business model, overhead, competition, and growth stage. It is
+                usually more useful to compare your margin with your own
+                historical performance and similar businesses in your
+                industry.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                Can a business have a positive gross margin but lose money?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Yes. A business can earn a positive gross profit but still have
+                a net loss if operating expenses are greater than the gross
+                profit generated.
+              </p>
+            </div>
+          </div>
+        </section>
+
+
+        {/* RELATED CALCULATORS */}
+
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
+          <h2 className="text-xl font-bold text-slate-900">
+            Related Business Calculators
+          </h2>
+
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Use these additional BizToolLab calculators to analyze costs,
+            break-even requirements, business profitability, and investment
+            returns.
+          </p>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <a
+              href="/calculators/break-even-calculator"
+              className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+            >
+              <div className="font-semibold text-slate-900">
+                Break-Even Calculator
+              </div>
+              <div className="mt-1 text-sm text-slate-500">
+                Estimate how many units or how much revenue you need to cover costs.
+              </div>
+            </a>
+
+            <a
+              href="/calculators/startup-cost-calculator"
+              className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+            >
+              <div className="font-semibold text-slate-900">
+                Startup Cost Calculator
+              </div>
+              <div className="mt-1 text-sm text-slate-500">
+                Estimate the capital needed to launch a business.
+              </div>
+            </a>
+
+            <a
+              href="/calculators/roi-calculator"
+              className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+            >
+              <div className="font-semibold text-slate-900">
+                ROI Calculator
+              </div>
+              <div className="mt-1 text-sm text-slate-500">
+                Measure return on investment and annualized return.
+              </div>
+            </a>
+
+            <a
+              href="/calculators/vending-machine-profit-calculator"
+              className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+            >
+              <div className="font-semibold text-slate-900">
+                Vending Machine Profit Calculator
+              </div>
+              <div className="mt-1 text-sm text-slate-500">
+                Estimate vending route revenue, expenses, and profit.
+              </div>
+            </a>
+          </div>
+        </section>
         <section className="mt-8 rounded-2xl border border-slate-200 bg-slate-100 p-6 text-sm leading-6 text-slate-500">
           This calculator is provided for general informational and planning
           purposes only. Actual business results may vary based on taxes,

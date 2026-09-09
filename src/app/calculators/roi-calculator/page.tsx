@@ -333,7 +333,218 @@ export default function RoiCalculatorPage() {
             </p>
           </div>
         </section>
+        {/* HOW TO USE */}
 
+        <section className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="text-2xl font-bold text-slate-900">
+            How to Use the ROI Calculator
+          </h2>
+
+          <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
+            <p>
+              Start by entering the amount originally invested in the business,
+              project, asset, or opportunity you want to evaluate.
+            </p>
+
+            <p>
+              Next, enter the total amount returned from the investment. This
+              should represent the value received or expected at the end of the
+              period being analyzed.
+            </p>
+
+            <p>
+              Then enter the number of years the investment is held. This allows
+              the calculator to estimate an annualized return in addition to
+              total ROI.
+            </p>
+
+            <p>
+              The calculator will estimate net profit, total return on
+              investment, return multiple, and annualized return.
+            </p>
+
+            <p>
+              You can adjust the investment amount, total return, and holding
+              period to compare different scenarios.
+            </p>
+          </div>
+        </section>
+
+
+        {/* EXAMPLE CALCULATION */}
+
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="text-2xl font-bold text-slate-900">
+            ROI Example
+          </h2>
+
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            Suppose you invest $50,000 in a business or project and receive a
+            total return of $65,000 after three years.
+          </p>
+
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            The net profit would be $15,000 because the total return exceeds
+            the original investment by that amount.
+          </p>
+
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            Dividing the $15,000 profit by the $50,000 investment produces an
+            ROI of 30%. The total return is also equal to 1.30 times the
+            original investment.
+          </p>
+
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            Because the investment was held for three years, the calculator
+            also converts the total return into an estimated annualized return,
+            which is approximately 9.1% per year in this example.
+          </p>
+        </section>
+
+
+        {/* FAQ */}
+
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="text-2xl font-bold text-slate-900">
+            Frequently Asked Questions
+          </h2>
+
+          <div className="mt-6 space-y-7">
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                What does ROI mean?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                ROI stands for return on investment. It measures the gain or
+                loss from an investment relative to the amount originally
+                invested.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                How is ROI calculated?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                ROI is calculated by subtracting the original investment from
+                the total return, dividing the result by the original
+                investment, and multiplying by 100.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                What is a return multiple?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Return multiple compares the total return directly with the
+                original investment. For example, a return multiple of 1.5x
+                means the total return is one and a half times the amount
+                originally invested.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                What is annualized return?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Annualized return estimates the compounded yearly rate that
+                would produce the same total return over the holding period.
+                This can make it easier to compare investments held for
+                different lengths of time.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                Can ROI be negative?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Yes. If the total return is less than the original investment,
+                the investment has lost value and the calculated ROI will be
+                negative.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                Does ROI include taxes, financing, or cash flow timing?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Not automatically. This calculator uses the investment amount,
+                total return, and holding period you enter. Taxes, financing
+                costs, fees, interim cash flows, and other factors may need to
+                be considered separately for a more detailed analysis.
+              </p>
+            </div>
+          </div>
+        </section>
+
+
+        {/* RELATED CALCULATORS */}
+
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
+          <h2 className="text-xl font-bold text-slate-900">
+            Related Business Calculators
+          </h2>
+
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Use these additional BizToolLab calculators to evaluate startup
+            costs, profit margins, break-even requirements, and business
+            performance.
+          </p>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <a
+              href="/calculators/startup-cost-calculator"
+              className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+            >
+              <div className="font-semibold text-slate-900">
+                Startup Cost Calculator
+              </div>
+              <div className="mt-1 text-sm text-slate-500">
+                Estimate the capital needed to launch a business.
+              </div>
+            </a>
+
+            <a
+              href="/calculators/profit-margin-calculator"
+              className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+            >
+              <div className="font-semibold text-slate-900">
+                Profit Margin Calculator
+              </div>
+              <div className="mt-1 text-sm text-slate-500">
+                Calculate gross and net profit margins.
+              </div>
+            </a>
+
+            <a
+              href="/calculators/break-even-calculator"
+              className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+            >
+              <div className="font-semibold text-slate-900">
+                Break-Even Calculator
+              </div>
+              <div className="mt-1 text-sm text-slate-500">
+                Estimate the sales needed to cover fixed and variable costs.
+              </div>
+            </a>
+
+            <a
+              href="/calculators/vending-machine-profit-calculator"
+              className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-400"
+            >
+              <div className="font-semibold text-slate-900">
+                Vending Machine Profit Calculator
+              </div>
+              <div className="mt-1 text-sm text-slate-500">
+                Estimate vending route revenue, expenses, profit, and payback.
+              </div>
+            </a>
+          </div>
+        </section>
         <section className="mt-8 rounded-2xl border border-slate-200 bg-slate-100 p-6 text-sm leading-6 text-slate-500">
           This calculator is provided for general informational and planning
           purposes only. Actual investment or business results may vary based on
