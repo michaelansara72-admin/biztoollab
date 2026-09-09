@@ -29,6 +29,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.9,
     },
+        {
+      url: `${baseUrl}/calculators/car-wash-profit-roi-calculator`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
     {
       url: `${baseUrl}/calculators/startup-cost-calculator`,
       lastModified,

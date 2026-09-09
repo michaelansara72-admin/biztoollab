@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Free Business Calculators & Tools",
   description:
-    "Browse free business calculators for profit, startup costs, break-even analysis, ROI, vending machines, laundromats, and more.",
+    "Browse free business calculators for profit, startup costs, break-even analysis, ROI, vending machines, laundromats, car washes, and more.",
 };
 
 const calculators = [
@@ -19,6 +19,13 @@ const calculators = [
     description:
       "Estimate vending route revenue, product costs, commissions, operating expenses, profit, and payback.",
     href: "/calculators/vending-machine-profit-calculator",
+    category: "Business Profitability",
+  },
+  {
+    title: "Car Wash Profit & ROI Calculator",
+    description:
+      "Estimate car wash revenue, operating expenses, break-even traffic, profit margin, ROI, and investment payback.",
+    href: "/calculators/car-wash-profit-roi-calculator",
     category: "Business Profitability",
   },
   {

@@ -1,17 +1,24 @@
 const tools = [
   {
-  title: "Laundromat Profit Calculator",
-  description:
-    "Estimate monthly revenue, operating expenses, profit margin, annual profit, and return on investment.",
-  category: "Industry Calculator",
-  href: "/calculators/laundromat-profit-calculator",
-},
+    title: "Laundromat Profit Calculator",
+    description:
+      "Estimate monthly revenue, operating expenses, profit margin, annual profit, and return on investment.",
+    category: "Industry Calculator",
+    href: "/calculators/laundromat-profit-calculator",
+  },
   {
     title: "Vending Machine Profit Calculator",
     description:
       "Estimate sales, product costs, commissions, operating expenses, and expected monthly profit.",
     category: "Industry Calculator",
     href: "/calculators/vending-machine-profit-calculator",
+  },
+  {
+    title: "Car Wash Profit & ROI Calculator",
+    description:
+      "Estimate car wash revenue, operating expenses, break-even traffic, profit margin, ROI, and investment payback.",
+    category: "Industry Calculator",
+    href: "/calculators/car-wash-profit-roi-calculator",
   },
   {
     title: "Startup Cost Calculator",
@@ -25,7 +32,7 @@ const tools = [
     description:
       "Calculate the sales volume or revenue required to cover your fixed and variable costs.",
     category: "Business Calculator",
-     href: "/calculators/break-even-calculator",
+    href: "/calculators/break-even-calculator",
   },
   {
     title: "Profit Margin Calculator",
@@ -65,10 +72,19 @@ export default function Home() {
           </div>
 
           <nav className="hidden items-center gap-8 text-sm font-medium text-slate-700 md:flex">
+            <a
+              href="/calculators"
+              className="hover:text-slate-950"
+            >
+              All Calculators
+            </a>
             <a href="#tools" className="hover:text-slate-950">
               Tools
             </a>
-            <a href="#categories" className="hover:text-slate-950">
+            <a
+              href="#categories"
+              className="hover:text-slate-950"
+            >
               Categories
             </a>
             <a href="#about" className="hover:text-slate-950">
@@ -109,23 +125,38 @@ export default function Home() {
 
           <div className="mt-8 flex flex-wrap justify-center gap-3 text-sm text-slate-500">
             <span>Popular:</span>
-            <a href="#tools" className="font-medium text-slate-700 hover:text-slate-950">
+            <a
+              href="/calculators/profit-margin-calculator"
+              className="font-medium text-slate-700 hover:text-slate-950"
+            >
               Profit Margin
             </a>
-            <a href="#tools" className="font-medium text-slate-700 hover:text-slate-950">
+            <a
+              href="/calculators/break-even-calculator"
+              className="font-medium text-slate-700 hover:text-slate-950"
+            >
               Break-Even
             </a>
-            <a href="#tools" className="font-medium text-slate-700 hover:text-slate-950">
+            <a
+              href="/calculators/startup-cost-calculator"
+              className="font-medium text-slate-700 hover:text-slate-950"
+            >
               Startup Costs
             </a>
-            <a href="#tools" className="font-medium text-slate-700 hover:text-slate-950">
-              Laundromat Profit
+            <a
+              href="/calculators/car-wash-profit-roi-calculator"
+              className="font-medium text-slate-700 hover:text-slate-950"
+            >
+              Car Wash Profit
             </a>
           </div>
         </div>
       </section>
 
-      <section id="categories" className="mx-auto max-w-7xl px-6 py-16">
+      <section
+        id="categories"
+        className="mx-auto max-w-7xl px-6 py-16"
+      >
         <div className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-wider text-slate-500">
             Browse by category
@@ -141,7 +172,9 @@ export default function Home() {
               key={category}
               className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
             >
-              <h3 className="text-lg font-semibold">{category}</h3>
+              <h3 className="text-lg font-semibold">
+                {category}
+              </h3>
               <p className="mt-2 text-sm leading-6 text-slate-500">
                 Practical tools designed to help you evaluate business
                 opportunities and financial decisions.
@@ -151,7 +184,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="tools" className="border-y border-slate-200 bg-white">
+      <section
+        id="tools"
+        className="border-y border-slate-200 bg-white"
+      >
         <div className="mx-auto max-w-7xl px-6 py-16">
           <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
@@ -163,9 +199,12 @@ export default function Home() {
               </h2>
             </div>
 
-            <span className="text-sm text-slate-500">
-              More tools coming soon
-            </span>
+            <a
+              href="/calculators"
+              className="text-sm font-semibold text-slate-700 hover:text-slate-950"
+            >
+              View all calculators →
+            </a>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -186,25 +225,22 @@ export default function Home() {
                   {tool.description}
                 </p>
 
-                {tool.href ? (
-  <a
-    href={tool.href}
-    className="mt-6 text-left text-sm font-semibold text-slate-900 hover:text-slate-600"
-  >
-    Open tool →
-  </a>
-) : (
-  <span className="mt-6 text-left text-sm font-semibold text-slate-400">
-    Coming soon
-  </span>
-)}
+                <a
+                  href={tool.href}
+                  className="mt-6 text-left text-sm font-semibold text-slate-900 hover:text-slate-600"
+                >
+                  Open tool →
+                </a>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="about" className="mx-auto max-w-7xl px-6 py-20">
+      <section
+        id="about"
+        className="mx-auto max-w-7xl px-6 py-20"
+      >
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-wider text-slate-500">
@@ -246,6 +282,7 @@ export default function Home() {
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
               Future advertising space
             </p>
+
             <p className="mt-2 text-sm text-slate-500">
               Reserved for a future Google AdSense placement.
             </p>
@@ -266,19 +303,25 @@ export default function Home() {
             </div>
 
             <div className="flex flex-wrap gap-6 text-sm">
-  <a href="/about" className="hover:text-white">
-    About
-  </a>
-  <a href="/privacy" className="hover:text-white">
-    Privacy
-  </a>
-  <a href="/terms" className="hover:text-white">
-    Terms
-  </a>
-  <a href="/contact" className="hover:text-white">
-    Contact
-  </a>
-</div>
+              <a
+                href="/calculators"
+                className="hover:text-white"
+              >
+                Calculators
+              </a>
+              <a href="/about" className="hover:text-white">
+                About
+              </a>
+              <a href="/privacy" className="hover:text-white">
+                Privacy
+              </a>
+              <a href="/terms" className="hover:text-white">
+                Terms
+              </a>
+              <a href="/contact" className="hover:text-white">
+                Contact
+              </a>
+            </div>
           </div>
 
           <div className="mt-8 border-t border-slate-800 pt-6 text-sm text-slate-500">
