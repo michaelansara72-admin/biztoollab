@@ -8,7 +8,10 @@ type AnalyzeRequest = {
   results?: Record<string, unknown>;
 };
 
-const supportedTools = ["laundromat-profit"];
+const supportedTools = [
+  "laundromat-profit",
+  "vending-machine-profit",
+];
 const rateLimitMap = new Map<string, number[]>();
 
 const RATE_LIMIT_WINDOW_MS = 60_000;

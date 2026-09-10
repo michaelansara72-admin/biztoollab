@@ -1,9 +1,17 @@
 "use client";
-
+import AIAnalysisPanel from "@/components/ai/AIAnalysisPanel";
+import { useAIAnalysis } from "@/hooks/useAIAnalysis";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 
-export default function VendingMachineProfitCalculator() {
+export default function VendingMachineProfitCalculator() 
+{  const {
+    analysis: aiAnalysis,
+    loading: aiLoading,
+    error: aiError,
+    cooldown: aiCooldown,
+    analyze: runAIAnalysis,
+  } = useAIAnalysis();
   const [machineCount, setMachineCount] = useState(10);
   const [salesPerMachine, setSalesPerMachine] = useState(650);
   const [productCostPercent, setProductCostPercent] = useState(45);
@@ -349,7 +357,8 @@ export default function VendingMachineProfitCalculator() {
         </div>
 
         <aside>
-          <div className="sticky top-6 overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl">
+  <div className="sticky top-6 space-y-6">
+    <div className="overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl">
             <div className="border-b border-slate-800 p-6">
               <p className="text-sm font-semibold uppercase tracking-widest text-slate-400">
                 Estimated Results
@@ -447,7 +456,35 @@ export default function VendingMachineProfitCalculator() {
               </p>
             </div>
           </div>
-        </aside>
+                    <AIAnalysisPanel
+            analysis={aiAnalysis}
+            loading={aiLoading}
+            error={aiError}
+            cooldown={aiCooldown}
+            onAnalyze={() =>
+              runAIAnalysis({
+                tool: "vending-machine-profit",
+                analysisType: "business-opportunity",
+                inputs: {
+                  machineCount,
+                  salesPerMachine,
+                  productCostPercent,
+                  locationCommissionPercent,
+                  cardSalesPercent,
+                  cardProcessingPercent,
+                  restockingCost,
+                  maintenanceCost,
+                  insuranceCost,
+                  otherExpenses,
+                  machineInvestment,
+                  monthlyLoanPayment,
+                },
+                results,
+              })
+            }
+          />
+  </div>
+</aside>
       </section>
 
       <section className="border-t border-slate-200 bg-white">
