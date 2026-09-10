@@ -21,6 +21,8 @@ export default function LaundromatProfitCalculator() {
     const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
 const [aiLoading, setAiLoading] = useState(false);
 const [aiError, setAiError] = useState("");
+const [lastAnalyzedSnapshot, setLastAnalyzedSnapshot] = useState("");
+const [aiCooldown, setAiCooldown] = useState(false);
 
   const [washers, setWashers] = useState(30);
   const [dryers, setDryers] = useState(24);
@@ -143,8 +145,38 @@ const [aiError, setAiError] = useState("");
     startupInvestment,
   ]);
 async function handleAIAnalysis() {
+    const currentSnapshot = JSON.stringify({
+  inputs: {
+    washers,
+    dryers,
+    washPrice,
+    dryPrice,
+    washerTurns,
+    dryerTurns,
+    daysOpen,
+    washFoldRevenue,
+    vendingRevenue,
+    otherRevenue,
+    rent,
+    utilities,
+    labor,
+    maintenance,
+    insurance,
+    otherExpenses,
+    processingRate,
+    monthlyLoanPayment,
+    startupInvestment,
+  },
+  results,
+});
+
+if (currentSnapshot === lastAnalyzedSnapshot) {
+  setAiError("These results have already been analyzed. Change an input to generate a new AI analysis.");
+  return;
+}
   try {
     setAiLoading(true);
+    setAiCooldown(true);
     setAiError("");
 
     const response = await fetch("/api/ai/analyze", {
@@ -189,6 +221,7 @@ async function handleAIAnalysis() {
     }
 
     setAiAnalysis(data.analysis);
+    setLastAnalyzedSnapshot(currentSnapshot);
   } catch (error) {
     setAiError(
       error instanceof Error
@@ -196,8 +229,12 @@ async function handleAIAnalysis() {
         : "Unable to generate AI analysis."
     );
   } finally {
-    setAiLoading(false);
-  }
+  setAiLoading(false);
+
+  setTimeout(() => {
+    setAiCooldown(false);
+  }, 3000);
+}
 }
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -643,12 +680,14 @@ async function handleAIAnalysis() {
   <button
     type="button"
     onClick={handleAIAnalysis}
-    disabled={aiLoading}
+    disabled={aiLoading || aiCooldown}
     className="mt-5 w-full rounded-xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
   >
     {aiLoading
-      ? "Analyzing..."
-      : "✨ Analyze My Results with AI"}
+  ? "Analyzing..."
+  : aiCooldown
+    ? "Please wait..."
+    : "✨ Analyze My Results with AI"}
   </button>
 
   {aiError && (
