@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import AIAnalysisPanel from "@/components/ai/AIAnalysisPanel";
 type AIAnalysis = {
   summary: string;
   strength: string;
@@ -667,77 +668,13 @@ if (currentSnapshot === lastAnalyzedSnapshot) {
           </div>
 {/* AI ANALYSIS */}
 
-<div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-  <h3 className="text-lg font-semibold text-slate-900">
-    AI Business Analysis
-  </h3>
-
-  <p className="mt-2 text-sm leading-6 text-slate-600">
-    Get an AI-powered analysis of your current laundromat
-    assumptions and estimated results.
-  </p>
-
-  <button
-    type="button"
-    onClick={handleAIAnalysis}
-    disabled={aiLoading || aiCooldown}
-    className="mt-5 w-full rounded-xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-  >
-    {aiLoading
-  ? "Analyzing..."
-  : aiCooldown
-    ? "Please wait..."
-    : "✨ Analyze My Results with AI"}
-  </button>
-
-  {aiError && (
-    <p className="mt-4 text-sm text-red-600">
-      {aiError}
-    </p>
-  )}
-  {aiAnalysis && (
-  <div className="mt-6 space-y-4 border-t border-slate-200 pt-5">
-
-    <AIInsight
-      label="Analysis Summary"
-      text={aiAnalysis.summary}
-    />
-
-    <AIInsight
-      label="Business Strength"
-      text={aiAnalysis.strength}
-    />
-
-    <AIInsight
-      label="Opportunity"
-      text={aiAnalysis.opportunity}
-    />
-
-    <AIInsight
-      label="Potential Risk"
-      text={aiAnalysis.risk}
-    />
-
-    <AIInsight
-      label="Scenario to Test"
-      text={aiAnalysis.scenarioToTest}
-    />
-
-    <AIInsight
-      label="Recommended Next Step"
-      text={aiAnalysis.nextStep}
-    />
-
-    <p className="pt-2 text-xs leading-5 text-slate-500">
-      AI analysis is based on the assumptions and calculator
-      results entered above. It is intended for planning and
-      educational purposes and does not guarantee actual business
-      performance.
-    </p>
-
-  </div>
-)}
-</div>
+<AIAnalysisPanel
+  analysis={aiAnalysis}
+  loading={aiLoading}
+  error={aiError}
+  cooldown={aiCooldown}
+  onAnalyze={handleAIAnalysis}
+/>
           {/* FUTURE AD */}
 
           <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center">
@@ -1170,24 +1107,6 @@ function Result({
         {value}
       </div>
 
-    </div>
-  );
-}function AIInsight({
-  label,
-  text,
-}: {
-  label: string;
-  text: string;
-}) {
-  return (
-    <div>
-      <h4 className="text-sm font-semibold text-slate-900">
-        {label}
-      </h4>
-
-      <p className="mt-1 text-sm leading-6 text-slate-600">
-        {text}
-      </p>
     </div>
   );
 }
