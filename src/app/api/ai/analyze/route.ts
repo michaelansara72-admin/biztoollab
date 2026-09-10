@@ -9,9 +9,35 @@ type AnalyzeRequest = {
 };
 
 const supportedTools = ["laundromat-profit"];
+const rateLimitMap = new Map<string, number[]>();
 
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 5;
 export async function POST(request: NextRequest) {
-  try {
+  try {const forwardedFor = request.headers.get("x-forwarded-for");
+const clientIp =
+  forwardedFor?.split(",")[0]?.trim() ||
+  request.headers.get("x-real-ip") ||
+  "unknown";
+
+const now = Date.now();
+
+const recentRequests = (rateLimitMap.get(clientIp) || []).filter(
+  (timestamp) => now - timestamp < RATE_LIMIT_WINDOW_MS
+);
+
+if (recentRequests.length >= RATE_LIMIT_MAX_REQUESTS) {
+  return NextResponse.json(
+    {
+      success: false,
+      error: "Too many AI requests. Please wait a moment and try again.",
+    },
+    { status: 429 }
+  );
+}
+
+recentRequests.push(now);
+rateLimitMap.set(clientIp, recentRequests);
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
