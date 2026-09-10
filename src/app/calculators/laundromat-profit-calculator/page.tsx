@@ -1,7 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-
+type AIAnalysis = {
+  summary: string;
+  strength: string;
+  opportunity: string;
+  risk: string;
+  scenarioToTest: string;
+  nextStep: string;
+};
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -11,6 +18,10 @@ function formatCurrency(value: number) {
 }
 
 export default function LaundromatProfitCalculator() {
+    const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
+const [aiLoading, setAiLoading] = useState(false);
+const [aiError, setAiError] = useState("");
+
   const [washers, setWashers] = useState(30);
   const [dryers, setDryers] = useState(24);
 
@@ -131,7 +142,63 @@ export default function LaundromatProfitCalculator() {
     monthlyLoanPayment,
     startupInvestment,
   ]);
+async function handleAIAnalysis() {
+  try {
+    setAiLoading(true);
+    setAiError("");
 
+    const response = await fetch("/api/ai/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        tool: "laundromat-profit",
+        analysisType: "business-opportunity",
+
+        inputs: {
+          washers,
+          dryers,
+          washPrice,
+          dryPrice,
+          washerTurns,
+          dryerTurns,
+          daysOpen,
+          washFoldRevenue,
+          vendingRevenue,
+          otherRevenue,
+          rent,
+          utilities,
+          labor,
+          maintenance,
+          insurance,
+          otherExpenses,
+          processingRate,
+          monthlyLoanPayment,
+          startupInvestment,
+        },
+
+        results,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "Unable to generate AI analysis.");
+    }
+
+    setAiAnalysis(data.analysis);
+  } catch (error) {
+    setAiError(
+      error instanceof Error
+        ? error.message
+        : "Unable to generate AI analysis."
+    );
+  } finally {
+    setAiLoading(false);
+  }
+}
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
@@ -561,7 +628,77 @@ export default function LaundromatProfitCalculator() {
 
             </div>
           </div>
+{/* AI ANALYSIS */}
 
+<div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+  <h3 className="text-lg font-semibold text-slate-900">
+    AI Business Analysis
+  </h3>
+
+  <p className="mt-2 text-sm leading-6 text-slate-600">
+    Get an AI-powered analysis of your current laundromat
+    assumptions and estimated results.
+  </p>
+
+  <button
+    type="button"
+    onClick={handleAIAnalysis}
+    disabled={aiLoading}
+    className="mt-5 w-full rounded-xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+  >
+    {aiLoading
+      ? "Analyzing..."
+      : "✨ Analyze My Results with AI"}
+  </button>
+
+  {aiError && (
+    <p className="mt-4 text-sm text-red-600">
+      {aiError}
+    </p>
+  )}
+  {aiAnalysis && (
+  <div className="mt-6 space-y-4 border-t border-slate-200 pt-5">
+
+    <AIInsight
+      label="Analysis Summary"
+      text={aiAnalysis.summary}
+    />
+
+    <AIInsight
+      label="Business Strength"
+      text={aiAnalysis.strength}
+    />
+
+    <AIInsight
+      label="Opportunity"
+      text={aiAnalysis.opportunity}
+    />
+
+    <AIInsight
+      label="Potential Risk"
+      text={aiAnalysis.risk}
+    />
+
+    <AIInsight
+      label="Scenario to Test"
+      text={aiAnalysis.scenarioToTest}
+    />
+
+    <AIInsight
+      label="Recommended Next Step"
+      text={aiAnalysis.nextStep}
+    />
+
+    <p className="pt-2 text-xs leading-5 text-slate-500">
+      AI analysis is based on the assumptions and calculator
+      results entered above. It is intended for planning and
+      educational purposes and does not guarantee actual business
+      performance.
+    </p>
+
+  </div>
+)}
+</div>
           {/* FUTURE AD */}
 
           <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center">
@@ -994,6 +1131,24 @@ function Result({
         {value}
       </div>
 
+    </div>
+  );
+}function AIInsight({
+  label,
+  text,
+}: {
+  label: string;
+  text: string;
+}) {
+  return (
+    <div>
+      <h4 className="text-sm font-semibold text-slate-900">
+        {label}
+      </h4>
+
+      <p className="mt-1 text-sm leading-6 text-slate-600">
+        {text}
+      </p>
     </div>
   );
 }
