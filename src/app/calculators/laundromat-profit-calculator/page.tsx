@@ -2,14 +2,8 @@
 
 import { useMemo, useState } from "react";
 import AIAnalysisPanel from "@/components/ai/AIAnalysisPanel";
-type AIAnalysis = {
-  summary: string;
-  strength: string;
-  opportunity: string;
-  risk: string;
-  scenarioToTest: string;
-  nextStep: string;
-};
+import { useAIAnalysis } from "@/hooks/useAIAnalysis";
+
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -19,11 +13,14 @@ function formatCurrency(value: number) {
 }
 
 export default function LaundromatProfitCalculator() {
-    const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
-const [aiLoading, setAiLoading] = useState(false);
-const [aiError, setAiError] = useState("");
-const [lastAnalyzedSnapshot, setLastAnalyzedSnapshot] = useState("");
-const [aiCooldown, setAiCooldown] = useState(false);
+      const {
+    analysis: reusableAIAnalysis,
+    loading: reusableAILoading,
+    error: reusableAIError,
+    cooldown: reusableAICooldown,
+    analyze: runAIAnalysis,
+  } = useAIAnalysis();
+    
 
   const [washers, setWashers] = useState(30);
   const [dryers, setDryers] = useState(24);
@@ -145,98 +142,6 @@ const [aiCooldown, setAiCooldown] = useState(false);
     monthlyLoanPayment,
     startupInvestment,
   ]);
-async function handleAIAnalysis() {
-    const currentSnapshot = JSON.stringify({
-  inputs: {
-    washers,
-    dryers,
-    washPrice,
-    dryPrice,
-    washerTurns,
-    dryerTurns,
-    daysOpen,
-    washFoldRevenue,
-    vendingRevenue,
-    otherRevenue,
-    rent,
-    utilities,
-    labor,
-    maintenance,
-    insurance,
-    otherExpenses,
-    processingRate,
-    monthlyLoanPayment,
-    startupInvestment,
-  },
-  results,
-});
-
-if (currentSnapshot === lastAnalyzedSnapshot) {
-  setAiError("These results have already been analyzed. Change an input to generate a new AI analysis.");
-  return;
-}
-  try {
-    setAiLoading(true);
-    setAiCooldown(true);
-    setAiError("");
-
-    const response = await fetch("/api/ai/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        tool: "laundromat-profit",
-        analysisType: "business-opportunity",
-
-        inputs: {
-          washers,
-          dryers,
-          washPrice,
-          dryPrice,
-          washerTurns,
-          dryerTurns,
-          daysOpen,
-          washFoldRevenue,
-          vendingRevenue,
-          otherRevenue,
-          rent,
-          utilities,
-          labor,
-          maintenance,
-          insurance,
-          otherExpenses,
-          processingRate,
-          monthlyLoanPayment,
-          startupInvestment,
-        },
-
-        results,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || "Unable to generate AI analysis.");
-    }
-
-    setAiAnalysis(data.analysis);
-    setLastAnalyzedSnapshot(currentSnapshot);
-  } catch (error) {
-    setAiError(
-      error instanceof Error
-        ? error.message
-        : "Unable to generate AI analysis."
-    );
-  } finally {
-  setAiLoading(false);
-
-  setTimeout(() => {
-    setAiCooldown(false);
-  }, 3000);
-}
-}
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
@@ -669,11 +574,38 @@ if (currentSnapshot === lastAnalyzedSnapshot) {
 {/* AI ANALYSIS */}
 
 <AIAnalysisPanel
-  analysis={aiAnalysis}
-  loading={aiLoading}
-  error={aiError}
-  cooldown={aiCooldown}
-  onAnalyze={handleAIAnalysis}
+  analysis={reusableAIAnalysis}
+  loading={reusableAILoading}
+  error={reusableAIError}
+  cooldown={reusableAICooldown}
+  onAnalyze={() =>
+    runAIAnalysis({
+      tool: "laundromat-profit",
+      analysisType: "business-opportunity",
+      inputs: {
+        washers,
+        dryers,
+        washPrice,
+        dryPrice,
+        washerTurns,
+        dryerTurns,
+        daysOpen,
+        washFoldRevenue,
+        vendingRevenue,
+        otherRevenue,
+        rent,
+        utilities,
+        labor,
+        maintenance,
+        insurance,
+        otherExpenses,
+        processingRate,
+        monthlyLoanPayment,
+        startupInvestment,
+      },
+      results,
+    })
+  }
 />
           {/* FUTURE AD */}
 
