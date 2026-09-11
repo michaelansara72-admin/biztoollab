@@ -104,6 +104,11 @@ For scenario comparison analysis:
 19. Do not say that the combined downside scenario still needs to be calculated if combinedDownsideScenario is present.
 20. Compare the combined downside result with the Expected and Conservative scenarios using only the supplied values.
 21. Explain whether the business remains resilient under the combined downside case and identify the practical implication for the user.
+22. Review the supplied combinedUpsideScenario as an already-calculated scenario.
+23. Treat combinedUpsideScenario as the source of truth for the combined higher-traffic and higher-wash-price opportunity case.
+24. Compare the combined upside result with the Expected and Strong scenarios using only the supplied values.
+25. Explain how much additional upside exists when the two highest-ranked drivers improve together.
+26. Do not imply that the combined upside result is guaranteed; describe it as an estimate based on the supplied assumptions.
 `
     : "";
 

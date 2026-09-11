@@ -454,6 +454,10 @@ const combinedDownsideScenario = calculateSensitivity({
   testRetailCarsPerDay: retailCarsPerDay * 0.75,
   testAverageWashPrice: averageWashPrice * 0.9,
 });
+const combinedUpsideScenario = calculateSensitivity({
+  testRetailCarsPerDay: retailCarsPerDay * 1.25,
+  testAverageWashPrice: averageWashPrice * 1.1,
+});
 const sensitivityRanking = [
   {
     key: "retailTraffic",
@@ -742,6 +746,7 @@ sensitivity: {
 },
 sensitivityRanking,
 combinedDownsideScenario,
+combinedUpsideScenario,
 scenarios,
     };
   }, [
