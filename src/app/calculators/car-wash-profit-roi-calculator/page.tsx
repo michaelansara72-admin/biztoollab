@@ -1,5 +1,7 @@
 "use client";
 
+import AIAnalysisPanel from "@/components/ai/AIAnalysisPanel";
+import { useAIAnalysis } from "@/hooks/useAIAnalysis";
 import { useMemo, useState } from "react";
 
 type NumberInputProps = {
@@ -192,6 +194,13 @@ const relatedCalculators = [
 ];
 
 export default function CarWashProfitROICalculator() {
+      const {
+    analysis: aiAnalysis,
+    loading: aiLoading,
+    error: aiError,
+    cooldown: aiCooldown,
+    analyze: runAIAnalysis,
+  } = useAIAnalysis();
   const [retailCarsPerDay, setRetailCarsPerDay] = useState(75);
   const [operatingDays, setOperatingDays] = useState(30);
   const [averageWashPrice, setAverageWashPrice] = useState(15);
@@ -974,6 +983,43 @@ export default function CarWashProfitROICalculator() {
                 </p>
               </div>
             )}
+            <AIAnalysisPanel
+  analysis={aiAnalysis}
+  loading={aiLoading}
+  error={aiError}
+  cooldown={aiCooldown}
+  onAnalyze={() =>
+    runAIAnalysis({
+      tool: "car-wash-profit-roi",
+      analysisType: "business-opportunity",
+      inputs: {
+        retailCarsPerDay,
+        operatingDays,
+        averageWashPrice,
+        members,
+        membershipPrice,
+        memberWashesPerMonth,
+        upsellRevenue,
+        otherRevenue,
+        waterCostPerWash,
+        chemicalCostPerWash,
+        otherVariableCostPerWash,
+        cardProcessingRate,
+        labor,
+        rentProperty,
+        electricityGas,
+        maintenance,
+        insurance,
+        marketing,
+        loanPayment,
+        otherExpenses,
+        startupInvestment,
+        renovationInvestment,
+      },
+      results,
+    })
+  }
+/>
           </div>
         </div>
       </section>

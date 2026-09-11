@@ -11,8 +11,8 @@ type AnalyzeRequest = {
 const supportedTools = [
   "laundromat-profit",
   "vending-machine-profit",
-];
-const rateLimitMap = new Map<string, number[]>();
+  "car-wash-profit-roi",
+];const rateLimitMap = new Map<string, number[]>();
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
