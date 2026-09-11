@@ -99,6 +99,11 @@ For scenario comparison analysis:
 14. Do not create a different ranking from your own interpretation.
 15. When discussing the strongest and weakest drivers, reference the ranking supplied by the calculator.
 16. Explain the ranking in plain English and connect the top-ranked drivers to the most useful scenario to test next.
+17. Review the supplied combinedDownsideScenario as an already-calculated scenario.
+18. Treat combinedDownsideScenario as the source of truth for the combined lower-traffic and lower-wash-price stress test.
+19. Do not say that the combined downside scenario still needs to be calculated if combinedDownsideScenario is present.
+20. Compare the combined downside result with the Expected and Conservative scenarios using only the supplied values.
+21. Explain whether the business remains resilient under the combined downside case and identify the practical implication for the user.
 `
     : "";
 

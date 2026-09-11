@@ -381,17 +381,31 @@ const calculateSensitivity = ({
     testTotalMonthlyExpenses;
 
   const testAnnualProfit =
-    testMonthlyProfit * 12;
+  testMonthlyProfit * 12;
 
-  const testAnnualROI =
-    totalInvestment > 0
-      ? (testAnnualProfit / totalInvestment) * 100
-      : 0;
+const testProfitMargin =
+  testTotalRevenue > 0
+    ? (testMonthlyProfit / testTotalRevenue) * 100
+    : 0;
 
-  return {
-    monthlyProfit: testMonthlyProfit,
-    annualROI: testAnnualROI,
-  };
+const testAnnualROI =
+  totalInvestment > 0
+    ? (testAnnualProfit / totalInvestment) * 100
+    : 0;
+
+const testPaybackMonths =
+  testMonthlyProfit > 0
+    ? totalInvestment / testMonthlyProfit
+    : null;
+
+return {
+  monthlyRevenue: testTotalRevenue,
+  monthlyProfit: testMonthlyProfit,
+  annualProfit: testAnnualProfit,
+  profitMargin: testProfitMargin,
+  annualROI: testAnnualROI,
+  paybackMonths: testPaybackMonths,
+};
 };
 
 const retailTrafficSensitivity = {
@@ -436,6 +450,10 @@ const propertyCostSensitivity = {
     testRentProperty: rentProperty * 1.1,
   }),
 };
+const combinedDownsideScenario = calculateSensitivity({
+  testRetailCarsPerDay: retailCarsPerDay * 0.75,
+  testAverageWashPrice: averageWashPrice * 0.9,
+});
 const sensitivityRanking = [
   {
     key: "retailTraffic",
@@ -723,6 +741,7 @@ sensitivity: {
   propertyCost: propertyCostSensitivity,
 },
 sensitivityRanking,
+combinedDownsideScenario,
 scenarios,
     };
   }, [
