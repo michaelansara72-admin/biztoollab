@@ -90,6 +90,11 @@ For scenario comparison analysis:
 5. Identify whether retail traffic appears to be a major business sensitivity based only on the supplied scenario results.
 6. Recommend one practical scenario the user should test next.
 7. Do not invent new scenario results or calculate values that were not supplied.
+8. Review the supplied sensitivity results for retail traffic, wash price, membership count, labor cost, and property cost.
+9. Compare the profit and ROI impact of a 10% decrease and a 10% increase for each variable.
+10. Identify which variable appears to have the greatest impact on business performance based only on the supplied sensitivity results.
+11. Distinguish between revenue-side sensitivities and expense-side sensitivities.
+12. Do not calculate new sensitivity values; interpret only the supplied sensitivity results.
 `
     : "";
 

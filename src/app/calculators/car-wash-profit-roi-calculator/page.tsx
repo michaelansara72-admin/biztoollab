@@ -317,7 +317,124 @@ export default function CarWashProfitROICalculator() {
       totalWashes > 0
         ? monthlyProfit / totalWashes
         : 0;
+const calculateSensitivity = ({
+  testRetailCarsPerDay = retailCarsPerDay,
+  testAverageWashPrice = averageWashPrice,
+  testMembers = members,
+  testLabor = labor,
+  testRentProperty = rentProperty,
+}: 
+{
+  testRetailCarsPerDay?: number;
+  testAverageWashPrice?: number;
+  testMembers?: number;
+  testLabor?: number;
+  testRentProperty?: number;
+}) => {
+  const testRetailWashesPerMonth =
+    testRetailCarsPerDay * operatingDays;
 
+  const testMembershipWashesPerMonth =
+    testMembers * memberWashesPerMonth;
+
+  const testTotalWashes =
+    testRetailWashesPerMonth +
+    testMembershipWashesPerMonth;
+
+  const testRetailRevenue =
+    testRetailWashesPerMonth *
+    testAverageWashPrice;
+
+  const testMembershipRevenue =
+    testMembers * membershipPrice;
+
+  const testTotalRevenue =
+    testRetailRevenue +
+    testMembershipRevenue +
+    upsellRevenue +
+    otherRevenue;
+
+  const testMonthlyVariableCosts =
+    testTotalWashes * variableCostPerWash;
+
+  const testCardProcessingFees =
+    testTotalRevenue *
+    (cardProcessingRate / 100);
+
+  const testFixedMonthlyExpenses =
+    testLabor +
+    testRentProperty +
+    electricityGas +
+    maintenance +
+    insurance +
+    marketing +
+    loanPayment +
+    otherExpenses;
+
+  const testTotalMonthlyExpenses =
+    testMonthlyVariableCosts +
+    testCardProcessingFees +
+    testFixedMonthlyExpenses;
+
+  const testMonthlyProfit =
+    testTotalRevenue -
+    testTotalMonthlyExpenses;
+
+  const testAnnualProfit =
+    testMonthlyProfit * 12;
+
+  const testAnnualROI =
+    totalInvestment > 0
+      ? (testAnnualProfit / totalInvestment) * 100
+      : 0;
+
+  return {
+    monthlyProfit: testMonthlyProfit,
+    annualROI: testAnnualROI,
+  };
+};
+
+const retailTrafficSensitivity = {
+  minus10Percent: calculateSensitivity({
+    testRetailCarsPerDay: retailCarsPerDay * 0.9,
+  }),
+  plus10Percent: calculateSensitivity({
+    testRetailCarsPerDay: retailCarsPerDay * 1.1,
+  }),
+};
+
+const washPriceSensitivity = {
+  minus10Percent: calculateSensitivity({
+    testAverageWashPrice: averageWashPrice * 0.9,
+  }),
+  plus10Percent: calculateSensitivity({
+    testAverageWashPrice: averageWashPrice * 1.1,
+  }),
+};
+const membershipSensitivity = {
+  minus10Percent: calculateSensitivity({
+    testMembers: members * 0.9,
+  }),
+  plus10Percent: calculateSensitivity({
+    testMembers: members * 1.1,
+  }),
+};
+const laborSensitivity = {
+  minus10Percent: calculateSensitivity({
+    testLabor: labor * 0.9,
+  }),
+  plus10Percent: calculateSensitivity({
+    testLabor: labor * 1.1,
+  }),
+};
+const propertyCostSensitivity = {
+  minus10Percent: calculateSensitivity({
+    testRentProperty: rentProperty * 0.9,
+  }),
+  plus10Percent: calculateSensitivity({
+    testRentProperty: rentProperty * 1.1,
+  }),
+};
     const retailContributionPerWash =
       averageWashPrice -
       variableCostPerWash -
@@ -376,6 +493,7 @@ const trafficCushionPercent =
         retailCarsPerDay) *
       100
     : null;
+    
     const createScenario = (
       label: string,
       multiplier: number
@@ -481,6 +599,13 @@ const trafficCushionPercent =
 breakEvenRetailCarsPerDay,
 trafficCushionCarsPerDay,
 trafficCushionPercent,
+sensitivity: {
+  retailTraffic: retailTrafficSensitivity,
+  washPrice: washPriceSensitivity,
+  membership: membershipSensitivity,
+  labor: laborSensitivity,
+  propertyCost: propertyCostSensitivity,
+},
 scenarios,
     };
   }, [
