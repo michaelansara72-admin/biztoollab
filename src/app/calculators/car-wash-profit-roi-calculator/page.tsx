@@ -991,7 +991,7 @@ export default function CarWashProfitROICalculator() {
   onAnalyze={() =>
     runAIAnalysis({
       tool: "car-wash-profit-roi",
-      analysisType: "business-opportunity",
+      analysisType: "scenario-comparison",
       inputs: {
         retailCarsPerDay,
         operatingDays,

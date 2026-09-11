@@ -78,6 +78,20 @@ rateLimitMap.set(clientIp, recentRequests);
     const openai = new OpenAI({
       apiKey,
     });
+    const scenarioInstructions =
+  body.analysisType === "scenario-comparison"
+    ? `
+For scenario comparison analysis:
+
+1. Compare the supplied Conservative, Expected, and Strong scenarios directly.
+2. Focus on how changes in retail car volume affect revenue, profit, profit margin, and ROI.
+3. Identify how resilient the business appears if retail traffic underperforms.
+4. Point out the downside risk between the Expected and Conservative scenarios.
+5. Identify whether retail traffic appears to be a major business sensitivity based only on the supplied scenario results.
+6. Recommend one practical scenario the user should test next.
+7. Do not invent new scenario results or calculate values that were not supplied.
+`
+    : "";
 
     const response = await openai.responses.create({
       model: "gpt-5.6-luna",
@@ -102,6 +116,7 @@ Follow these rules:
 8. If important information is missing, explain the limitation instead of guessing.
 9. Keep recommendations practical and concise.
 10. Prioritize observations that help the user make a better business decision.
+${scenarioInstructions}
       `,
       input: `
 Analyze the following BizToolLab calculator scenario.
