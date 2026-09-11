@@ -431,10 +431,126 @@ const propertyCostSensitivity = {
   minus10Percent: calculateSensitivity({
     testRentProperty: rentProperty * 0.9,
   }),
-  plus10Percent: calculateSensitivity({
+
+    plus10Percent: calculateSensitivity({
     testRentProperty: rentProperty * 1.1,
   }),
 };
+const sensitivityRanking = [
+  {
+    key: "retailTraffic",
+    label: "Retail Traffic",
+    profitImpact:
+      Math.abs(
+        retailTrafficSensitivity.plus10Percent.monthlyProfit -
+          monthlyProfit
+      ) +
+      Math.abs(
+        retailTrafficSensitivity.minus10Percent.monthlyProfit -
+          monthlyProfit
+      ),
+    roiImpact:
+      Math.abs(
+        retailTrafficSensitivity.plus10Percent.annualROI -
+          annualROI
+      ) +
+      Math.abs(
+        retailTrafficSensitivity.minus10Percent.annualROI -
+          annualROI
+      ),
+  },
+  {
+    key: "washPrice",
+    label: "Wash Price",
+    profitImpact:
+      Math.abs(
+        washPriceSensitivity.plus10Percent.monthlyProfit -
+          monthlyProfit
+      ) +
+      Math.abs(
+        washPriceSensitivity.minus10Percent.monthlyProfit -
+          monthlyProfit
+      ),
+    roiImpact:
+      Math.abs(
+        washPriceSensitivity.plus10Percent.annualROI -
+          annualROI
+      ) +
+      Math.abs(
+        washPriceSensitivity.minus10Percent.annualROI -
+          annualROI
+      ),
+  },
+  {
+    key: "membership",
+    label: "Membership Count",
+    profitImpact:
+      Math.abs(
+        membershipSensitivity.plus10Percent.monthlyProfit -
+          monthlyProfit
+      ) +
+      Math.abs(
+        membershipSensitivity.minus10Percent.monthlyProfit -
+          monthlyProfit
+      ),
+    roiImpact:
+      Math.abs(
+        membershipSensitivity.plus10Percent.annualROI -
+          annualROI
+      ) +
+      Math.abs(
+        membershipSensitivity.minus10Percent.annualROI -
+          annualROI
+      ),
+  },
+  {
+    key: "labor",
+    label: "Labor Cost",
+    profitImpact:
+      Math.abs(
+        laborSensitivity.plus10Percent.monthlyProfit -
+          monthlyProfit
+      ) +
+      Math.abs(
+        laborSensitivity.minus10Percent.monthlyProfit -
+          monthlyProfit
+      ),
+    roiImpact:
+      Math.abs(
+        laborSensitivity.plus10Percent.annualROI -
+          annualROI
+      ) +
+      Math.abs(
+        laborSensitivity.minus10Percent.annualROI -
+          annualROI
+      ),
+  },
+  {
+    key: "propertyCost",
+    label: "Property Cost",
+    profitImpact:
+      Math.abs(
+        propertyCostSensitivity.plus10Percent.monthlyProfit -
+          monthlyProfit
+      ) +
+      Math.abs(
+        propertyCostSensitivity.minus10Percent.monthlyProfit -
+          monthlyProfit
+      ),
+    roiImpact:
+      Math.abs(
+        propertyCostSensitivity.plus10Percent.annualROI -
+          annualROI
+      ) +
+      Math.abs(
+        propertyCostSensitivity.minus10Percent.annualROI -
+          annualROI
+      ),
+  },
+].sort(
+  (a, b) =>
+    b.profitImpact - a.profitImpact
+);
     const retailContributionPerWash =
       averageWashPrice -
       variableCostPerWash -
@@ -606,6 +722,7 @@ sensitivity: {
   labor: laborSensitivity,
   propertyCost: propertyCostSensitivity,
 },
+sensitivityRanking,
 scenarios,
     };
   }, [

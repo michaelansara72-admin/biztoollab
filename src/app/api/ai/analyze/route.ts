@@ -95,6 +95,10 @@ For scenario comparison analysis:
 10. Identify which variable appears to have the greatest impact on business performance based only on the supplied sensitivity results.
 11. Distinguish between revenue-side sensitivities and expense-side sensitivities.
 12. Do not calculate new sensitivity values; interpret only the supplied sensitivity results.
+13. Use the supplied sensitivityRanking as the source of truth for the order of business drivers.
+14. Do not create a different ranking from your own interpretation.
+15. When discussing the strongest and weakest drivers, reference the ranking supplied by the calculator.
+16. Explain the ranking in plain English and connect the top-ranked drivers to the most useful scenario to test next.
 `
     : "";
 
