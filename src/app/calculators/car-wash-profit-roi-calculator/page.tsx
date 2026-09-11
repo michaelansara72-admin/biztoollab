@@ -364,7 +364,18 @@ export default function CarWashProfitROICalculator() {
         ? breakEvenRetailWashesPerMonth /
           operatingDays
         : null;
+const trafficCushionCarsPerDay =
+  breakEvenRetailCarsPerDay !== null
+    ? retailCarsPerDay - breakEvenRetailCarsPerDay
+    : null;
 
+const trafficCushionPercent =
+  breakEvenRetailCarsPerDay !== null &&
+  retailCarsPerDay > 0
+    ? ((retailCarsPerDay - breakEvenRetailCarsPerDay) /
+        retailCarsPerDay) *
+      100
+    : null;
     const createScenario = (
       label: string,
       multiplier: number
@@ -467,8 +478,10 @@ export default function CarWashProfitROICalculator() {
       paybackMonths,
       paybackYears,
       profitPerWash,
-      breakEvenRetailCarsPerDay,
-      scenarios,
+breakEvenRetailCarsPerDay,
+trafficCushionCarsPerDay,
+trafficCushionPercent,
+scenarios,
     };
   }, [
     retailCarsPerDay,
