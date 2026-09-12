@@ -1,5 +1,7 @@
 import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
+import { getAnalysisProfile } from "@/lib/ai/analysisProfiles";
+
 
 type AnalyzeRequest = {
   tool: string;
@@ -12,35 +14,42 @@ const supportedTools = [
   "laundromat-profit",
   "vending-machine-profit",
   "car-wash-profit-roi",
-];const rateLimitMap = new Map<string, number[]>();
+];
+
+const rateLimitMap = new Map<string, number[]>();
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
+
 export async function POST(request: NextRequest) {
-  try {const forwardedFor = request.headers.get("x-forwarded-for");
-const clientIp =
-  forwardedFor?.split(",")[0]?.trim() ||
-  request.headers.get("x-real-ip") ||
-  "unknown";
+  try {
+    const forwardedFor = request.headers.get("x-forwarded-for");
 
-const now = Date.now();
+    const clientIp =
+      forwardedFor?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
 
-const recentRequests = (rateLimitMap.get(clientIp) || []).filter(
-  (timestamp) => now - timestamp < RATE_LIMIT_WINDOW_MS
-);
+    const now = Date.now();
 
-if (recentRequests.length >= RATE_LIMIT_MAX_REQUESTS) {
-  return NextResponse.json(
-    {
-      success: false,
-      error: "Too many AI requests. Please wait a moment and try again.",
-    },
-    { status: 429 }
-  );
-}
+    const recentRequests = (rateLimitMap.get(clientIp) || []).filter(
+      (timestamp) => now - timestamp < RATE_LIMIT_WINDOW_MS
+    );
 
-recentRequests.push(now);
-rateLimitMap.set(clientIp, recentRequests);
+    if (recentRequests.length >= RATE_LIMIT_MAX_REQUESTS) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Too many AI requests. Please wait a moment and try again.",
+        },
+        { status: 429 }
+      );
+    }
+
+    recentRequests.push(now);
+    rateLimitMap.set(clientIp, recentRequests);
+
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
@@ -78,53 +87,24 @@ rateLimitMap.set(clientIp, recentRequests);
     const openai = new OpenAI({
       apiKey,
     });
-    const scenarioInstructions =
-  body.analysisType === "scenario-comparison"
-    ? `
-For scenario comparison analysis:
 
-1. Compare the supplied Conservative, Expected, and Strong scenarios directly.
-2. Focus on how changes in retail car volume affect revenue, profit, profit margin, and ROI.
-3. Identify how resilient the business appears if retail traffic underperforms.
-4. Point out the downside risk between the Expected and Conservative scenarios.
-5. Identify whether retail traffic appears to be a major business sensitivity based only on the supplied scenario results.
-6. Recommend one practical scenario the user should test next.
-7. Do not invent new scenario results or calculate values that were not supplied.
-8. Review the supplied sensitivity results for retail traffic, wash price, membership count, labor cost, and property cost.
-9. Compare the profit and ROI impact of a 10% decrease and a 10% increase for each variable.
-10. Identify which variable appears to have the greatest impact on business performance based only on the supplied sensitivity results.
-11. Distinguish between revenue-side sensitivities and expense-side sensitivities.
-12. Do not calculate new sensitivity values; interpret only the supplied sensitivity results.
-13. Use the supplied sensitivityRanking as the source of truth for the order of business drivers.
-14. Do not create a different ranking from your own interpretation.
-15. When discussing the strongest and weakest drivers, reference the ranking supplied by the calculator.
-16. Explain the ranking in plain English and connect the top-ranked drivers to the most useful scenario to test next.
-17. Review the supplied combinedDownsideScenario as an already-calculated scenario.
-18. Treat combinedDownsideScenario as the source of truth for the combined lower-traffic and lower-wash-price stress test.
-19. Do not say that the combined downside scenario still needs to be calculated if combinedDownsideScenario is present.
-20. Compare the combined downside result with the Expected and Conservative scenarios using only the supplied values.
-21. Explain whether the business remains resilient under the combined downside case and identify the practical implication for the user.
-22. Review the supplied combinedUpsideScenario as an already-calculated scenario.
-23. Treat combinedUpsideScenario as the source of truth for the combined higher-traffic and higher-wash-price opportunity case.
-24. Compare the combined upside result with the Expected and Strong scenarios using only the supplied values.
-25. Explain how much additional upside exists when the two highest-ranked drivers improve together.
-26. Do not imply that the combined upside result is guaranteed; describe it as an estimate based on the supplied assumptions.
-27. If customScenario is present, you MUST explicitly discuss it in the final analysis, including its monthly profit and annual ROI, and compare it directly with the Expected scenario.
-28. Treat customScenario as the source of truth for the user's custom combination of traffic, wash price, membership count, labor cost, and property cost.
-29. Use the supplied custom input values to explain what changed from the Expected scenario.
-30. Compare the custom scenario with the Expected scenario using only the supplied calculator results.
-31. Identify the most important improvement or deterioration in the custom scenario and explain its practical business impact.
-32. Do not recalculate the custom scenario or invent additional custom values.
-`
-    : "";
+    const analysisType =
+      body.analysisType ?? "business-opportunity";
+
+    const analysisProfile =
+      getAnalysisProfile(analysisType);
 
     const response = await openai.responses.create({
       model: "gpt-5.6-luna",
+
       store: false,
+
       reasoning: {
         effort: "none",
       },
+
       max_output_tokens: 1200,
+
       instructions: `
 You are BizToolLab AI, a business decision-support assistant.
 
@@ -141,8 +121,10 @@ Follow these rules:
 8. If important information is missing, explain the limitation instead of guessing.
 9. Keep recommendations practical and concise.
 10. Prioritize observations that help the user make a better business decision.
-${scenarioInstructions}
+
+${analysisProfile}
       `,
+
       input: `
 Analyze the following BizToolLab calculator scenario.
 
@@ -150,7 +132,7 @@ Tool:
 ${body.tool}
 
 Analysis type:
-${body.analysisType ?? "business-opportunity"}
+${analysisType}
 
 User inputs:
 ${JSON.stringify(body.inputs ?? {}, null, 2)}
@@ -158,33 +140,42 @@ ${JSON.stringify(body.inputs ?? {}, null, 2)}
 Calculator results:
 ${JSON.stringify(body.results, null, 2)}
       `,
+
       text: {
         format: {
           type: "json_schema",
           name: "biztoollab_analysis",
           strict: true,
+
           schema: {
             type: "object",
+
             properties: {
               summary: {
                 type: "string",
               },
+
               strength: {
                 type: "string",
               },
+
               opportunity: {
                 type: "string",
               },
+
               risk: {
                 type: "string",
               },
+
               scenarioToTest: {
                 type: "string",
               },
+
               nextStep: {
                 type: "string",
               },
             },
+
             required: [
               "summary",
               "strength",
@@ -193,6 +184,7 @@ ${JSON.stringify(body.results, null, 2)}
               "scenarioToTest",
               "nextStep",
             ],
+
             additionalProperties: false,
           },
         },
@@ -207,7 +199,10 @@ ${JSON.stringify(body.results, null, 2)}
       analysis,
     });
   } catch (error) {
-    console.error("BizToolLab AI analysis error:", error);
+    console.error(
+      "BizToolLab AI analysis error:",
+      error
+    );
 
     return NextResponse.json(
       {
