@@ -201,11 +201,16 @@ export default function CarWashProfitROICalculator() {
     cooldown: aiCooldown,
     analyze: runAIAnalysis,
   } = useAIAnalysis();
+
+  const [aiAnalysisType, setAIAnalysisType] = useState<
+  "scenario-comparison" | "profitability-diagnosis"
+>("scenario-comparison");
+
   const [retailCarsPerDay, setRetailCarsPerDay] = useState(75);
   const [customRetailCarsPerDay, setCustomRetailCarsPerDay] =
   useState(75);
   
-  const [operatingDays, setOperatingDays] = useState(30);
+    const [operatingDays, setOperatingDays] = useState(30);
   const [averageWashPrice, setAverageWashPrice] = useState(15);
 const [customAverageWashPrice, setCustomAverageWashPrice] =
   useState(15);
@@ -1285,6 +1290,72 @@ customRentProperty,
                 </p>
               </div>
             )}
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+  <p className="text-sm font-bold uppercase tracking-[0.16em] text-slate-400">
+    AI Intelligence Mode
+  </p>
+
+  <h2 className="mt-2 text-lg font-bold">
+    Choose Your Analysis
+  </h2>
+
+  <p className="mt-2 text-sm leading-6 text-slate-500">
+    Select how BizToolLab AI should evaluate your current
+    calculator results.
+  </p>
+
+  <div className="mt-5 grid gap-3">
+    <button
+      type="button"
+      onClick={() => setAIAnalysisType("scenario-comparison")}
+      className={`rounded-xl border p-4 text-left transition ${
+        aiAnalysisType === "scenario-comparison"
+          ? "border-slate-900 bg-slate-900 text-white"
+          : "border-slate-200 bg-white text-slate-900 hover:border-slate-400"
+      }`}
+    >
+      <span className="block font-bold">
+        Scenario Analysis
+      </span>
+
+      <span
+        className={`mt-1 block text-sm ${
+          aiAnalysisType === "scenario-comparison"
+            ? "text-slate-300"
+            : "text-slate-500"
+        }`}
+      >
+        Compare scenarios, sensitivities, downside risk, and
+        potential upside.
+      </span>
+    </button>
+
+    <button
+      type="button"
+      onClick={() => setAIAnalysisType("profitability-diagnosis")}
+      className={`rounded-xl border p-4 text-left transition ${
+        aiAnalysisType === "profitability-diagnosis"
+          ? "border-slate-900 bg-slate-900 text-white"
+          : "border-slate-200 bg-white text-slate-900 hover:border-slate-400"
+      }`}
+    >
+      <span className="block font-bold">
+        Profitability Diagnosis
+      </span>
+
+      <span
+        className={`mt-1 block text-sm ${
+          aiAnalysisType === "profitability-diagnosis"
+            ? "text-slate-300"
+            : "text-slate-500"
+        }`}
+      >
+        Diagnose the strongest profit driver, vulnerabilities,
+        resilience, and what to validate next.
+      </span>
+    </button>
+  </div>
+</div>
             <AIAnalysisPanel
   analysis={aiAnalysis}
   loading={aiLoading}
@@ -1293,7 +1364,7 @@ customRentProperty,
   onAnalyze={() =>
     runAIAnalysis({
       tool: "car-wash-profit-roi",
-      analysisType: "scenario-comparison",
+      analysisType: aiAnalysisType,
       inputs: {
         retailCarsPerDay,
         operatingDays,

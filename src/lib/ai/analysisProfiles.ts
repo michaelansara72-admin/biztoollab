@@ -1,6 +1,7 @@
 export type AnalysisType =
   | "business-opportunity"
-  | "scenario-comparison";
+  | "scenario-comparison"
+  | "profitability-diagnosis";
 
 const scenarioComparisonInstructions = `
 For scenario comparison analysis:
@@ -39,9 +40,33 @@ For scenario comparison analysis:
 32. Do not recalculate the custom scenario or invent additional custom values.
 `;
 
+const profitabilityDiagnosisInstructions = `
+For profitability diagnosis:
+
+1. Diagnose the supplied business results rather than merely summarizing them.
+2. Identify the strongest apparent driver of profitability using only the supplied calculator data.
+3. Identify the largest apparent vulnerability or pressure point.
+4. Separate revenue-side drivers from expense-side drivers when the supplied data allows it.
+5. If a sensitivity ranking is supplied, treat that ranking as the source of truth.
+6. Do not create a different ranking from your own interpretation.
+7. Explain why the highest-ranked driver matters in practical business terms.
+8. Identify whether the business appears highly dependent on one assumption or reasonably balanced across several assumptions.
+9. Review profit, profit margin, ROI, payback, break-even information, and scenario results when supplied.
+10. Highlight any result that suggests the business could remain profitable while still becoming materially less attractive.
+11. Distinguish between profitability and resilience. A profitable scenario is not automatically a resilient scenario.
+12. Identify the single variable or assumption that deserves validation first.
+13. Recommend one practical test the user can perform with the calculator next.
+14. Do not invent benchmarks, target margins, industry averages, market demand, costs, or other external information.
+15. Do not recalculate values or create values that were not supplied.
+16. Base every diagnosis on the calculator inputs and results provided.
+17. If the supplied information is insufficient to diagnose a particular issue, clearly state that limitation.
+18. Keep the diagnosis decision-oriented: explain what matters, why it matters, and what the user should investigate next.
+`;
+
 const analysisProfiles: Record<AnalysisType, string> = {
   "business-opportunity": "",
   "scenario-comparison": scenarioComparisonInstructions,
+  "profitability-diagnosis": profitabilityDiagnosisInstructions,
 };
 
 export function getAnalysisProfile(
