@@ -202,10 +202,16 @@ export default function CarWashProfitROICalculator() {
     analyze: runAIAnalysis,
   } = useAIAnalysis();
   const [retailCarsPerDay, setRetailCarsPerDay] = useState(75);
+  const [customRetailCarsPerDay, setCustomRetailCarsPerDay] =
+  useState(75);
+  
   const [operatingDays, setOperatingDays] = useState(30);
   const [averageWashPrice, setAverageWashPrice] = useState(15);
-
+const [customAverageWashPrice, setCustomAverageWashPrice] =
+  useState(15);
   const [members, setMembers] = useState(250);
+  const [customMembers, setCustomMembers] =
+  useState(250);
   const [membershipPrice, setMembershipPrice] = useState(30);
   const [memberWashesPerMonth, setMemberWashesPerMonth] =
     useState(3);
@@ -223,7 +229,11 @@ export default function CarWashProfitROICalculator() {
     useState(3);
 
   const [labor, setLabor] = useState(7000);
+  const [customLabor, setCustomLabor] =
+  useState(7000);
   const [rentProperty, setRentProperty] = useState(4500);
+  const [customRentProperty, setCustomRentProperty] =
+  useState(4500);
   const [electricityGas, setElectricityGas] = useState(1800);
   const [maintenance, setMaintenance] = useState(1500);
   const [insurance, setInsurance] = useState(600);
@@ -454,8 +464,15 @@ const combinedDownsideScenario = calculateSensitivity({
   testRetailCarsPerDay: retailCarsPerDay * 0.75,
   testAverageWashPrice: averageWashPrice * 0.9,
 });
+const customScenario = calculateSensitivity({
+  testRetailCarsPerDay: customRetailCarsPerDay,
+  testAverageWashPrice: customAverageWashPrice,
+  testMembers: customMembers,
+  testLabor: customLabor,
+  testRentProperty: customRentProperty,
+});
 const combinedUpsideScenario = calculateSensitivity({
-  testRetailCarsPerDay: retailCarsPerDay * 1.25,
+    testRetailCarsPerDay: retailCarsPerDay * 1.25,
   testAverageWashPrice: averageWashPrice * 1.1,
 });
 const sensitivityRanking = [
@@ -747,6 +764,7 @@ sensitivity: {
 sensitivityRanking,
 combinedDownsideScenario,
 combinedUpsideScenario,
+customScenario,
 scenarios,
     };
   }, [
@@ -772,6 +790,11 @@ scenarios,
     otherExpenses,
     startupInvestment,
     renovationInvestment,
+    customRetailCarsPerDay,
+customAverageWashPrice,
+customMembers,
+customLabor,
+customRentProperty,
   ]);
 
   return (
@@ -814,26 +837,26 @@ scenarios,
             </p>
 
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
-              <NumberInput
-                label="Retail Cars per Day"
-                value={retailCarsPerDay}
-                onChange={setRetailCarsPerDay}
-              />
+  <NumberInput
+    label="Retail Cars per Day"
+    value={retailCarsPerDay}
+    onChange={setRetailCarsPerDay}
+  />
 
-              <NumberInput
-                label="Operating Days per Month"
-                value={operatingDays}
-                onChange={setOperatingDays}
-              />
+  <NumberInput
+    label="Operating Days per Month"
+    value={operatingDays}
+    onChange={setOperatingDays}
+  />
 
-              <NumberInput
-                label="Average Retail Wash Price"
-                value={averageWashPrice}
-                onChange={setAverageWashPrice}
-                prefix="$"
-                step={0.5}
-              />
-            </div>
+  <NumberInput
+    label="Average Retail Wash Price"
+    value={averageWashPrice}
+    onChange={setAverageWashPrice}
+    prefix="$"
+    step={0.5}
+  />
+</div>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -1294,6 +1317,11 @@ scenarios,
         otherExpenses,
         startupInvestment,
         renovationInvestment,
+        customRetailCarsPerDay,
+customAverageWashPrice,
+customMembers,
+customLabor,
+customRentProperty,
       },
       results,
     })
@@ -1461,6 +1489,54 @@ scenarios,
             125%. These scenarios are estimates and do not
             predict actual car wash performance.
           </p>
+          <div className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+  <div className="max-w-3xl">
+    <p className="text-sm font-bold uppercase tracking-[0.16em] text-slate-400">
+      Custom Scenario Builder
+    </p>
+
+    <h3 className="mt-2 text-2xl font-bold text-slate-900">
+      Build Your Own Car Wash Scenario
+    </h3>
+
+    <p className="mt-3 text-sm leading-6 text-slate-600">
+      Adjust multiple business assumptions together to see how changes in
+      traffic, pricing, memberships, labor, and property costs could affect
+      profitability and ROI.
+    </p>
+    <div className="mt-6 grid gap-5 md:grid-cols-2">
+  <NumberInput
+    label="Custom Retail Cars Per Day"
+    value={customRetailCarsPerDay}
+onChange={setCustomRetailCarsPerDay}
+  />
+  <NumberInput
+  label="Custom Average Wash Price"
+  value={customAverageWashPrice}
+  onChange={setCustomAverageWashPrice}
+  prefix="$"
+  step={0.5}
+/>
+<NumberInput
+  label="Custom Membership Count"
+  value={customMembers}
+onChange={setCustomMembers}
+/>
+<NumberInput
+  label="Custom Labor / Payroll"
+  value={customLabor}
+onChange={setCustomLabor}
+  prefix="$"
+/>
+<NumberInput
+  label="Custom Rent / Property Expense"
+  value={customRentProperty}
+onChange={setCustomRentProperty}
+  prefix="$"
+/>
+</div>
+  </div>
+</div>
         </div>
       </section>
 

@@ -109,6 +109,12 @@ For scenario comparison analysis:
 24. Compare the combined upside result with the Expected and Strong scenarios using only the supplied values.
 25. Explain how much additional upside exists when the two highest-ranked drivers improve together.
 26. Do not imply that the combined upside result is guaranteed; describe it as an estimate based on the supplied assumptions.
+27. If customScenario is present, you MUST explicitly discuss it in the final analysis, including its monthly profit and annual ROI, and compare it directly with the Expected scenario.
+28. Treat customScenario as the source of truth for the user's custom combination of traffic, wash price, membership count, labor cost, and property cost.
+29. Use the supplied custom input values to explain what changed from the Expected scenario.
+30. Compare the custom scenario with the Expected scenario using only the supplied calculator results.
+31. Identify the most important improvement or deterioration in the custom scenario and explain its practical business impact.
+32. Do not recalculate the custom scenario or invent additional custom values.
 `
     : "";
 
@@ -118,7 +124,7 @@ For scenario comparison analysis:
       reasoning: {
         effort: "none",
       },
-      max_output_tokens: 700,
+      max_output_tokens: 1200,
       instructions: `
 You are BizToolLab AI, a business decision-support assistant.
 
