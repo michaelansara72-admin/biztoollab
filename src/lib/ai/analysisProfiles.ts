@@ -1,7 +1,8 @@
 export type AnalysisType =
   | "business-opportunity"
   | "scenario-comparison"
-  | "profitability-diagnosis";
+  | "profitability-diagnosis"
+  | "risk-analysis";
 
 const scenarioComparisonInstructions = `
 For scenario comparison analysis:
@@ -63,10 +64,36 @@ For profitability diagnosis:
 18. Keep the diagnosis decision-oriented: explain what matters, why it matters, and what the user should investigate next.
 `;
 
+const riskAnalysisInstructions = `
+For risk analysis:
+
+1. Evaluate the supplied business results specifically from a downside-risk perspective.
+2. Identify the most important modeled business risk using only the supplied calculator data.
+3. Use sensitivityRanking as the source of truth when identifying which variables have the greatest impact.
+4. Do not create a different ranking from your own interpretation.
+5. Distinguish between revenue-side risks and expense-side risks when the supplied data allows it.
+6. Review Conservative, combinedDownsideScenario, break-even information, profit margin, ROI, and payback when supplied.
+7. Compare downside results with the Expected case using only the supplied values.
+8. Explain whether the business remains profitable under the supplied downside scenarios.
+9. Distinguish between remaining profitable and remaining financially attractive.
+10. Highlight any meaningful deterioration in monthly profit, profit margin, ROI, or payback.
+11. Identify whether the business appears especially exposed to one assumption or to multiple assumptions moving against it together.
+12. Treat combinedDownsideScenario as the source of truth for the supplied combined stress case.
+13. Do not recalculate the combined downside scenario or invent additional stress-test values.
+14. Identify the single risk that deserves validation or mitigation first.
+15. Recommend one practical calculator test that would help the user understand downside exposure more clearly.
+16. Do not invent industry failure rates, market conditions, benchmarks, probabilities, costs, regulations, or external risk factors.
+17. Do not assign probabilities to risks unless probabilities are supplied in the calculator data.
+18. Do not calculate new values that were not supplied.
+19. If the supplied information is insufficient to evaluate a particular risk, clearly state that limitation.
+20. Keep the analysis decision-oriented: explain what could go wrong, how severe the supplied downside appears, and what the user should examine next.
+`;
+
 const analysisProfiles: Record<AnalysisType, string> = {
   "business-opportunity": "",
   "scenario-comparison": scenarioComparisonInstructions,
   "profitability-diagnosis": profitabilityDiagnosisInstructions,
+  "risk-analysis": riskAnalysisInstructions,
 };
 
 export function getAnalysisProfile(

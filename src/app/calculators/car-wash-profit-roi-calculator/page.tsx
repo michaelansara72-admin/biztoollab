@@ -203,7 +203,9 @@ export default function CarWashProfitROICalculator() {
   } = useAIAnalysis();
 
   const [aiAnalysisType, setAIAnalysisType] = useState<
-  "scenario-comparison" | "profitability-diagnosis"
+  | "scenario-comparison"
+  | "profitability-diagnosis"
+  | "risk-analysis"
 >("scenario-comparison");
 
   const [retailCarsPerDay, setRetailCarsPerDay] = useState(75);
@@ -1354,6 +1356,30 @@ customRentProperty,
         resilience, and what to validate next.
       </span>
     </button>
+    <button
+  type="button"
+  onClick={() => setAIAnalysisType("risk-analysis")}
+  className={`rounded-xl border p-4 text-left transition ${
+    aiAnalysisType === "risk-analysis"
+      ? "border-slate-900 bg-slate-900 text-white"
+      : "border-slate-200 bg-white text-slate-900 hover:border-slate-400"
+  }`}
+>
+  <span className="block font-bold">
+    Risk Analysis
+  </span>
+
+  <span
+    className={`mt-1 block text-sm ${
+      aiAnalysisType === "risk-analysis"
+        ? "text-slate-300"
+        : "text-slate-500"
+    }`}
+  >
+    Evaluate downside exposure, financial resilience, and the
+    risks that deserve attention first.
+  </span>
+</button>
   </div>
 </div>
             <AIAnalysisPanel
