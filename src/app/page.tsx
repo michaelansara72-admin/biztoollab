@@ -1,3 +1,5 @@
+import ToolSearch from "./components/ToolSearch";
+
 const tools = [
   {
     title: "Laundromat Profit Calculator",
@@ -109,20 +111,8 @@ export default function Home() {
             hustlers estimate costs, calculate profits, compare opportunities,
             and make more informed decisions.
           </p>
-
-          <div className="mx-auto mt-10 max-w-2xl">
-            <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:flex-row">
-              <input
-                type="text"
-                placeholder="Search calculators and business tools..."
-                className="flex-1 rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-slate-400"
-              />
-              <button className="rounded-xl bg-slate-900 px-6 py-3 font-semibold text-white transition hover:bg-slate-700">
-                Search Tools
-              </button>
-            </div>
-          </div>
-
+          
+<ToolSearch />
           <div className="mt-8 flex flex-wrap justify-center gap-3 text-sm text-slate-500">
             <span>Popular:</span>
             <a
