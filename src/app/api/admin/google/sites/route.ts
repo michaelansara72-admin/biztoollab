@@ -6,10 +6,12 @@ import {
   verifyAdminSessionToken,
 } from "@/lib/adminAuth";
 
-export const runtime = "nodejs";
+import {
+  getGoogleAccessToken,
+  getSearchConsoleSites,
+} from "@/lib/googleSearchConsole";
 
-const SEARCH_CONSOLE_SITES_URL =
-  "https://www.googleapis.com/webmasters/v3/sites";
+export const runtime = "nodejs";
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -30,34 +32,26 @@ export async function GET() {
     );
   }
 
-  const googleAccessToken = cookieStore.get(
-    "biztoollab_google_access_token"
-  )?.value;
+  try {
+    const googleAccessToken =
+      await getGoogleAccessToken();
 
-  if (!googleAccessToken) {
-    return NextResponse.json(
-      {
-        success: false,
-        connected: false,
-        error: "Google Search Console is not connected.",
-      },
-      {
-        status: 401,
-      }
+    const sites =
+      await getSearchConsoleSites(
+        googleAccessToken
+      );
+
+    return NextResponse.json({
+      success: true,
+      connected: true,
+      sites,
+    });
+  } catch (error) {
+    console.error(
+      "Search Console sites error:",
+      error
     );
-  }
 
-  const response = await fetch(
-    SEARCH_CONSOLE_SITES_URL,
-    {
-      headers: {
-        Authorization: `Bearer ${googleAccessToken}`,
-      },
-      cache: "no-store",
-    }
-  );
-
-  if (!response.ok) {
     return NextResponse.json(
       {
         success: false,
@@ -66,16 +60,8 @@ export async function GET() {
           "Unable to retrieve Search Console properties.",
       },
       {
-        status: response.status,
+        status: 502,
       }
     );
   }
-
-  const data = await response.json();
-
-  return NextResponse.json({
-    success: true,
-    connected: true,
-    sites: data.siteEntry ?? [],
-  });
 }
