@@ -1,5 +1,6 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import SaveRecommendationButton from "./components/SaveRecommendationButton";
 
 import {
   adminSessionCookie,
@@ -482,6 +483,25 @@ const seoAnalysis =
           {seoAnalysis.confidence}
         </span>
       </div>
+      
+      <SaveRecommendationButton
+  recommendation={{
+    source:
+      seoOpportunityData?.source ??
+      "google-search-console",
+
+    siteUrl:
+      seoOpportunityData?.siteUrl ?? "",
+
+    period:
+      seoOpportunityData?.period ?? {
+        startDate: "",
+        endDate: "",
+      },
+
+    analysis: seoAnalysis,
+  }}
+/>
     </>
   ) : (
     <p className="mt-4 text-sm text-slate-500">
