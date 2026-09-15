@@ -38,6 +38,31 @@ type SearchConsoleResponse = {
   }>;
 };
 
+type SeoOpportunityResponse = {
+  success: boolean;
+  source: string;
+  siteUrl: string;
+
+  period: {
+    startDate: string;
+    endDate: string;
+  };
+
+  analysis: {
+    summary: string;
+    evidenceAssessment: string;
+    opportunity: string;
+    evidence: string;
+    recommendation: string;
+    experiment: string;
+    measurement: string;
+    confidence: "low" | "moderate" | "high";
+    governanceStatus:
+      | "monitor-longer"
+      | "candidate-experiment";
+  };
+};
+
 function formatPercent(value: number) {
   return `${(value * 100).toFixed(2)}%`;
 }
@@ -120,7 +145,43 @@ async function getSearchConsoleData() {
 
   return (await response.json()) as SearchConsoleResponse;
 }
+async function getSeoOpportunityData() {
+  const headerStore = await headers();
 
+  const host =
+    headerStore.get("host") ?? "localhost:3000";
+
+  const protocol =
+    process.env.NODE_ENV === "production"
+      ? "https"
+      : "http";
+
+  const cookieStore = await cookies();
+
+  const cookieHeader = cookieStore
+    .getAll()
+    .map(
+      (cookie) =>
+        `${cookie.name}=${cookie.value}`
+    )
+    .join("; ");
+
+  const response = await fetch(
+    `${protocol}://${host}/api/admin/ai/seo-opportunity`,
+    {
+      headers: {
+        cookie: cookieHeader,
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!response.ok) {
+    return null;
+  }
+
+  return (await response.json()) as SeoOpportunityResponse;
+}
 export default async function AdminPage() {
   const cookieStore = await cookies();
 
@@ -135,14 +196,22 @@ export default async function AdminPage() {
     redirect("/admin/login");
   }
 
-  const searchConsoleData =
-    await getSearchConsoleData();
+  const [
+  searchConsoleData,
+  seoOpportunityData,
+] = await Promise.all([
+  getSearchConsoleData(),
+  getSeoOpportunityData(),
+]);
 
-  const topQueries =
-    searchConsoleData?.queries?.slice(0, 10) ?? [];
+const topQueries =
+  searchConsoleData?.queries?.slice(0, 10) ?? [];
 
-  const topPages =
-    searchConsoleData?.pages?.slice(0, 10) ?? [];
+const topPages =
+  searchConsoleData?.pages?.slice(0, 10) ?? [];
+
+const seoAnalysis =
+  seoOpportunityData?.analysis ?? null;
 
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-12">
@@ -350,19 +419,76 @@ export default async function AdminPage() {
 
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <p className="text-sm font-bold text-slate-500">
-              AI Opportunities
-            </p>
+  <div className="flex items-start justify-between gap-4">
+    <div>
+      <p className="text-sm font-bold text-slate-500">
+        AI Opportunities
+      </p>
 
-            <p className="mt-3 text-2xl font-bold text-slate-900">
-              Coming Soon
-            </p>
+      <p className="mt-3 text-2xl font-bold text-slate-900">
+        SEO Intelligence
+      </p>
+    </div>
 
-            <p className="mt-2 text-sm text-slate-500">
-              AI-detected growth and optimization opportunities.
-            </p>
-          </section>
+    {seoAnalysis && (
+      <span
+        className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${
+          seoAnalysis.governanceStatus ===
+          "candidate-experiment"
+            ? "bg-blue-50 text-blue-700"
+            : "bg-amber-50 text-amber-700"
+        }`}
+      >
+        {seoAnalysis.governanceStatus ===
+        "candidate-experiment"
+          ? "Candidate Experiment"
+          : "Monitor Longer"}
+      </span>
+    )}
+  </div>
 
+  {seoAnalysis ? (
+    <>
+      <p className="mt-4 text-sm leading-6 text-slate-600">
+        {seoAnalysis.summary}
+      </p>
+
+      <div className="mt-5 rounded-xl bg-slate-50 p-4">
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+          Opportunity
+        </p>
+
+        <p className="mt-2 text-sm leading-6 text-slate-700">
+          {seoAnalysis.opportunity}
+        </p>
+      </div>
+
+      <div className="mt-4">
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+          Recommendation
+        </p>
+
+        <p className="mt-2 text-sm leading-6 text-slate-600">
+          {seoAnalysis.recommendation}
+        </p>
+      </div>
+
+      <div className="mt-5 flex items-center justify-between border-t border-slate-200 pt-4">
+        <span className="text-sm font-semibold text-slate-500">
+          AI Confidence
+        </span>
+
+        <span className="text-sm font-bold capitalize text-slate-900">
+          {seoAnalysis.confidence}
+        </span>
+      </div>
+    </>
+  ) : (
+    <p className="mt-4 text-sm text-slate-500">
+      AI opportunity intelligence is currently unavailable.
+    </p>
+  )}
+</section>
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <p className="text-sm font-bold text-slate-500">
               Experiments
