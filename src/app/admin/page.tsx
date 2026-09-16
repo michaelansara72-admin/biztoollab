@@ -1,6 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import SaveRecommendationButton from "./components/SaveRecommendationButton";
+import GovernanceDecisionBrief from "./components/GovernanceDecisionBrief";
 
 import {
   adminSessionCookie,
@@ -417,7 +418,13 @@ const seoAnalysis =
             </p>
           </section>
         )}
-
+{searchConsoleData && seoAnalysis && (
+  <GovernanceDecisionBrief
+    siteMetrics={searchConsoleData.metrics}
+    period={searchConsoleData.period}
+    analysis={seoAnalysis}
+  />
+)}
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
   <div className="flex items-start justify-between gap-4">
@@ -483,7 +490,7 @@ const seoAnalysis =
           {seoAnalysis.confidence}
         </span>
       </div>
-      
+
       <SaveRecommendationButton
   recommendation={{
     source:
