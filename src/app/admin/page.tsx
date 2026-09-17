@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 import SaveRecommendationButton from "./components/SaveRecommendationButton";
 import GovernanceDecisionBrief from "./components/GovernanceDecisionBrief";
 import SavedGovernanceHistory from "./components/SavedGovernanceHistory";
+import RecommendationEvidence from "./components/RecommendationEvidence";
+import {
+  getSnapshotsForRecommendation,
+} from "@/lib/recommendationSnapshotRepository";
 import {
   getLatestAiRecommendation,
 } from "@/lib/aiRecommendationRepository";
@@ -232,15 +236,21 @@ try {
     await getLatestAiRecommendation();
 
   if (recommendation) {
-    const decisions =
-      await getDecisionsForRecommendation(
-        recommendation.id
-      );
+    const [decisions, evidenceSnapshots] =
+      await Promise.all([
+        getDecisionsForRecommendation(
+          recommendation.id
+        ),
+        getSnapshotsForRecommendation(
+          recommendation.id
+        ),
+      ]);
 
     savedGovernance = {
       recommendation,
       latestDecision: decisions[0] ?? null,
       decisions,
+      evidenceSnapshots,
     };
   }
 } catch (error) {
@@ -248,8 +258,7 @@ try {
     "Unable to load saved governance history:",
     error
   );
-}
-  return (
+}  return (
     <main className="min-h-screen bg-slate-50 px-6 py-12">
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
@@ -460,11 +469,17 @@ try {
   />
 )}
    {savedGovernance && (
-  <SavedGovernanceHistory
-    recommendation={savedGovernance.recommendation}
-    latestDecision={savedGovernance.latestDecision}
-    decisions={savedGovernance.decisions}
-  />
+  <>
+    <SavedGovernanceHistory
+      recommendation={savedGovernance.recommendation}
+      latestDecision={savedGovernance.latestDecision}
+      decisions={savedGovernance.decisions}
+    />
+
+    <RecommendationEvidence
+      snapshots={savedGovernance.evidenceSnapshots}
+    />
+  </>
 )}
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
