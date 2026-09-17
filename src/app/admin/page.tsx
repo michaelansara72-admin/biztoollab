@@ -2,6 +2,14 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import SaveRecommendationButton from "./components/SaveRecommendationButton";
 import GovernanceDecisionBrief from "./components/GovernanceDecisionBrief";
+import SavedGovernanceHistory from "./components/SavedGovernanceHistory";
+import {
+  getLatestAiRecommendation,
+} from "@/lib/aiRecommendationRepository";
+
+import {
+  getDecisionsForRecommendation,
+} from "@/lib/humanDecisionRepository";
 
 import {
   adminSessionCookie,
@@ -214,7 +222,33 @@ const topPages =
 
 const seoAnalysis =
   seoOpportunityData?.analysis ?? null;
+// Retrieve the latest saved governance history.
+// A database error must not prevent the dashboard from loading.
 
+let savedGovernance = null;
+
+try {
+  const recommendation =
+    await getLatestAiRecommendation();
+
+  if (recommendation) {
+    const decisions =
+      await getDecisionsForRecommendation(
+        recommendation.id
+      );
+
+    savedGovernance = {
+      recommendation,
+      latestDecision: decisions[0] ?? null,
+      decisions,
+    };
+  }
+} catch (error) {
+  console.error(
+    "Unable to load saved governance history:",
+    error
+  );
+}
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-12">
       <div className="mx-auto max-w-6xl">
@@ -423,6 +457,13 @@ const seoAnalysis =
     siteMetrics={searchConsoleData.metrics}
     period={searchConsoleData.period}
     analysis={seoAnalysis}
+  />
+)}
+   {savedGovernance && (
+  <SavedGovernanceHistory
+    recommendation={savedGovernance.recommendation}
+    latestDecision={savedGovernance.latestDecision}
+    decisions={savedGovernance.decisions}
   />
 )}
         <div className="mt-8 grid gap-6 md:grid-cols-3">

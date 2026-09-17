@@ -69,3 +69,62 @@ export async function saveHumanDecision({
     decision,
   };
 }
+
+export type SavedHumanDecision =
+  RowDataPacket & {
+    id: number;
+    recommendation_id: number;
+    decision: HumanDecision;
+    notes: string | null;
+    decided_by: string;
+    created_at: Date;
+  };
+
+export async function getDecisionsForRecommendation(
+  recommendationId: number
+): Promise<SavedHumanDecision[]> {
+  const [rows] = await db.execute<
+    SavedHumanDecision[]
+  >(
+    `
+      SELECT
+        id,
+        recommendation_id,
+        decision,
+        notes,
+        decided_by,
+        created_at
+      FROM human_decisions
+      WHERE recommendation_id = ?
+      ORDER BY created_at DESC, id DESC
+    `,
+    [recommendationId]
+  );
+
+  return rows;
+}
+
+export async function getLatestDecisionForRecommendation(
+  recommendationId: number
+): Promise<SavedHumanDecision | null> {
+  const [rows] = await db.execute<
+    SavedHumanDecision[]
+  >(
+    `
+      SELECT
+        id,
+        recommendation_id,
+        decision,
+        notes,
+        decided_by,
+        created_at
+      FROM human_decisions
+      WHERE recommendation_id = ?
+      ORDER BY created_at DESC, id DESC
+      LIMIT 1
+    `,
+    [recommendationId]
+  );
+
+  return rows[0] ?? null;
+}

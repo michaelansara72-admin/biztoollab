@@ -1,4 +1,7 @@
-import type { ResultSetHeader } from "mysql2";
+import type {
+  ResultSetHeader,
+  RowDataPacket,
+} from "mysql2";
 import { db } from "@/lib/db";
 
 export type AiRecommendationRecord = {
@@ -64,4 +67,66 @@ export async function saveAiRecommendation(
   return {
     id: result.insertId,
   };
+
+  
+}
+
+export type SavedAiRecommendation =
+  RowDataPacket & {
+    id: number;
+    source: string;
+    site_url: string;
+    evidence_start: Date | string;
+    evidence_end: Date | string;
+
+    summary: string;
+    evidence_assessment: string;
+    opportunity: string;
+    evidence: string;
+    recommendation: string;
+    proposed_experiment: string;
+    measurement_plan: string;
+
+    confidence: "low" | "moderate" | "high";
+
+    ai_governance_status:
+      | "monitor-longer"
+      | "candidate-experiment";
+
+    created_at: Date;
+    updated_at: Date;
+  };
+
+export async function getAiRecommendationById(
+  recommendationId: number
+): Promise<SavedAiRecommendation | null> {
+  const [rows] = await db.execute<
+    SavedAiRecommendation[]
+  >(
+    `
+      SELECT *
+      FROM ai_recommendations
+      WHERE id = ?
+      LIMIT 1
+    `,
+    [recommendationId]
+  );
+
+  return rows[0] ?? null;
+}
+
+export async function getLatestAiRecommendation():
+  Promise<SavedAiRecommendation | null> {
+  const [rows] = await db.execute<
+    SavedAiRecommendation[]
+  >(
+    `
+      SELECT *
+      FROM ai_recommendations
+      ORDER BY created_at DESC, id DESC
+      LIMIT 1
+    `
+  );
+
+  return rows[0] ?? null;
 }
