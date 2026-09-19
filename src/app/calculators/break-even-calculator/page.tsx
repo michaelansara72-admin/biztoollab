@@ -228,13 +228,6 @@ export default function BreakEvenCalculator() {
               </p>
             </div>
           </div>
-
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
-            <p className="text-sm font-medium text-slate-500">Advertisement</p>
-            <p className="mt-1 text-xs text-slate-400">
-              Future advertising space
-            </p>
-          </div>
         </div>
 
         <aside>

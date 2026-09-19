@@ -607,19 +607,6 @@ export default function LaundromatProfitCalculator() {
     })
   }
 />
-          {/* FUTURE AD */}
-
-          <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center">
-
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Future ad space
-            </p>
-
-            <p className="mt-2 text-sm text-slate-500">
-              Reserved for future Google AdSense placement.
-            </p>
-
-          </div>
 
         </aside>
       </section>

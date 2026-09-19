@@ -266,20 +266,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-y border-dashed border-slate-300 bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
-              Future advertising space
-            </p>
-
-            <p className="mt-2 text-sm text-slate-500">
-              Reserved for a future Google AdSense placement.
-            </p>
-          </div>
-        </div>
-      </section>
-
       <footer className="bg-slate-950 text-slate-300">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <div className="flex flex-col justify-between gap-6 sm:flex-row">
