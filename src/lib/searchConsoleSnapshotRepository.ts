@@ -144,3 +144,25 @@ export async function getSearchConsoleSnapshots(
 
   return rows;
 }
+
+export async function getSearchConsoleSnapshotById(
+  id: number
+): Promise<SavedSearchConsoleSnapshot | null> {
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return null;
+  }
+
+  const [rows] = await db.execute<
+    SavedSearchConsoleSnapshot[]
+  >(
+    `
+      SELECT *
+      FROM search_console_snapshots
+      WHERE id = ?
+      LIMIT 1
+    `,
+    [id]
+  );
+
+  return rows[0] ?? null;
+}
