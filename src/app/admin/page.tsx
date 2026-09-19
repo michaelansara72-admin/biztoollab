@@ -4,6 +4,8 @@ import SaveRecommendationButton from "./components/SaveRecommendationButton";
 import GovernanceDecisionBrief from "./components/GovernanceDecisionBrief";
 import SavedGovernanceHistory from "./components/SavedGovernanceHistory";
 import RecommendationEvidence from "./components/RecommendationEvidence";
+import SearchConsoleComparisonPanel from "./components/SearchConsoleComparisonPanel";
+import { getSearchConsoleSnapshots } from "@/lib/searchConsoleSnapshotRepository";
 import {
   getSnapshotsForRecommendation,
 } from "@/lib/recommendationSnapshotRepository";
@@ -226,6 +228,36 @@ const topPages =
 
 const seoAnalysis =
   seoOpportunityData?.analysis ?? null;
+let searchConsoleSnapshots: Array<{
+  id: number;
+  siteUrl: string;
+  evidenceStart: string;
+  evidenceEnd: string;
+  collectedAt: string;
+}> = [];
+
+try {
+  const snapshotRecords = await getSearchConsoleSnapshots(20);
+
+  searchConsoleSnapshots = snapshotRecords.map((snapshot) => ({
+    id: Number(snapshot.id),
+    siteUrl: snapshot.site_url,
+    evidenceStart:
+      snapshot.evidence_start instanceof Date
+        ? snapshot.evidence_start.toISOString().slice(0, 10)
+        : String(snapshot.evidence_start).slice(0, 10),
+    evidenceEnd:
+      snapshot.evidence_end instanceof Date
+        ? snapshot.evidence_end.toISOString().slice(0, 10)
+        : String(snapshot.evidence_end).slice(0, 10),
+    collectedAt:
+      snapshot.collected_at instanceof Date
+        ? snapshot.collected_at.toISOString()
+        : String(snapshot.collected_at),
+  }));
+} catch (error) {
+  console.error("Unable to load Search Console snapshots:", error);
+}
 // Retrieve the latest saved governance history.
 // A database error must not prevent the dashboard from loading.
 
@@ -355,7 +387,7 @@ try {
                   {formatDate(
                     searchConsoleData.period.startDate
                   )}{" "}
-                  –{" "}
+                  â€“{" "}
                   {formatDate(
                     searchConsoleData.period.endDate
                   )}
@@ -363,7 +395,10 @@ try {
               </p>
             </section>
 
-            <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            <SearchConsoleComparisonPanel
+  snapshots={searchConsoleSnapshots}
+/>
+<div className="mt-8 grid gap-6 lg:grid-cols-2">
               <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="mb-5">
                   <p className="text-sm font-bold uppercase tracking-[0.14em] text-slate-400">
@@ -592,7 +627,7 @@ try {
             </p>
 
             <p className="mt-3 text-2xl font-bold text-slate-900">
-              PDF · Excel · CSV
+              PDF Â· Excel Â· CSV
             </p>
 
             <p className="mt-2 text-sm text-slate-500">
@@ -601,14 +636,17 @@ try {
           </section>
         </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <SearchConsoleComparisonPanel
+  snapshots={searchConsoleSnapshots}
+/>
+<div className="mt-8 grid gap-6 lg:grid-cols-2">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <p className="text-sm font-bold uppercase tracking-[0.14em] text-slate-400">
               Intelligence Pipeline
             </p>
 
             <h2 className="mt-2 text-xl font-bold text-slate-900">
-              Observe → Analyze → Recommend → Decide
+              Observe â†’ Analyze â†’ Recommend â†’ Decide
             </h2>
 
             <p className="mt-3 leading-7 text-slate-600">
