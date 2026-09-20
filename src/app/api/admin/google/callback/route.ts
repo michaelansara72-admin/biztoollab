@@ -1,5 +1,11 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import {
+  adminSessionCookie,
+  verifyAdminSessionToken,
+} from "@/lib/adminAuth";
+
+
 
 export const runtime = "nodejs";
 
@@ -8,6 +14,22 @@ const GOOGLE_TOKEN_URL =
 
 export async function GET(request: NextRequest) {
   const cookieStore = await cookies();
+
+  const adminToken = cookieStore.get(
+    adminSessionCookie.name
+  )?.value;
+
+  if (!verifyAdminSessionToken(adminToken)) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Admin authentication required.",
+      },
+      {
+        status: 401,
+      }
+    );
+  }
 
   const savedState = cookieStore.get(
     "biztoollab_google_oauth_state"
@@ -121,8 +143,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error:
-          "Google did not return an access token.",
+        error: "Google did not return an access token.",
       },
       {
         status: 502,
