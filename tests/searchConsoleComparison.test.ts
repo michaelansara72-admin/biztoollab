@@ -141,3 +141,75 @@ test("rejects snapshots from different Search Console properties", () => {
     /same Search Console property/i
   );
 });
+test("calculates metric percentage changes correctly", () => {
+  const result = compareSearchConsoleSnapshots(
+    snapshot({
+      clicks: 10,
+      impressions: 1000,
+      ctr: 0.01,
+      position: 50,
+    }),
+    snapshot({
+      evidenceStart: "2026-08-29",
+      evidenceEnd: "2026-09-25",
+      clicks: 15,
+      impressions: 1200,
+      ctr: 0.015,
+      position: 45,
+    })
+  );
+
+  assert.equal(result.valid, true);
+
+  if (!result.valid) return;
+
+  assert.equal(result.metrics.clicks.percentChange, 50);
+  assert.equal(result.metrics.impressions.percentChange, 20);
+  assert.ok(
+    Math.abs(result.metrics.ctr.percentChange! - 50) < 0.000001
+  );
+  assert.equal(result.metrics.position.percentChange, -10);
+});
+
+test("rejects reversed evidence periods", () => {
+  const result = compareSearchConsoleSnapshots(
+    snapshot({
+      evidenceStart: "2026-08-28",
+      evidenceEnd: "2026-08-01",
+    }),
+    snapshot({
+      evidenceStart: "2026-08-29",
+      evidenceEnd: "2026-09-25",
+    })
+  );
+
+  assert.equal(result.valid, false);
+
+  if (result.valid) return;
+
+  assert.match(result.reason, /reversed dates/i);
+});
+
+test("rejects non-finite metric values", () => {
+  const nanResult = compareSearchConsoleSnapshots(
+    snapshot({
+      ctr: Number.NaN,
+    }),
+    snapshot({
+      evidenceStart: "2026-08-29",
+      evidenceEnd: "2026-09-25",
+    })
+  );
+
+  const infinityResult = compareSearchConsoleSnapshots(
+    snapshot(),
+    snapshot({
+      evidenceStart: "2026-08-29",
+      evidenceEnd: "2026-09-25",
+      position: Number.POSITIVE_INFINITY,
+    })
+  );
+
+  assert.equal(nanResult.valid, false);
+  assert.equal(infinityResult.valid, false);
+});
