@@ -18,6 +18,11 @@ import {
   seoOpportunityProfile,
 } from "@/lib/ai/seoOpportunityProfile";
 
+import {
+  createSeoEvidenceFingerprint,
+  serializeSeoEvidence,
+  type SeoEvidence,
+} from "@/lib/seoEvidence";
 export const runtime = "nodejs";
 
 function formatDate(date: Date) {
@@ -131,7 +136,7 @@ export async function GET() {
         })
       ) ?? [];
 
-    const evidence = {
+    const evidence: SeoEvidence = {
       siteUrl: getSearchConsoleSiteUrl(),
 
       period: {
@@ -150,6 +155,8 @@ export async function GET() {
       pages,
     };
 
+    const serializedEvidence = serializeSeoEvidence(evidence);
+    const evidenceFingerprint = createSeoEvidenceFingerprint(evidence);
     const openai = new OpenAI({
       apiKey,
     });
@@ -171,7 +178,7 @@ export async function GET() {
 Analyze the following live Google Search Console evidence
 for BizToolLab.
 
-${JSON.stringify(evidence, null, 2)}
+${serializedEvidence}
       `,
 
       text: {
