@@ -270,6 +270,7 @@ ${serializedEvidence}
       },
 
       analysis,
+      evidenceFingerprint,
     });
   } catch (error) {
     console.error(
