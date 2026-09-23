@@ -34,10 +34,31 @@ export type SeoEvidence = {
   queries: SeoEvidenceQuery[];
   pages: SeoEvidencePage[];
 };
+function validateSeoEvidence(evidence: SeoEvidence): void {
+  const metrics = [
+    evidence.metrics,
+    ...evidence.queries,
+    ...evidence.pages,
+  ];
 
+  for (const row of metrics) {
+    for (const field of [
+      "clicks",
+      "impressions",
+      "ctr",
+      "position",
+    ] as const) {
+      if (!Number.isFinite(row[field])) {
+        throw new Error(
+          `SEO evidence ${field} must be a finite number.`
+        );
+      }
+    }
+  }
+}
 export function serializeSeoEvidence(
   evidence: SeoEvidence
-): string {
+): string {validateSeoEvidence(evidence);
   return JSON.stringify({
     siteUrl: evidence.siteUrl,
 

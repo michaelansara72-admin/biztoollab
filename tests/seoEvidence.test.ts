@@ -141,3 +141,25 @@ test("serialization is deterministic for identical evidence", () => {
     serializeSeoEvidence(second)
   );
 });
+
+test("rejects non-finite evidence metrics", () => {
+  for (const invalidValue of [
+    NaN,
+    Infinity,
+    -Infinity,
+  ]) {
+    const invalidEvidence = evidence();
+
+    invalidEvidence.metrics.clicks = invalidValue;
+
+    assert.throws(
+      () => serializeSeoEvidence(invalidEvidence),
+      /finite/i
+    );
+
+    assert.throws(
+      () => createSeoEvidenceFingerprint(invalidEvidence),
+      /finite/i
+    );
+  }
+});
