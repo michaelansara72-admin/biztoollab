@@ -1,4 +1,4 @@
-﻿import { createHash } from "node:crypto";
+import { createHash } from "node:crypto";
 
 export type SeoEvidenceQuery = {
   query: string;
@@ -34,6 +34,7 @@ export type SeoEvidence = {
   queries: SeoEvidenceQuery[];
   pages: SeoEvidencePage[];
 };
+
 function validateSeoEvidence(evidence: SeoEvidence): void {
   const metrics = [
     evidence.metrics,
@@ -56,9 +57,12 @@ function validateSeoEvidence(evidence: SeoEvidence): void {
     }
   }
 }
+
 export function serializeSeoEvidence(
   evidence: SeoEvidence
-): string {validateSeoEvidence(evidence);
+): string {
+  validateSeoEvidence(evidence);
+
   return JSON.stringify({
     siteUrl: evidence.siteUrl,
 
