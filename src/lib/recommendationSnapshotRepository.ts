@@ -1,29 +1,94 @@
-import type { RowDataPacket } from "mysql2";
+import type {
+  ResultSetHeader,
+  RowDataPacket,
+} from "mysql2";
+
 import { db } from "@/lib/db";
 
-export type LinkedRecommendationSnapshot = RowDataPacket & {
-  link_id: number;
-  recommendation_id: number;
-  snapshot_id: number;
+export type RecommendationSnapshotRelationship =
+  | "analysis-time"
+  | "historical-reconstruction";
 
-  relationship_type:
-    | "analysis-time"
-    | "historical-reconstruction";
+export type LinkedRecommendationSnapshot =
+  RowDataPacket & {
+    link_id: number;
+    recommendation_id: number;
+    snapshot_id: number;
 
-  notes: string | null;
-  linked_at: Date;
+    relationship_type:
+      RecommendationSnapshotRelationship;
 
-  site_url: string;
-  evidence_start: Date | string;
-  evidence_end: Date | string;
+    notes: string | null;
+    linked_at: Date;
 
-  clicks: string | number;
-  impressions: string | number;
-  ctr: string | number;
-  position: string | number;
+    site_url: string;
+    evidence_start: Date | string;
+    evidence_end: Date | string;
 
-  collected_at: Date;
-};
+    clicks: string | number;
+    impressions: string | number;
+    ctr: string | number;
+    position: string | number;
+
+    collected_at: Date;
+  };
+
+export async function saveRecommendationSnapshotLink({
+  recommendationId,
+  snapshotId,
+  relationshipType,
+  notes = null,
+}: {
+  recommendationId: number;
+  snapshotId: number;
+  relationshipType:
+    RecommendationSnapshotRelationship;
+  notes?: string | null;
+}) {
+  if (
+    !Number.isSafeInteger(recommendationId) ||
+    recommendationId <= 0
+  ) {
+    throw new Error(
+      "recommendationId must be a positive safe integer."
+    );
+  }
+
+  if (
+    !Number.isSafeInteger(snapshotId) ||
+    snapshotId <= 0
+  ) {
+    throw new Error(
+      "snapshotId must be a positive safe integer."
+    );
+  }
+
+  const [result] =
+    await db.execute<ResultSetHeader>(
+      `
+        INSERT INTO recommendation_snapshot_links (
+          recommendation_id,
+          snapshot_id,
+          relationship_type,
+          notes
+        )
+        VALUES (?, ?, ?, ?)
+      `,
+      [
+        recommendationId,
+        snapshotId,
+        relationshipType,
+        notes?.trim() || null,
+      ]
+    );
+
+  return {
+    id: result.insertId,
+    recommendationId,
+    snapshotId,
+    relationshipType,
+  };
+}
 
 export async function getSnapshotsForRecommendation(
   recommendationId: number

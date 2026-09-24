@@ -5,6 +5,8 @@ import { useState } from "react";
 type RecommendationPayload = {
   source: string;
   siteUrl: string;
+  snapshotId: number;
+  evidenceFingerprint: string;
 
   period: {
     startDate: string;

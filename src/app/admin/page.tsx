@@ -1,4 +1,4 @@
-import { cookies, headers } from "next/headers";
+﻿import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import SaveRecommendationButton from "./components/SaveRecommendationButton";
 import GovernanceDecisionBrief from "./components/GovernanceDecisionBrief";
@@ -58,7 +58,8 @@ type SeoOpportunityResponse = {
   success: boolean;
   source: string;
   siteUrl: string;
-
+  snapshotId: number;
+  evidenceFingerprint: string;
   period: {
     startDate: string;
     endDate: string;
@@ -387,7 +388,7 @@ try {
                   {formatDate(
                     searchConsoleData.period.startDate
                   )}{" "}
-                  â€“{" "}
+                  Ã¢â‚¬â€œ{" "}
                   {formatDate(
                     searchConsoleData.period.endDate
                   )}
@@ -589,8 +590,13 @@ try {
       "google-search-console",
 
     siteUrl:
-      seoOpportunityData?.siteUrl ?? "",
+  seoOpportunityData?.siteUrl ?? "",
 
+snapshotId:
+  seoOpportunityData?.snapshotId ?? 0,
+
+evidenceFingerprint:
+  seoOpportunityData?.evidenceFingerprint ?? "",
     period:
       seoOpportunityData?.period ?? {
         startDate: "",
@@ -627,7 +633,7 @@ try {
             </p>
 
             <p className="mt-3 text-2xl font-bold text-slate-900">
-              PDF Â· Excel Â· CSV
+              PDF Ã‚Â· Excel Ã‚Â· CSV
             </p>
 
             <p className="mt-2 text-sm text-slate-500">
@@ -646,7 +652,7 @@ try {
             </p>
 
             <h2 className="mt-2 text-xl font-bold text-slate-900">
-              Observe â†’ Analyze â†’ Recommend â†’ Decide
+              Observe Ã¢â€ â€™ Analyze Ã¢â€ â€™ Recommend Ã¢â€ â€™ Decide
             </h2>
 
             <p className="mt-3 leading-7 text-slate-600">

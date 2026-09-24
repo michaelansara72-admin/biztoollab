@@ -1,4 +1,4 @@
-import type {
+﻿import type {
   ResultSetHeader,
   RowDataPacket,
 } from "mysql2";
@@ -9,6 +9,7 @@ export type AiRecommendationRecord = {
   siteUrl: string;
   evidenceStart: string;
   evidenceEnd: string;
+  evidenceFingerprint: string | null;
 
   summary: string;
   evidenceAssessment: string;
@@ -35,6 +36,7 @@ export async function saveAiRecommendation(
         site_url,
         evidence_start,
         evidence_end,
+        evidence_fingerprint,
         summary,
         evidence_assessment,
         opportunity,
@@ -45,13 +47,14 @@ export async function saveAiRecommendation(
         confidence,
         ai_governance_status
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
       record.source,
       record.siteUrl,
       record.evidenceStart,
       record.evidenceEnd,
+      record.evidenceFingerprint,
       record.summary,
       record.evidenceAssessment,
       record.opportunity,
@@ -67,8 +70,6 @@ export async function saveAiRecommendation(
   return {
     id: result.insertId,
   };
-
-  
 }
 
 export type SavedAiRecommendation =
@@ -78,6 +79,7 @@ export type SavedAiRecommendation =
     site_url: string;
     evidence_start: Date | string;
     evidence_end: Date | string;
+    evidence_fingerprint: string | null;
 
     summary: string;
     evidence_assessment: string;

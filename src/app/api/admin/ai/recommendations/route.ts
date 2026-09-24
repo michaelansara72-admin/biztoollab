@@ -16,6 +16,7 @@ export const runtime = "nodejs";
 type SaveRecommendationRequest = {
   source?: unknown;
   siteUrl?: unknown;
+  evidenceFingerprint?: unknown;
   period?: {
     startDate?: unknown;
     endDate?: unknown;
@@ -39,6 +40,15 @@ function isNonEmptyString(
   return (
     typeof value === "string" &&
     value.trim().length > 0
+  );
+}
+
+function isEvidenceFingerprint(
+  value: unknown
+): value is string {
+  return (
+    typeof value === "string" &&
+    /^[a-f0-9]{64}$/.test(value)
   );
 }
 
@@ -103,6 +113,9 @@ export async function POST(request: Request) {
   if (
     !isNonEmptyString(body.source) ||
     !isNonEmptyString(body.siteUrl) ||
+    !isEvidenceFingerprint(
+      body.evidenceFingerprint
+    ) ||
     !isNonEmptyString(period?.startDate) ||
     !isNonEmptyString(period?.endDate) ||
     !isNonEmptyString(analysis?.summary) ||
@@ -139,6 +152,8 @@ export async function POST(request: Request) {
       siteUrl: body.siteUrl,
       evidenceStart: period.startDate,
       evidenceEnd: period.endDate,
+      evidenceFingerprint:
+        body.evidenceFingerprint,
 
       summary: analysis.summary,
       evidenceAssessment:
