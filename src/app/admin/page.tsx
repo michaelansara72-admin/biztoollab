@@ -1,4 +1,4 @@
-﻿import { cookies, headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import SaveRecommendationButton from "./components/SaveRecommendationButton";
 import GovernanceDecisionBrief from "./components/GovernanceDecisionBrief";
@@ -590,13 +590,14 @@ try {
       "google-search-console",
 
     siteUrl:
-  seoOpportunityData?.siteUrl ?? "",
+      seoOpportunityData?.siteUrl ?? "",
 
-snapshotId:
-  seoOpportunityData?.snapshotId ?? 0,
+    snapshotId:
+      seoOpportunityData?.snapshotId ?? 0,
 
-evidenceFingerprint:
-  seoOpportunityData?.evidenceFingerprint ?? "",
+    evidenceFingerprint:
+      seoOpportunityData?.evidenceFingerprint ?? "",
+
     period:
       seoOpportunityData?.period ?? {
         startDate: "",
