@@ -58,6 +58,9 @@ export async function saveSearchConsoleSnapshot(
         pages_json
       )
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+      ON DUPLICATE KEY UPDATE
+        id = LAST_INSERT_ID(id)
     `,
     [
       record.siteUrl,
@@ -71,6 +74,15 @@ export async function saveSearchConsoleSnapshot(
       JSON.stringify(record.pages),
     ]
   );
+
+  if (
+    !Number.isSafeInteger(result.insertId) ||
+    result.insertId <= 0
+  ) {
+    throw new Error(
+      "Unable to resolve Search Console snapshot ID."
+    );
+  }
 
   return {
     id: result.insertId,

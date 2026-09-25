@@ -1,7 +1,9 @@
 ﻿import type {
+  PoolConnection,
   ResultSetHeader,
   RowDataPacket,
-} from "mysql2";
+} from "mysql2/promise";
+
 import { db } from "@/lib/db";
 
 export type AiRecommendationRecord = {
@@ -27,45 +29,49 @@ export type AiRecommendationRecord = {
 };
 
 export async function saveAiRecommendation(
-  record: AiRecommendationRecord
+  record: AiRecommendationRecord,
+  connection?: PoolConnection
 ) {
-  const [result] = await db.execute<ResultSetHeader>(
-    `
-      INSERT INTO ai_recommendations (
-        source,
-        site_url,
-        evidence_start,
-        evidence_end,
-        evidence_fingerprint,
-        summary,
-        evidence_assessment,
-        opportunity,
-        evidence,
-        recommendation,
-        proposed_experiment,
-        measurement_plan,
-        confidence,
-        ai_governance_status
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `,
-    [
-      record.source,
-      record.siteUrl,
-      record.evidenceStart,
-      record.evidenceEnd,
-      record.evidenceFingerprint,
-      record.summary,
-      record.evidenceAssessment,
-      record.opportunity,
-      record.evidence,
-      record.recommendation,
-      record.proposedExperiment,
-      record.measurementPlan,
-      record.confidence,
-      record.aiGovernanceStatus,
-    ]
-  );
+  const executor = connection ?? db;
+
+  const [result] =
+    await executor.execute<ResultSetHeader>(
+      `
+        INSERT INTO ai_recommendations (
+          source,
+          site_url,
+          evidence_start,
+          evidence_end,
+          evidence_fingerprint,
+          summary,
+          evidence_assessment,
+          opportunity,
+          evidence,
+          recommendation,
+          proposed_experiment,
+          measurement_plan,
+          confidence,
+          ai_governance_status
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        record.source,
+        record.siteUrl,
+        record.evidenceStart,
+        record.evidenceEnd,
+        record.evidenceFingerprint,
+        record.summary,
+        record.evidenceAssessment,
+        record.opportunity,
+        record.evidence,
+        record.recommendation,
+        record.proposedExperiment,
+        record.measurementPlan,
+        record.confidence,
+        record.aiGovernanceStatus,
+      ]
+    );
 
   return {
     id: result.insertId,

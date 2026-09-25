@@ -73,18 +73,22 @@ function requireFiniteNumber(
   value: unknown,
   label: string
 ): number {
-  if (
-    typeof value !== "number" ||
-    !Number.isFinite(value)
-  ) {
+  const normalizedValue =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" &&
+          value.trim() !== ""
+        ? Number(value)
+        : Number.NaN;
+
+  if (!Number.isFinite(normalizedValue)) {
     throw new Error(
       `Stored Search Console ${label} must be a finite number.`
     );
   }
 
-  return value;
+  return normalizedValue;
 }
-
 function parseStoredQueries(
   value: string | object | null
 ): SeoEvidenceQuery[] {

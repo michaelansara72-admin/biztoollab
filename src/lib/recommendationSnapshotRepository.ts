@@ -1,7 +1,8 @@
 import type {
+  PoolConnection,
   ResultSetHeader,
   RowDataPacket,
-} from "mysql2";
+} from "mysql2/promise";
 
 import { db } from "@/lib/db";
 
@@ -33,18 +34,21 @@ export type LinkedRecommendationSnapshot =
     collected_at: Date;
   };
 
-export async function saveRecommendationSnapshotLink({
-  recommendationId,
-  snapshotId,
-  relationshipType,
-  notes = null,
-}: {
-  recommendationId: number;
-  snapshotId: number;
-  relationshipType:
-    RecommendationSnapshotRelationship;
-  notes?: string | null;
-}) {
+export async function saveRecommendationSnapshotLink(
+  {
+    recommendationId,
+    snapshotId,
+    relationshipType,
+    notes = null,
+  }: {
+    recommendationId: number;
+    snapshotId: number;
+    relationshipType:
+      RecommendationSnapshotRelationship;
+    notes?: string | null;
+  },
+  connection?: PoolConnection
+) {
   if (
     !Number.isSafeInteger(recommendationId) ||
     recommendationId <= 0
@@ -63,8 +67,10 @@ export async function saveRecommendationSnapshotLink({
     );
   }
 
+  const executor = connection ?? db;
+
   const [result] =
-    await db.execute<ResultSetHeader>(
+    await executor.execute<ResultSetHeader>(
       `
         INSERT INTO recommendation_snapshot_links (
           recommendation_id,
