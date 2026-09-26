@@ -6,6 +6,8 @@ import type {
   SavedHumanDecision,
 } from "@/lib/humanDecisionRepository";
 
+import SavedGovernanceDecisionControls from "./SavedGovernanceDecisionControls";
+
 type Props = {
   recommendation: SavedAiRecommendation;
   latestDecision: SavedHumanDecision | null;
@@ -110,6 +112,12 @@ export default function SavedGovernanceHistory({
           {recommendation.recommendation}
         </p>
       </div>
+
+      {!latestDecision && (
+        <SavedGovernanceDecisionControls
+          recommendationId={recommendation.id}
+        />
+      )}
 
       {latestDecision && (
         <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-5">

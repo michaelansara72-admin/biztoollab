@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import SaveRecommendationButton from "./components/SaveRecommendationButton";
 import GovernanceDecisionBrief from "./components/GovernanceDecisionBrief";
 import SavedGovernanceHistory from "./components/SavedGovernanceHistory";
+import CreateDraftExperimentControl from "./components/CreateDraftExperimentControl";
+import SavedDraftExperiment from "./components/SavedDraftExperiment";
 import RecommendationEvidence from "./components/RecommendationEvidence";
 import SearchConsoleComparisonPanel from "./components/SearchConsoleComparisonPanel";
 import { getSearchConsoleSnapshots } from "@/lib/searchConsoleSnapshotRepository";
@@ -16,6 +18,10 @@ import {
 import {
   getDecisionsForRecommendation,
 } from "@/lib/humanDecisionRepository";
+
+import {
+  getLatestExperimentForRecommendation,
+} from "@/lib/experimentRepository";
 
 import {
   adminSessionCookie,
@@ -269,21 +275,28 @@ try {
     await getLatestAiRecommendation();
 
   if (recommendation) {
-    const [decisions, evidenceSnapshots] =
-      await Promise.all([
-        getDecisionsForRecommendation(
-          recommendation.id
-        ),
-        getSnapshotsForRecommendation(
-          recommendation.id
-        ),
-      ]);
+    const [
+      decisions,
+      evidenceSnapshots,
+      latestExperiment,
+    ] = await Promise.all([
+      getDecisionsForRecommendation(
+        recommendation.id
+      ),
+      getSnapshotsForRecommendation(
+        recommendation.id
+      ),
+      getLatestExperimentForRecommendation(
+        recommendation.id
+      ),
+    ]);
 
     savedGovernance = {
       recommendation,
       latestDecision: decisions[0] ?? null,
       decisions,
       evidenceSnapshots,
+      latestExperiment,
     };
   }
 } catch (error) {
@@ -388,7 +401,7 @@ try {
                   {formatDate(
                     searchConsoleData.period.startDate
                   )}{" "}
-                  Ã¢â‚¬â€œ{" "}
+                  ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ{" "}
                   {formatDate(
                     searchConsoleData.period.endDate
                   )}
@@ -512,6 +525,24 @@ try {
       decisions={savedGovernance.decisions}
     />
 
+    {savedGovernance.latestExperiment ? (
+      <SavedDraftExperiment
+        experiment={savedGovernance.latestExperiment}
+      />
+    ) : (
+      savedGovernance.latestDecision?.decision ===
+        "review-experiment" && (
+          <CreateDraftExperimentControl
+            recommendationId={
+              savedGovernance.recommendation.id
+            }
+            sourceDecisionId={
+              savedGovernance.latestDecision.id
+            }
+          />
+        )
+    )}
+
     <RecommendationEvidence
       snapshots={savedGovernance.evidenceSnapshots}
     />
@@ -634,7 +665,7 @@ try {
             </p>
 
             <p className="mt-3 text-2xl font-bold text-slate-900">
-              PDF Ã‚Â· Excel Ã‚Â· CSV
+              PDF ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Excel ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· CSV
             </p>
 
             <p className="mt-2 text-sm text-slate-500">
@@ -653,7 +684,7 @@ try {
             </p>
 
             <h2 className="mt-2 text-xl font-bold text-slate-900">
-              Observe Ã¢â€ â€™ Analyze Ã¢â€ â€™ Recommend Ã¢â€ â€™ Decide
+              Observe ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Analyze ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Recommend ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Decide
             </h2>
 
             <p className="mt-3 leading-7 text-slate-600">

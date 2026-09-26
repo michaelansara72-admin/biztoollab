@@ -128,3 +128,34 @@ export async function getLatestDecisionForRecommendation(
 
   return rows[0] ?? null;
 }
+
+export async function getHumanDecisionById(
+  decisionId: number
+): Promise<SavedHumanDecision | null> {
+  if (
+    !Number.isSafeInteger(decisionId) ||
+    decisionId <= 0
+  ) {
+    return null;
+  }
+
+  const [rows] = await db.execute<
+    SavedHumanDecision[]
+  >(
+    `
+      SELECT
+        id,
+        recommendation_id,
+        decision,
+        notes,
+        decided_by,
+        created_at
+      FROM human_decisions
+      WHERE id = ?
+      LIMIT 1
+    `,
+    [decisionId]
+  );
+
+  return rows[0] ?? null;
+}
