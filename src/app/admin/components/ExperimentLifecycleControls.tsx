@@ -161,6 +161,45 @@ export default function ExperimentLifecycleControls({
           No production implementation is authorized
           by this review state.
         </p>
+
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() =>
+              transitionExperiment("approved")
+            }
+            className="rounded-lg bg-emerald-700 px-5 py-3 text-sm font-bold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isPending
+              ? "Processing..."
+              : "Approve Experiment"}
+          </button>
+
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() =>
+              transitionExperiment("rejected")
+            }
+            className="rounded-lg bg-rose-700 px-5 py-3 text-sm font-bold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isPending
+              ? "Processing..."
+              : "Reject Experiment"}
+          </button>
+        </div>
+
+        <p className="mt-4 text-xs leading-5 text-amber-800">
+          Approval advances this experiment through
+          governance review only. It does not deploy
+          or automatically modify the production site.
+        </p>
+
+        <LifecycleFeedback
+          message={message}
+          error={error}
+        />
       </div>
     );
   }
