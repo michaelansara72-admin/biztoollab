@@ -6,6 +6,7 @@ import SavedGovernanceHistory from "./components/SavedGovernanceHistory";
 import CreateDraftExperimentControl from "./components/CreateDraftExperimentControl";
 import SavedDraftExperiment from "./components/SavedDraftExperiment";
 import CreateImplementationPlanControl from "./components/CreateImplementationPlanControl";
+import SavedImplementationPlan from "./components/SavedImplementationPlan";
 import RecommendationEvidence from "./components/RecommendationEvidence";
 import SearchConsoleComparisonPanel from "./components/SearchConsoleComparisonPanel";
 import { getSearchConsoleSnapshots } from "@/lib/searchConsoleSnapshotRepository";
@@ -556,18 +557,25 @@ try {
         )
     )}
 
-    {savedGovernance.latestExperiment?.status ===
-      "approved" &&
-      !savedGovernance.latestImplementationPlan && (
-        <CreateImplementationPlanControl
-          experimentId={
-            savedGovernance.latestExperiment.id
-          }
-          recommendationId={
-            savedGovernance.recommendation.id
-          }
-        />
-      )}
+    {savedGovernance.latestImplementationPlan ? (
+  <SavedImplementationPlan
+    implementationPlan={
+      savedGovernance.latestImplementationPlan
+    }
+  />
+) : (
+  savedGovernance.latestExperiment?.status ===
+    "approved" && (
+      <CreateImplementationPlanControl
+        experimentId={
+          savedGovernance.latestExperiment.id
+        }
+        recommendationId={
+          savedGovernance.recommendation.id
+        }
+      />
+    )
+)}
 
     <RecommendationEvidence
       snapshots={savedGovernance.evidenceSnapshots}
