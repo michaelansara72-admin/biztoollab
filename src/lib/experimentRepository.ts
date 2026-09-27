@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   ResultSetHeader,
   RowDataPacket,
 } from "mysql2";
@@ -220,4 +220,96 @@ export async function getLatestExperimentForRecommendation(
   );
 
   return rows[0] ?? null;
+}
+export type ExperimentStatusTransitionResult = {
+  experimentId: number;
+  previousStatus: ExperimentStatus;
+  status: ExperimentStatus;
+};
+
+const allowedExperimentStatusTransitions: Record<
+  ExperimentStatus,
+  readonly ExperimentStatus[]
+> = {
+  draft: ["ready-for-review"],
+  "ready-for-review": ["approved", "rejected"],
+  approved: [],
+  rejected: [],
+};
+
+export function canTransitionExperimentStatus(
+  currentStatus: ExperimentStatus,
+  nextStatus: ExperimentStatus
+) {
+  return allowedExperimentStatusTransitions[
+    currentStatus
+  ].includes(nextStatus);
+}
+
+export async function transitionExperimentStatus({
+  experimentId,
+  nextStatus,
+}: {
+  experimentId: number;
+  nextStatus: ExperimentStatus;
+}): Promise<ExperimentStatusTransitionResult> {
+  requirePositiveSafeInteger(
+    experimentId,
+    "experimentId"
+  );
+
+  const experiment =
+    await getExperimentById(experimentId);
+
+  if (!experiment) {
+    throw new Error(
+      "Experiment not found."
+    );
+  }
+
+  const previousStatus = experiment.status;
+
+  if (previousStatus === nextStatus) {
+    throw new Error(
+      `Experiment #${experimentId} is already ${nextStatus}.`
+    );
+  }
+
+  if (
+    !canTransitionExperimentStatus(
+      previousStatus,
+      nextStatus
+    )
+  ) {
+    throw new Error(
+      `Invalid experiment status transition: ${previousStatus} -> ${nextStatus}.`
+    );
+  }
+
+  const [result] =
+    await db.execute<ResultSetHeader>(
+      `
+        UPDATE experiments
+        SET status = ?
+        WHERE id = ?
+          AND status = ?
+      `,
+      [
+        nextStatus,
+        experimentId,
+        previousStatus,
+      ]
+    );
+
+  if (result.affectedRows !== 1) {
+    throw new Error(
+      "Experiment status changed before this transition could be completed."
+    );
+  }
+
+  return {
+    experimentId,
+    previousStatus,
+    status: nextStatus,
+  };
 }

@@ -1,7 +1,7 @@
 import type {
   SavedExperiment,
 } from "@/lib/experimentRepository";
-
+import ExperimentLifecycleControls from "./ExperimentLifecycleControls";
 type Props = {
   experiment: SavedExperiment;
 };
@@ -167,16 +167,30 @@ export default function SavedDraftExperiment({
       </div>
 
       <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5">
-        <p className="font-bold text-amber-900">
-          Human approval remains required.
-        </p>
+  <p className="font-bold text-amber-900">
+    {experiment.status === "draft"
+      ? "Human review remains required."
+      : experiment.status === "ready-for-review"
+        ? "Human approval remains required."
+        : experiment.status === "approved"
+          ? "Experiment approved for the governed next step."
+          : "Experiment rejected."}
+  </p>
 
-        <p className="mt-2 text-sm leading-6 text-amber-800">
-          This saved experiment is a planning artifact.
-          Draft status does not authorize implementation,
-          deployment, or automatic production changes.
-        </p>
-      </div>
+  <p className="mt-2 text-sm leading-6 text-amber-800">
+    {experiment.status === "draft"
+      ? "This saved experiment is a planning artifact. Draft status does not authorize implementation, deployment, or automatic production changes."
+      : experiment.status === "ready-for-review"
+        ? "This experiment is under human review. Review status does not authorize implementation, deployment, or automatic production changes."
+        : experiment.status === "approved"
+          ? "Approval records a human governance decision. It does not by itself perform or deploy a production change."
+          : "This experiment has been rejected and is not authorized for implementation."}
+  </p>
+</div>
+            <ExperimentLifecycleControls
+        experimentId={experiment.id}
+        status={experiment.status}
+      />
     </section>
   );
 }
