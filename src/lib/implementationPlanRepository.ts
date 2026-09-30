@@ -305,3 +305,147 @@ export async function getImplementationPlansForRecommendation(
 
   return rows;
 }
+
+export type ImplementationPlanStatusTransitionResult = {
+  implementationPlanId: number;
+  previousStatus: ImplementationPlanStatus;
+  status: ImplementationPlanStatus;
+};
+
+const allowedImplementationPlanStatusTransitions: Record<
+  ImplementationPlanStatus,
+  readonly ImplementationPlanStatus[]
+> = {
+  draft: ["ready-for-review"],
+  "ready-for-review": [],
+  authorized: [],
+  rejected: [],
+};
+
+export function canTransitionImplementationPlanStatus(
+  currentStatus: ImplementationPlanStatus,
+  nextStatus: ImplementationPlanStatus
+) {
+  return allowedImplementationPlanStatusTransitions[
+    currentStatus
+  ].includes(nextStatus);
+}
+
+export const implementationPlanStatusTransitionSql = `
+  UPDATE implementation_plans
+  SET status = ?
+  WHERE id = ?
+    AND status = ?
+    AND production_authorized = FALSE
+`;
+
+export function getImplementationPlanStatusTransitionRejection({
+  currentStatus,
+  nextStatus,
+  productionAuthorized,
+}: {
+  currentStatus: ImplementationPlanStatus;
+  nextStatus: ImplementationPlanStatus;
+  productionAuthorized: boolean;
+}): string | null {
+  if (productionAuthorized) {
+    return "An implementation plan with production authorization cannot be transitioned by this review action.";
+  }
+
+  if (currentStatus === nextStatus) {
+    return null;
+  }
+
+  if (
+    !canTransitionImplementationPlanStatus(
+      currentStatus,
+      nextStatus
+    )
+  ) {
+    return `Invalid implementation plan status transition: ${currentStatus} -> ${nextStatus}.`;
+  }
+
+  return null;
+}
+
+export function assertImplementationPlanStatusTransitionApplied(
+  affectedRows: number
+) {
+  if (affectedRows !== 1) {
+    throw new Error(
+      "Implementation plan status changed before this transition could be completed."
+    );
+  }
+}
+
+function isProductionAuthorized(
+  value: SavedImplementationPlan["production_authorized"]
+) {
+  return Boolean(value);
+}
+
+export async function transitionImplementationPlanStatus({
+  implementationPlanId,
+  nextStatus,
+}: {
+  implementationPlanId: number;
+  nextStatus: ImplementationPlanStatus;
+}): Promise<ImplementationPlanStatusTransitionResult> {
+  requirePositiveSafeInteger(
+    implementationPlanId,
+    "implementationPlanId"
+  );
+
+  const implementationPlan =
+    await getImplementationPlanById(
+      implementationPlanId
+    );
+
+  if (!implementationPlan) {
+    throw new Error(
+      "Implementation plan not found."
+    );
+  }
+
+  const previousStatus =
+    implementationPlan.status;
+
+  if (previousStatus === nextStatus) {
+    throw new Error(
+      `Implementation plan #${implementationPlanId} is already ${nextStatus}.`
+    );
+  }
+
+  const rejection =
+    getImplementationPlanStatusTransitionRejection({
+      currentStatus: previousStatus,
+      nextStatus,
+      productionAuthorized: isProductionAuthorized(
+        implementationPlan.production_authorized
+      ),
+    });
+
+  if (rejection) {
+    throw new Error(rejection);
+  }
+
+  const [result] =
+    await db.execute<ResultSetHeader>(
+      implementationPlanStatusTransitionSql,
+      [
+        nextStatus,
+        implementationPlanId,
+        previousStatus,
+      ]
+    );
+
+  assertImplementationPlanStatusTransitionApplied(
+    result.affectedRows
+  );
+
+  return {
+    implementationPlanId,
+    previousStatus,
+    status: nextStatus,
+  };
+}

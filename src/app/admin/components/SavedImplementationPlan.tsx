@@ -1,6 +1,7 @@
 ﻿import type {
   SavedImplementationPlan,
 } from "@/lib/implementationPlanRepository";
+import ImplementationPlanLifecycleControls from "./ImplementationPlanLifecycleControls";
 
 type Props = {
   implementationPlan: SavedImplementationPlan;
@@ -142,9 +143,19 @@ export default function SavedImplementationPlan({
         >
           {productionAuthorized
             ? "This implementation plan contains an explicit production authorization record."
-            : "This implementation plan is a governance artifact only. It does not authorize code changes, deployment, or autonomous production modification."}
+            : implementationPlan.status === "draft"
+              ? "This saved implementation plan is a planning artifact. Draft status does not authorize implementation, deployment, or automatic production changes."
+              : implementationPlan.status ===
+                  "ready-for-review"
+                ? "This implementation plan is under human review. Review status does not authorize implementation, deployment, or automatic production changes."
+                : "This implementation plan is a governance artifact only. It does not authorize code changes, deployment, or autonomous production modification."}
         </p>
       </div>
+
+      <ImplementationPlanLifecycleControls
+        implementationPlanId={implementationPlan.id}
+        status={implementationPlan.status}
+      />
     </section>
   );
 }
