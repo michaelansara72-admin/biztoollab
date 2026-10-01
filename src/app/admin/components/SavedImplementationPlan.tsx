@@ -148,7 +148,10 @@ export default function SavedImplementationPlan({
               : implementationPlan.status ===
                   "ready-for-review"
                 ? "This implementation plan is under human review. Review status does not authorize implementation, deployment, or automatic production changes."
-                : "This implementation plan is a governance artifact only. It does not authorize code changes, deployment, or autonomous production modification."}
+                : implementationPlan.status ===
+                    "authorized"
+                  ? "This implementation plan passed human review. Authorized review status does not authorize implementation, deployment, or automatic production changes."
+                  : "This implementation plan was rejected during human review. Rejection does not authorize implementation, deployment, or automatic production changes."}
         </p>
       </div>
 

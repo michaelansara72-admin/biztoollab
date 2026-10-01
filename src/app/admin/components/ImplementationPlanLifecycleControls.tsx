@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useRef,
   useState,
   useTransition,
 } from "react";
@@ -44,17 +45,30 @@ export default function ImplementationPlanLifecycleControls({
     startTransition,
   ] = useTransition();
 
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
+
+  const inFlightRef = useRef(false);
+
   const [message, setMessage] =
     useState<string | null>(null);
 
   const [error, setError] =
     useState<string | null>(null);
 
+  const isBusy = isPending || isSubmitting;
+
   async function transitionImplementationPlan(
     nextStatus: ImplementationPlanStatus
   ) {
+    if (inFlightRef.current || isBusy) {
+      return;
+    }
+
+    inFlightRef.current = true;
     setMessage(null);
     setError(null);
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(
@@ -104,6 +118,9 @@ export default function ImplementationPlanLifecycleControls({
           ? transitionError.message
           : "The implementation plan status could not be changed."
       );
+    } finally {
+      inFlightRef.current = false;
+      setIsSubmitting(false);
     }
   }
 
@@ -124,7 +141,7 @@ export default function ImplementationPlanLifecycleControls({
 
         <button
           type="button"
-          disabled={isPending}
+          disabled={isBusy}
           onClick={() =>
             transitionImplementationPlan(
               "ready-for-review"
@@ -132,7 +149,7 @@ export default function ImplementationPlanLifecycleControls({
           }
           className="mt-4 rounded-lg bg-sky-700 px-5 py-3 text-sm font-bold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isPending
+          {isBusy
             ? "Submitting..."
             : "Submit for Human Review"}
         </button>
@@ -155,13 +172,52 @@ export default function ImplementationPlanLifecycleControls({
         <p className="mt-2 text-sm leading-6 text-amber-900">
           This implementation plan has been submitted
           for review. Authorization or rejection must
-          be an explicit later human governance
-          decision.
+          be an explicit human governance decision.
         </p>
 
         <p className="mt-4 text-sm font-semibold text-amber-950">
-          No production implementation is authorized
-          by this review state.
+          Authorize Plan approves this reviewed plan
+          only. It does not authorize production
+          execution, deployment, or automatic
+          implementation.
+        </p>
+
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={() =>
+              transitionImplementationPlan(
+                "authorized"
+              )
+            }
+            className="rounded-lg bg-emerald-700 px-5 py-3 text-sm font-bold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isBusy
+              ? "Processing..."
+              : "Authorize Plan"}
+          </button>
+
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={() =>
+              transitionImplementationPlan(
+                "rejected"
+              )
+            }
+            className="rounded-lg bg-rose-700 px-5 py-3 text-sm font-bold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isBusy
+              ? "Processing..."
+              : "Reject Plan"}
+          </button>
+        </div>
+
+        <p className="mt-4 text-xs leading-5 text-amber-800">
+          These review decisions do not set production
+          authorization and do not deploy or
+          automatically modify the production site.
         </p>
 
         <LifecycleFeedback
@@ -180,11 +236,10 @@ export default function ImplementationPlanLifecycleControls({
         </p>
 
         <p className="mt-2 text-sm leading-6 text-emerald-900">
-          The implementation plan has passed
-          implementation plan governance review.
-          Production implementation remains separately
-          governed and has not been authorized
-          automatically.
+          The implementation plan has passed human
+          review. This authorized review status does
+          not authorize production execution,
+          deployment, or automatic implementation.
         </p>
       </div>
     );

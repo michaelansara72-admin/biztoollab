@@ -23,6 +23,8 @@ type TransitionImplementationPlanRequest = {
 const allowedRequestedStatuses:
   readonly ImplementationPlanStatus[] = [
     "ready-for-review",
+    "authorized",
+    "rejected",
   ];
 
 function isPositiveSafeInteger(

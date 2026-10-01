@@ -28,19 +28,89 @@ test("draft can transition to ready-for-review", () => {
   );
 });
 
+test("ready-for-review can transition to authorized", () => {
+  assert.equal(
+    canTransitionImplementationPlanStatus(
+      "ready-for-review",
+      "authorized"
+    ),
+    true
+  );
+});
+
+test("ready-for-review can transition to rejected", () => {
+  assert.equal(
+    canTransitionImplementationPlanStatus(
+      "ready-for-review",
+      "rejected"
+    ),
+    true
+  );
+});
+
+test("draft cannot transition directly to authorized", () => {
+  assert.equal(
+    canTransitionImplementationPlanStatus(
+      "draft",
+      "authorized"
+    ),
+    false
+  );
+});
+
+test("draft cannot transition directly to rejected", () => {
+  assert.equal(
+    canTransitionImplementationPlanStatus(
+      "draft",
+      "rejected"
+    ),
+    false
+  );
+});
+
+test("authorized has no outgoing transitions", () => {
+  for (const nextStatus of statuses) {
+    assert.equal(
+      canTransitionImplementationPlanStatus(
+        "authorized",
+        nextStatus
+      ),
+      false,
+      `authorized -> ${nextStatus}`
+    );
+  }
+});
+
+test("rejected has no outgoing transitions", () => {
+  for (const nextStatus of statuses) {
+    assert.equal(
+      canTransitionImplementationPlanStatus(
+        "rejected",
+        nextStatus
+      ),
+      false,
+      `rejected -> ${nextStatus}`
+    );
+  }
+});
+
 test("no other current status transition is allowed", () => {
+  const allowedTransitions = new Set([
+    "draft->ready-for-review",
+    "ready-for-review->authorized",
+    "ready-for-review->rejected",
+  ]);
+
   for (const currentStatus of statuses) {
     for (const nextStatus of statuses) {
-      const allowed =
-        currentStatus === "draft" &&
-        nextStatus === "ready-for-review";
-
       assert.equal(
         canTransitionImplementationPlanStatus(
           currentStatus,
           nextStatus
         ),
-        allowed,
+        allowedTransitions.has(
+          `${currentStatus}->${nextStatus}`
+        ),
         `${currentStatus} -> ${nextStatus}`
       );
     }
@@ -48,7 +118,7 @@ test("no other current status transition is allowed", () => {
 });
 
 test("a production-authorized plan cannot transition through this path", () => {
-  const rejection =
+  const reviewRejection =
     getImplementationPlanStatusTransitionRejection({
       currentStatus: "draft",
       nextStatus: "ready-for-review",
@@ -56,13 +126,41 @@ test("a production-authorized plan cannot transition through this path", () => {
     });
 
   assert.equal(
-    rejection,
+    reviewRejection,
+    "An implementation plan with production authorization cannot be transitioned by this review action."
+  );
+
+  const authorizeRejection =
+    getImplementationPlanStatusTransitionRejection({
+      currentStatus: "ready-for-review",
+      nextStatus: "authorized",
+      productionAuthorized: true,
+    });
+
+  assert.equal(
+    authorizeRejection,
+    "An implementation plan with production authorization cannot be transitioned by this review action."
+  );
+
+  const rejectRejection =
+    getImplementationPlanStatusTransitionRejection({
+      currentStatus: "ready-for-review",
+      nextStatus: "rejected",
+      productionAuthorized: true,
+    });
+
+  assert.equal(
+    rejectRejection,
     "An implementation plan with production authorization cannot be transitioned by this review action."
   );
 
   assert.match(
     implementationPlanStatusTransitionSql,
     /AND production_authorized = FALSE/
+  );
+  assert.doesNotMatch(
+    implementationPlanStatusTransitionSql,
+    /production_authorized\s*=\s*TRUE/i
   );
 });
 

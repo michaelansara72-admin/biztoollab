@@ -317,7 +317,7 @@ const allowedImplementationPlanStatusTransitions: Record<
   readonly ImplementationPlanStatus[]
 > = {
   draft: ["ready-for-review"],
-  "ready-for-review": [],
+  "ready-for-review": ["authorized", "rejected"],
   authorized: [],
   rejected: [],
 };
