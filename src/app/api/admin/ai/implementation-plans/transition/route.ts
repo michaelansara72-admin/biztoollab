@@ -172,6 +172,8 @@ export async function POST(request: Request) {
       );
     }
 
+    // The admin session proves an authenticated-admin role.
+    // Reviewer identity is not taken from the request JSON.
     const transition =
       await transitionImplementationPlanStatus({
         implementationPlanId:

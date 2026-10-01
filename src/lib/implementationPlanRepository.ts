@@ -378,26 +378,118 @@ export function assertImplementationPlanStatusTransitionApplied(
   }
 }
 
+export const implementationPlanAuditActorType =
+  "authenticated-admin" as const;
+
+export const implementationPlanAuditInsertSql = `
+  INSERT INTO implementation_plan_audit (
+    implementation_plan_id,
+    previous_status,
+    next_status,
+    actor_type
+  )
+  VALUES (?, ?, ?, ?)
+`;
+
+export function assertImplementationPlanAuditRecorded(
+  affectedRows: number
+) {
+  if (affectedRows !== 1) {
+    throw new Error(
+      "Implementation plan status transition audit record was not created."
+    );
+  }
+}
+
+export type ImplementationPlanTransitionConnection = {
+  execute: (
+    sql: string,
+    values: readonly (string | number)[]
+  ) => Promise<
+    readonly [
+      {
+        affectedRows: number;
+      },
+      unknown,
+    ]
+  >;
+
+  beginTransaction: () => Promise<void>;
+
+  commit: () => Promise<void>;
+
+  rollback: () => Promise<void>;
+
+  release: () => void;
+};
+
+export type ImplementationPlanTransitionDependencies = {
+  loadImplementationPlan: (
+    implementationPlanId: number
+  ) => Promise<SavedImplementationPlan | null>;
+
+  acquireConnection: () => Promise<ImplementationPlanTransitionConnection>;
+};
+
+async function acquireImplementationPlanTransitionConnection(): Promise<ImplementationPlanTransitionConnection> {
+  const connection =
+    await db.getConnection();
+
+  return {
+    execute: (sql, values) =>
+      connection.execute<ResultSetHeader>(
+        sql,
+        [...values]
+      ),
+
+    beginTransaction: () =>
+      connection.beginTransaction(),
+
+    commit: () =>
+      connection.commit(),
+
+    rollback: () =>
+      connection.rollback(),
+
+    release: () => {
+      connection.release();
+    },
+  };
+}
+
+const defaultImplementationPlanTransitionDependencies: ImplementationPlanTransitionDependencies =
+  {
+    loadImplementationPlan:
+      getImplementationPlanById,
+
+    acquireConnection:
+      acquireImplementationPlanTransitionConnection,
+  };
+
 function isProductionAuthorized(
   value: SavedImplementationPlan["production_authorized"]
 ) {
   return Boolean(value);
 }
 
-export async function transitionImplementationPlanStatus({
-  implementationPlanId,
-  nextStatus,
-}: {
-  implementationPlanId: number;
-  nextStatus: ImplementationPlanStatus;
-}): Promise<ImplementationPlanStatusTransitionResult> {
+export async function transitionImplementationPlanStatus(
+  {
+    implementationPlanId,
+    nextStatus,
+  }: {
+    implementationPlanId: number;
+    nextStatus: ImplementationPlanStatus;
+  },
+  dependencies: ImplementationPlanTransitionDependencies =
+    defaultImplementationPlanTransitionDependencies
+): Promise<ImplementationPlanStatusTransitionResult> {
   requirePositiveSafeInteger(
     implementationPlanId,
     "implementationPlanId"
   );
 
   const implementationPlan =
-    await getImplementationPlanById(
+    await dependencies.loadImplementationPlan(
       implementationPlanId
     );
 
@@ -429,19 +521,56 @@ export async function transitionImplementationPlanStatus({
     throw new Error(rejection);
   }
 
-  const [result] =
-    await db.execute<ResultSetHeader>(
-      implementationPlanStatusTransitionSql,
-      [
-        nextStatus,
-        implementationPlanId,
-        previousStatus,
-      ]
+  const connection =
+    await dependencies.acquireConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const [updateResult] =
+      await connection.execute(
+        implementationPlanStatusTransitionSql,
+        [
+          nextStatus,
+          implementationPlanId,
+          previousStatus,
+        ]
+      );
+
+    assertImplementationPlanStatusTransitionApplied(
+      updateResult.affectedRows
     );
 
-  assertImplementationPlanStatusTransitionApplied(
-    result.affectedRows
-  );
+    const [auditResult] =
+      await connection.execute(
+        implementationPlanAuditInsertSql,
+        [
+          implementationPlanId,
+          previousStatus,
+          nextStatus,
+          implementationPlanAuditActorType,
+        ]
+      );
+
+    assertImplementationPlanAuditRecorded(
+      auditResult.affectedRows
+    );
+
+    await connection.commit();
+  } catch (error) {
+    try {
+      await connection.rollback();
+    } catch (rollbackError) {
+      console.error(
+        "Failed to roll back implementation plan status transition:",
+        rollbackError
+      );
+    }
+
+    throw error;
+  } finally {
+    connection.release();
+  }
 
   return {
     implementationPlanId,
