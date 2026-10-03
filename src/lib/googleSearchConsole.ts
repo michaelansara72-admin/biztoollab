@@ -18,6 +18,93 @@ export function getSearchConsoleSiteUrl() {
   return SITE_URL;
 }
 
+function isSafeOAuthErrorCode(value: string) {
+  return /^[a-z][a-z0-9_]{0,40}$/.test(value);
+}
+
+function isSafeOAuthErrorDescription(
+  description: string,
+  secrets: readonly string[]
+) {
+  const trimmed = description.trim();
+
+  if (
+    !trimmed ||
+    trimmed.length > 180 ||
+    /[\r\n]/.test(trimmed)
+  ) {
+    return false;
+  }
+
+  const normalized = trimmed.toLowerCase();
+
+  if (
+    normalized.includes("bearer ") ||
+    normalized.includes("ya29.")
+  ) {
+    return false;
+  }
+
+  for (const secret of secrets) {
+    if (
+      secret &&
+      normalized.includes(secret.toLowerCase())
+    ) {
+      return false;
+    }
+  }
+
+  if (/[A-Za-z0-9+/=_-]{24,}/.test(trimmed)) {
+    return false;
+  }
+
+  return true;
+}
+
+async function readGoogleOAuthErrorDetail(
+  response: Response,
+  secrets: readonly string[]
+) {
+  let body: unknown;
+
+  try {
+    body = await response.json();
+  } catch {
+    return "";
+  }
+
+  if (!body || typeof body !== "object") {
+    return "";
+  }
+
+  const errorCode = Reflect.get(body, "error");
+
+  if (
+    typeof errorCode !== "string" ||
+    !isSafeOAuthErrorCode(errorCode)
+  ) {
+    return "";
+  }
+
+  let detail = ` error=${errorCode}`;
+  const description = Reflect.get(
+    body,
+    "error_description"
+  );
+
+  if (
+    typeof description === "string" &&
+    isSafeOAuthErrorDescription(
+      description,
+      secrets
+    )
+  ) {
+    detail += ` error_description=${description.trim()}`;
+  }
+
+  return detail;
+}
+
 export async function getGoogleAccessToken() {
   const clientId =
     process.env.GOOGLE_SEARCH_CONSOLE_CLIENT_ID;
@@ -50,8 +137,14 @@ export async function getGoogleAccessToken() {
   });
 
   if (!response.ok) {
+    const detail =
+      await readGoogleOAuthErrorDetail(
+        response,
+        [clientId, clientSecret, refreshToken]
+      );
+
     throw new Error(
-      `Google access-token refresh failed: ${response.status}`
+      `Google access-token refresh failed: ${response.status}${detail}`
     );
   }
 

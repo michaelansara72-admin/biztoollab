@@ -1,9 +1,16 @@
+import path from "node:path";
+
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import {
   adminSessionCookie,
   verifyAdminSessionToken,
 } from "@/lib/adminAuth";
+
+import {
+  handoffGoogleSearchConsoleRefreshToken,
+  localRefreshInstallFailureMessage,
+} from "@/lib/googleSearchConsoleLocalRefreshInstall";
 
 
 
@@ -151,12 +158,38 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!tokenData.refresh_token) {
+  if (
+    typeof tokenData.refresh_token !== "string" ||
+    !tokenData.refresh_token
+  ) {
     return NextResponse.json(
       {
         success: false,
         error:
           "Google did not return a refresh token. Reauthorize using the consent flow.",
+      },
+      {
+        status: 502,
+      }
+    );
+  }
+
+  const handoff =
+    await handoffGoogleSearchConsoleRefreshToken({
+      refreshToken: tokenData.refresh_token,
+      adminAuthenticated: true,
+      oauthStateValid: true,
+      envFilePath: path.resolve(
+        process.cwd(),
+        ".env.local"
+      ),
+    });
+
+  if (handoff.action === "failed") {
+    return NextResponse.json(
+      {
+        success: false,
+        error: localRefreshInstallFailureMessage,
       },
       {
         status: 502,
@@ -171,21 +204,25 @@ export async function GET(request: NextRequest) {
     )
   );
 
-  response.cookies.set({
-    name: "biztoollab_google_refresh_token_temp",
-    value: tokenData.refresh_token,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 10,
-  });
+  if (handoff.action === "cookie") {
+    response.cookies.set({
+      name: "biztoollab_google_refresh_token_temp",
+      value: tokenData.refresh_token,
+      httpOnly: true,
+      secure:
+        process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 10,
+    });
+  }
 
   response.cookies.set({
     name: "biztoollab_google_oauth_state",
     value: "",
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure:
+      process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/api/admin/google",
     maxAge: 0,
