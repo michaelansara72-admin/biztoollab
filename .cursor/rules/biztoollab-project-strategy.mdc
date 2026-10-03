@@ -1,0 +1,25 @@
+---
+description: Standing business and production strategy for the live BizToolLab website
+alwaysApply: true
+---
+
+# BizToolLab project strategy
+
+`docs/PROJECT_STRATEGY.md` is the authoritative business and production strategy. Consult it when planning significant work, modifying code, assessing production impact, or preparing releases. Follow it. Do not copy or replace it.
+
+BizToolLab, a product of Synergy Media & Tech LLC, is an existing live production website. Local work is not deployed until a separate, authorized release.
+
+Keep the ongoing Google Search Console traffic-testing initiative visible in sprint planning. Preserve measurement integrity. Do not invent Search Console metrics or assume access to live data.
+
+SEO, AdSense readiness, and sustainable revenue generation remain permanent considerations even when they are not the sprint focus. If a sprint has no direct SEO or monetization impact, say so.
+
+Consider both workstreams on significant work. Do not abandon either silently:
+
+- Product Engineering: build, test, secure, and improve the platform.
+- Traffic and Revenue Readiness: organic visibility, public value, growth, and monetization readiness.
+
+Protect existing public URLs, calculators, content, functionality, indexing, and user experience.
+
+Treat implementation, tests, commits, pushes, database migrations, and production deployments as distinct operations. Never push or deploy without explicit user authorization. Never execute a live database migration without explicit authorization.
+
+For relevant changes, identify potential production, indexing, and measurement consequences before release. This rule supplements existing engineering instructions, architecture, testing practices, and security requirements. It does not replace them.
