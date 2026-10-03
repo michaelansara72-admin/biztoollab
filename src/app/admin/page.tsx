@@ -26,7 +26,9 @@ import {
 } from "@/lib/experimentRepository";
 
 import {
+  getImplementationPlanAuditHistory,
   getLatestImplementationPlanForExperiment,
+  type ImplementationPlanAuditHistoryView,
 } from "@/lib/implementationPlanRepository";
 
 import {
@@ -304,6 +306,31 @@ try {
           )
         : null;
 
+    let implementationPlanAuditHistory:
+      | ImplementationPlanAuditHistoryView
+      | null = null;
+
+    if (latestImplementationPlan) {
+      try {
+        implementationPlanAuditHistory = {
+          status: "ready",
+          records:
+            await getImplementationPlanAuditHistory(
+              latestImplementationPlan.id
+            ),
+        };
+      } catch (auditError) {
+        console.error(
+          "Unable to load implementation plan audit history:",
+          auditError
+        );
+
+        implementationPlanAuditHistory = {
+          status: "unavailable",
+        };
+      }
+    }
+
     savedGovernance = {
       recommendation,
       latestDecision: decisions[0] ?? null,
@@ -311,6 +338,7 @@ try {
       evidenceSnapshots,
       latestExperiment,
       latestImplementationPlan,
+      implementationPlanAuditHistory,
     };
   }
 } catch (error) {
@@ -561,6 +589,11 @@ try {
   <SavedImplementationPlan
     implementationPlan={
       savedGovernance.latestImplementationPlan
+    }
+    auditHistory={
+      savedGovernance.implementationPlanAuditHistory ?? {
+        status: "unavailable",
+      }
     }
   />
 ) : (

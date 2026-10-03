@@ -1,10 +1,13 @@
 ﻿import type {
+  ImplementationPlanAuditHistoryView,
   SavedImplementationPlan,
 } from "@/lib/implementationPlanRepository";
+import ImplementationPlanAuditHistory from "./ImplementationPlanAuditHistory";
 import ImplementationPlanLifecycleControls from "./ImplementationPlanLifecycleControls";
 
 type Props = {
   implementationPlan: SavedImplementationPlan;
+  auditHistory: ImplementationPlanAuditHistoryView;
 };
 
 function formatStatus(
@@ -22,6 +25,7 @@ function formatStatus(
 
 export default function SavedImplementationPlan({
   implementationPlan,
+  auditHistory,
 }: Props) {
   const productionAuthorized =
     Boolean(
@@ -158,6 +162,13 @@ export default function SavedImplementationPlan({
       <ImplementationPlanLifecycleControls
         implementationPlanId={implementationPlan.id}
         status={implementationPlan.status}
+      />
+
+      <ImplementationPlanAuditHistory
+        implementationPlanId={
+          implementationPlan.id
+        }
+        history={auditHistory}
       />
     </section>
   );

@@ -401,6 +401,171 @@ export function assertImplementationPlanAuditRecorded(
   }
 }
 
+export type ImplementationPlanAuditRecord = {
+  id: number;
+  implementationPlanId: number;
+  previousStatus: ImplementationPlanStatus;
+  nextStatus: ImplementationPlanStatus;
+  actorType: typeof implementationPlanAuditActorType;
+  createdAt: Date;
+};
+
+export type ImplementationPlanAuditHistoryView =
+  | {
+      status: "ready";
+      records: readonly ImplementationPlanAuditRecord[];
+    }
+  | {
+      status: "unavailable";
+    };
+
+export type ImplementationPlanAuditRow = {
+  id: number | string;
+  implementation_plan_id: number | string;
+  previous_status: string;
+  next_status: string;
+  actor_type: string;
+  created_at: Date | string;
+};
+
+export const implementationPlanAuditHistorySql = `
+  SELECT
+    id,
+    implementation_plan_id,
+    previous_status,
+    next_status,
+    actor_type,
+    created_at
+  FROM implementation_plan_audit
+  WHERE implementation_plan_id = ?
+  ORDER BY created_at DESC, id DESC
+`;
+
+const implementationPlanAuditStatuses =
+  new Set<ImplementationPlanStatus>([
+    "draft",
+    "ready-for-review",
+    "authorized",
+    "rejected",
+  ]);
+
+function isImplementationPlanAuditStatus(
+  value: string
+): value is ImplementationPlanStatus {
+  return implementationPlanAuditStatuses.has(
+    value as ImplementationPlanStatus
+  );
+}
+
+export function mapImplementationPlanAuditRow(
+  row: ImplementationPlanAuditRow
+): ImplementationPlanAuditRecord {
+  const id = Number(row.id);
+  const implementationPlanId = Number(
+    row.implementation_plan_id
+  );
+
+  if (
+    !Number.isSafeInteger(id) ||
+    id <= 0 ||
+    !Number.isSafeInteger(implementationPlanId) ||
+    implementationPlanId <= 0 ||
+    !isImplementationPlanAuditStatus(
+      row.previous_status
+    ) ||
+    !isImplementationPlanAuditStatus(
+      row.next_status
+    ) ||
+    row.actor_type !==
+      implementationPlanAuditActorType
+  ) {
+    throw new Error(
+      "Implementation plan audit history could not be read."
+    );
+  }
+
+  const createdAt =
+    row.created_at instanceof Date
+      ? row.created_at
+      : new Date(row.created_at);
+
+  if (Number.isNaN(createdAt.getTime())) {
+    throw new Error(
+      "Implementation plan audit history could not be read."
+    );
+  }
+
+  return {
+    id,
+    implementationPlanId,
+    previousStatus: row.previous_status,
+    nextStatus: row.next_status,
+    actorType: row.actor_type,
+    createdAt,
+  };
+}
+
+export type ImplementationPlanAuditHistoryExecutor = {
+  execute: (
+    sql: string,
+    values: readonly [number]
+  ) => Promise<
+    readonly [
+      readonly ImplementationPlanAuditRow[],
+      unknown,
+    ]
+  >;
+};
+
+function defaultImplementationPlanAuditHistoryExecutor(): ImplementationPlanAuditHistoryExecutor {
+  return {
+    execute: (sql, values) =>
+      db.execute<
+        (ImplementationPlanAuditRow & RowDataPacket)[]
+      >(sql, [values[0]]),
+  };
+}
+
+export async function getImplementationPlanAuditHistory(
+  implementationPlanId: number,
+  executor: ImplementationPlanAuditHistoryExecutor =
+    defaultImplementationPlanAuditHistoryExecutor()
+): Promise<ImplementationPlanAuditRecord[]> {
+  if (
+    !Number.isSafeInteger(implementationPlanId) ||
+    implementationPlanId <= 0
+  ) {
+    return [];
+  }
+
+  const [rows] = await executor.execute(
+    implementationPlanAuditHistorySql,
+    [implementationPlanId]
+  );
+
+  if (!Array.isArray(rows)) {
+    throw new Error(
+      "Implementation plan audit history could not be read."
+    );
+  }
+
+  return rows.map((row) => {
+    const record =
+      mapImplementationPlanAuditRow(row);
+
+    if (
+      record.implementationPlanId !==
+      implementationPlanId
+    ) {
+      throw new Error(
+        "Implementation plan audit history could not be read."
+      );
+    }
+
+    return record;
+  });
+}
+
 export type ImplementationPlanTransitionConnection = {
   execute: (
     sql: string,
