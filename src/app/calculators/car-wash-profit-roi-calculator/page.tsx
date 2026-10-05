@@ -3,6 +3,10 @@
 import AIAnalysisPanel from "@/components/ai/AIAnalysisPanel";
 import { useAIAnalysis } from "@/hooks/useAIAnalysis";
 import { useMemo, useState } from "react";
+import {
+  calculateCarWashProfitRoi,
+  carWashProfitRoiDefaultInputs,
+} from "./calculateCarWashProfitRoi";
 
 type NumberInputProps = {
   label: string;
@@ -208,601 +212,162 @@ export default function CarWashProfitROICalculator() {
   | "risk-analysis"
 >("scenario-comparison");
 
-  const [retailCarsPerDay, setRetailCarsPerDay] = useState(75);
+  const [retailCarsPerDay, setRetailCarsPerDay] = useState(
+    carWashProfitRoiDefaultInputs.retailCarsPerDay
+  );
   const [customRetailCarsPerDay, setCustomRetailCarsPerDay] =
-  useState(75);
-  
-    const [operatingDays, setOperatingDays] = useState(30);
-  const [averageWashPrice, setAverageWashPrice] = useState(15);
-const [customAverageWashPrice, setCustomAverageWashPrice] =
-  useState(15);
-  const [members, setMembers] = useState(250);
-  const [customMembers, setCustomMembers] =
-  useState(250);
-  const [membershipPrice, setMembershipPrice] = useState(30);
+    useState(
+      carWashProfitRoiDefaultInputs.customRetailCarsPerDay
+    );
+  const [operatingDays, setOperatingDays] = useState(
+    carWashProfitRoiDefaultInputs.operatingDays
+  );
+  const [averageWashPrice, setAverageWashPrice] = useState(
+    carWashProfitRoiDefaultInputs.averageWashPrice
+  );
+  const [customAverageWashPrice, setCustomAverageWashPrice] =
+    useState(
+      carWashProfitRoiDefaultInputs.customAverageWashPrice
+    );
+  const [members, setMembers] = useState(
+    carWashProfitRoiDefaultInputs.members
+  );
+  const [customMembers, setCustomMembers] = useState(
+    carWashProfitRoiDefaultInputs.customMembers
+  );
+  const [membershipPrice, setMembershipPrice] = useState(
+    carWashProfitRoiDefaultInputs.membershipPrice
+  );
   const [memberWashesPerMonth, setMemberWashesPerMonth] =
-    useState(3);
+    useState(
+      carWashProfitRoiDefaultInputs.memberWashesPerMonth
+    );
 
-  const [upsellRevenue, setUpsellRevenue] = useState(2000);
-  const [otherRevenue, setOtherRevenue] = useState(500);
+  const [upsellRevenue, setUpsellRevenue] = useState(
+    carWashProfitRoiDefaultInputs.upsellRevenue
+  );
+  const [otherRevenue, setOtherRevenue] = useState(
+    carWashProfitRoiDefaultInputs.otherRevenue
+  );
 
-  const [waterCostPerWash, setWaterCostPerWash] =
-    useState(0.75);
+  const [waterCostPerWash, setWaterCostPerWash] = useState(
+    carWashProfitRoiDefaultInputs.waterCostPerWash
+  );
   const [chemicalCostPerWash, setChemicalCostPerWash] =
-    useState(0.85);
+    useState(
+      carWashProfitRoiDefaultInputs.chemicalCostPerWash
+    );
   const [otherVariableCostPerWash, setOtherVariableCostPerWash] =
-    useState(0.4);
+    useState(
+      carWashProfitRoiDefaultInputs.otherVariableCostPerWash
+    );
   const [cardProcessingRate, setCardProcessingRate] =
-    useState(3);
+    useState(
+      carWashProfitRoiDefaultInputs.cardProcessingRate
+    );
 
-  const [labor, setLabor] = useState(7000);
-  const [customLabor, setCustomLabor] =
-  useState(7000);
-  const [rentProperty, setRentProperty] = useState(4500);
+  const [labor, setLabor] = useState(
+    carWashProfitRoiDefaultInputs.labor
+  );
+  const [customLabor, setCustomLabor] = useState(
+    carWashProfitRoiDefaultInputs.customLabor
+  );
+  const [rentProperty, setRentProperty] = useState(
+    carWashProfitRoiDefaultInputs.rentProperty
+  );
   const [customRentProperty, setCustomRentProperty] =
-  useState(4500);
-  const [electricityGas, setElectricityGas] = useState(1800);
-  const [maintenance, setMaintenance] = useState(1500);
-  const [insurance, setInsurance] = useState(600);
-  const [marketing, setMarketing] = useState(750);
-  const [loanPayment, setLoanPayment] = useState(0);
-  const [otherExpenses, setOtherExpenses] = useState(500);
+    useState(
+      carWashProfitRoiDefaultInputs.customRentProperty
+    );
+  const [electricityGas, setElectricityGas] = useState(
+    carWashProfitRoiDefaultInputs.electricityGas
+  );
+  const [maintenance, setMaintenance] = useState(
+    carWashProfitRoiDefaultInputs.maintenance
+  );
+  const [insurance, setInsurance] = useState(
+    carWashProfitRoiDefaultInputs.insurance
+  );
+  const [marketing, setMarketing] = useState(
+    carWashProfitRoiDefaultInputs.marketing
+  );
+  const [loanPayment, setLoanPayment] = useState(
+    carWashProfitRoiDefaultInputs.loanPayment
+  );
+  const [otherExpenses, setOtherExpenses] = useState(
+    carWashProfitRoiDefaultInputs.otherExpenses
+  );
 
   const [startupInvestment, setStartupInvestment] =
-    useState(350000);
+    useState(
+      carWashProfitRoiDefaultInputs.startupInvestment
+    );
   const [renovationInvestment, setRenovationInvestment] =
-    useState(50000);
+    useState(
+      carWashProfitRoiDefaultInputs.renovationInvestment
+    );
 
-  const results = useMemo(() => {
-    const retailWashesPerMonth =
-      retailCarsPerDay * operatingDays;
-
-    const membershipWashesPerMonth =
-      members * memberWashesPerMonth;
-
-    const totalWashes =
-      retailWashesPerMonth + membershipWashesPerMonth;
-
-    const retailRevenue =
-      retailWashesPerMonth * averageWashPrice;
-
-    const membershipRevenue =
-      members * membershipPrice;
-
-    const totalRevenue =
-      retailRevenue +
-      membershipRevenue +
-      upsellRevenue +
-      otherRevenue;
-
-    const variableCostPerWash =
-      waterCostPerWash +
-      chemicalCostPerWash +
-      otherVariableCostPerWash;
-
-    const monthlyVariableCosts =
-      totalWashes * variableCostPerWash;
-
-    const cardProcessingFees =
-      totalRevenue * (cardProcessingRate / 100);
-
-    const fixedMonthlyExpenses =
-      labor +
-      rentProperty +
-      electricityGas +
-      maintenance +
-      insurance +
-      marketing +
-      loanPayment +
-      otherExpenses;
-
-    const totalMonthlyExpenses =
-      monthlyVariableCosts +
-      cardProcessingFees +
-      fixedMonthlyExpenses;
-
-    const monthlyProfit =
-      totalRevenue - totalMonthlyExpenses;
-
-    const annualProfit =
-      monthlyProfit * 12;
-
-    const profitMargin =
-      totalRevenue > 0
-        ? (monthlyProfit / totalRevenue) * 100
-        : 0;
-
-    const totalInvestment =
-      startupInvestment + renovationInvestment;
-
-    const annualROI =
-      totalInvestment > 0
-        ? (annualProfit / totalInvestment) * 100
-        : 0;
-
-    const paybackMonths =
-      monthlyProfit > 0
-        ? totalInvestment / monthlyProfit
-        : null;
-
-    const paybackYears =
-      paybackMonths !== null
-        ? paybackMonths / 12
-        : null;
-
-    const profitPerWash =
-      totalWashes > 0
-        ? monthlyProfit / totalWashes
-        : 0;
-const calculateSensitivity = ({
-  testRetailCarsPerDay = retailCarsPerDay,
-  testAverageWashPrice = averageWashPrice,
-  testMembers = members,
-  testLabor = labor,
-  testRentProperty = rentProperty,
-}: 
-{
-  testRetailCarsPerDay?: number;
-  testAverageWashPrice?: number;
-  testMembers?: number;
-  testLabor?: number;
-  testRentProperty?: number;
-}) => {
-  const testRetailWashesPerMonth =
-    testRetailCarsPerDay * operatingDays;
-
-  const testMembershipWashesPerMonth =
-    testMembers * memberWashesPerMonth;
-
-  const testTotalWashes =
-    testRetailWashesPerMonth +
-    testMembershipWashesPerMonth;
-
-  const testRetailRevenue =
-    testRetailWashesPerMonth *
-    testAverageWashPrice;
-
-  const testMembershipRevenue =
-    testMembers * membershipPrice;
-
-  const testTotalRevenue =
-    testRetailRevenue +
-    testMembershipRevenue +
-    upsellRevenue +
-    otherRevenue;
-
-  const testMonthlyVariableCosts =
-    testTotalWashes * variableCostPerWash;
-
-  const testCardProcessingFees =
-    testTotalRevenue *
-    (cardProcessingRate / 100);
-
-  const testFixedMonthlyExpenses =
-    testLabor +
-    testRentProperty +
-    electricityGas +
-    maintenance +
-    insurance +
-    marketing +
-    loanPayment +
-    otherExpenses;
-
-  const testTotalMonthlyExpenses =
-    testMonthlyVariableCosts +
-    testCardProcessingFees +
-    testFixedMonthlyExpenses;
-
-  const testMonthlyProfit =
-    testTotalRevenue -
-    testTotalMonthlyExpenses;
-
-  const testAnnualProfit =
-  testMonthlyProfit * 12;
-
-const testProfitMargin =
-  testTotalRevenue > 0
-    ? (testMonthlyProfit / testTotalRevenue) * 100
-    : 0;
-
-const testAnnualROI =
-  totalInvestment > 0
-    ? (testAnnualProfit / totalInvestment) * 100
-    : 0;
-
-const testPaybackMonths =
-  testMonthlyProfit > 0
-    ? totalInvestment / testMonthlyProfit
-    : null;
-
-return {
-  monthlyRevenue: testTotalRevenue,
-  monthlyProfit: testMonthlyProfit,
-  annualProfit: testAnnualProfit,
-  profitMargin: testProfitMargin,
-  annualROI: testAnnualROI,
-  paybackMonths: testPaybackMonths,
-};
-};
-
-const retailTrafficSensitivity = {
-  minus10Percent: calculateSensitivity({
-    testRetailCarsPerDay: retailCarsPerDay * 0.9,
-  }),
-  plus10Percent: calculateSensitivity({
-    testRetailCarsPerDay: retailCarsPerDay * 1.1,
-  }),
-};
-
-const washPriceSensitivity = {
-  minus10Percent: calculateSensitivity({
-    testAverageWashPrice: averageWashPrice * 0.9,
-  }),
-  plus10Percent: calculateSensitivity({
-    testAverageWashPrice: averageWashPrice * 1.1,
-  }),
-};
-const membershipSensitivity = {
-  minus10Percent: calculateSensitivity({
-    testMembers: members * 0.9,
-  }),
-  plus10Percent: calculateSensitivity({
-    testMembers: members * 1.1,
-  }),
-};
-const laborSensitivity = {
-  minus10Percent: calculateSensitivity({
-    testLabor: labor * 0.9,
-  }),
-  plus10Percent: calculateSensitivity({
-    testLabor: labor * 1.1,
-  }),
-};
-const propertyCostSensitivity = {
-  minus10Percent: calculateSensitivity({
-    testRentProperty: rentProperty * 0.9,
-  }),
-
-    plus10Percent: calculateSensitivity({
-    testRentProperty: rentProperty * 1.1,
-  }),
-};
-const combinedDownsideScenario = calculateSensitivity({
-  testRetailCarsPerDay: retailCarsPerDay * 0.75,
-  testAverageWashPrice: averageWashPrice * 0.9,
-});
-const customScenario = calculateSensitivity({
-  testRetailCarsPerDay: customRetailCarsPerDay,
-  testAverageWashPrice: customAverageWashPrice,
-  testMembers: customMembers,
-  testLabor: customLabor,
-  testRentProperty: customRentProperty,
-});
-const combinedUpsideScenario = calculateSensitivity({
-    testRetailCarsPerDay: retailCarsPerDay * 1.25,
-  testAverageWashPrice: averageWashPrice * 1.1,
-});
-const sensitivityRanking = [
-  {
-    key: "retailTraffic",
-    label: "Retail Traffic",
-    profitImpact:
-      Math.abs(
-        retailTrafficSensitivity.plus10Percent.monthlyProfit -
-          monthlyProfit
-      ) +
-      Math.abs(
-        retailTrafficSensitivity.minus10Percent.monthlyProfit -
-          monthlyProfit
-      ),
-    roiImpact:
-      Math.abs(
-        retailTrafficSensitivity.plus10Percent.annualROI -
-          annualROI
-      ) +
-      Math.abs(
-        retailTrafficSensitivity.minus10Percent.annualROI -
-          annualROI
-      ),
-  },
-  {
-    key: "washPrice",
-    label: "Wash Price",
-    profitImpact:
-      Math.abs(
-        washPriceSensitivity.plus10Percent.monthlyProfit -
-          monthlyProfit
-      ) +
-      Math.abs(
-        washPriceSensitivity.minus10Percent.monthlyProfit -
-          monthlyProfit
-      ),
-    roiImpact:
-      Math.abs(
-        washPriceSensitivity.plus10Percent.annualROI -
-          annualROI
-      ) +
-      Math.abs(
-        washPriceSensitivity.minus10Percent.annualROI -
-          annualROI
-      ),
-  },
-  {
-    key: "membership",
-    label: "Membership Count",
-    profitImpact:
-      Math.abs(
-        membershipSensitivity.plus10Percent.monthlyProfit -
-          monthlyProfit
-      ) +
-      Math.abs(
-        membershipSensitivity.minus10Percent.monthlyProfit -
-          monthlyProfit
-      ),
-    roiImpact:
-      Math.abs(
-        membershipSensitivity.plus10Percent.annualROI -
-          annualROI
-      ) +
-      Math.abs(
-        membershipSensitivity.minus10Percent.annualROI -
-          annualROI
-      ),
-  },
-  {
-    key: "labor",
-    label: "Labor Cost",
-    profitImpact:
-      Math.abs(
-        laborSensitivity.plus10Percent.monthlyProfit -
-          monthlyProfit
-      ) +
-      Math.abs(
-        laborSensitivity.minus10Percent.monthlyProfit -
-          monthlyProfit
-      ),
-    roiImpact:
-      Math.abs(
-        laborSensitivity.plus10Percent.annualROI -
-          annualROI
-      ) +
-      Math.abs(
-        laborSensitivity.minus10Percent.annualROI -
-          annualROI
-      ),
-  },
-  {
-    key: "propertyCost",
-    label: "Property Cost",
-    profitImpact:
-      Math.abs(
-        propertyCostSensitivity.plus10Percent.monthlyProfit -
-          monthlyProfit
-      ) +
-      Math.abs(
-        propertyCostSensitivity.minus10Percent.monthlyProfit -
-          monthlyProfit
-      ),
-    roiImpact:
-      Math.abs(
-        propertyCostSensitivity.plus10Percent.annualROI -
-          annualROI
-      ) +
-      Math.abs(
-        propertyCostSensitivity.minus10Percent.annualROI -
-          annualROI
-      ),
-  },
-].sort(
-  (a, b) =>
-    b.profitImpact - a.profitImpact
-);
-    const retailContributionPerWash =
-      averageWashPrice -
-      variableCostPerWash -
-      averageWashPrice * (cardProcessingRate / 100);
-
-    const nonRetailRevenue =
-      membershipRevenue +
-      upsellRevenue +
-      otherRevenue;
-
-    const nonRetailCardFees =
-      nonRetailRevenue *
-      (cardProcessingRate / 100);
-
-    const membershipVariableCosts =
-      membershipWashesPerMonth *
-      variableCostPerWash;
-
-    const monthlyCostsBeforeRetailWashes =
-      fixedMonthlyExpenses +
-      membershipVariableCosts +
-      nonRetailCardFees;
-
-    const amountRetailMustCover =
-      monthlyCostsBeforeRetailWashes -
-      nonRetailRevenue;
-
-    let breakEvenRetailWashesPerMonth:
-      | number
-      | null = null;
-
-    if (retailContributionPerWash > 0) {
-      breakEvenRetailWashesPerMonth =
-        Math.max(
-          0,
-          amountRetailMustCover /
-            retailContributionPerWash
-        );
-    }
-
-    const breakEvenRetailCarsPerDay =
-      breakEvenRetailWashesPerMonth !== null &&
-      operatingDays > 0
-        ? breakEvenRetailWashesPerMonth /
-          operatingDays
-        : null;
-const trafficCushionCarsPerDay =
-  breakEvenRetailCarsPerDay !== null
-    ? retailCarsPerDay - breakEvenRetailCarsPerDay
-    : null;
-
-const trafficCushionPercent =
-  breakEvenRetailCarsPerDay !== null &&
-  retailCarsPerDay > 0
-    ? ((retailCarsPerDay - breakEvenRetailCarsPerDay) /
-        retailCarsPerDay) *
-      100
-    : null;
-    
-    const createScenario = (
-      label: string,
-      multiplier: number
-    ) => {
-      const scenarioRetailCarsPerDay =
-        retailCarsPerDay * multiplier;
-
-      const scenarioRetailWashesPerMonth =
-        scenarioRetailCarsPerDay *
-        operatingDays;
-
-      const scenarioTotalWashes =
-        scenarioRetailWashesPerMonth +
-        membershipWashesPerMonth;
-
-      const scenarioRetailRevenue =
-        scenarioRetailWashesPerMonth *
-        averageWashPrice;
-
-      const scenarioTotalRevenue =
-        scenarioRetailRevenue +
-        membershipRevenue +
-        upsellRevenue +
-        otherRevenue;
-
-      const scenarioVariableCosts =
-        scenarioTotalWashes *
-        variableCostPerWash;
-
-      const scenarioCardFees =
-        scenarioTotalRevenue *
-        (cardProcessingRate / 100);
-
-      const scenarioTotalExpenses =
-        fixedMonthlyExpenses +
-        scenarioVariableCosts +
-        scenarioCardFees;
-
-      const scenarioMonthlyProfit =
-        scenarioTotalRevenue -
-        scenarioTotalExpenses;
-
-      const scenarioAnnualProfit =
-        scenarioMonthlyProfit * 12;
-
-      const scenarioProfitMargin =
-        scenarioTotalRevenue > 0
-          ? (scenarioMonthlyProfit /
-              scenarioTotalRevenue) *
-            100
-          : 0;
-
-      const scenarioAnnualROI =
-        totalInvestment > 0
-          ? (scenarioAnnualProfit /
-              totalInvestment) *
-            100
-          : 0;
-
-      return {
-        label,
-        retailCarsPerDay:
-          scenarioRetailCarsPerDay,
-        monthlyRevenue:
-          scenarioTotalRevenue,
-        monthlyProfit:
-          scenarioMonthlyProfit,
-        annualProfit:
-          scenarioAnnualProfit,
-        profitMargin:
-          scenarioProfitMargin,
-        annualROI:
-          scenarioAnnualROI,
-      };
-    };
-
-    const scenarios = [
-      createScenario("Conservative", 0.75),
-      createScenario("Expected", 1),
-      createScenario("Strong", 1.25),
-    ];
-
-    return {
-      retailWashesPerMonth,
-      membershipWashesPerMonth,
-      totalWashes,
-      retailRevenue,
-      membershipRevenue,
-      totalRevenue,
-      variableCostPerWash,
-      monthlyVariableCosts,
-      cardProcessingFees,
-      fixedMonthlyExpenses,
-      totalMonthlyExpenses,
-      monthlyProfit,
-      annualProfit,
-      profitMargin,
-      totalInvestment,
-      annualROI,
-      paybackMonths,
-      paybackYears,
-      profitPerWash,
-breakEvenRetailCarsPerDay,
-trafficCushionCarsPerDay,
-trafficCushionPercent,
-sensitivity: {
-  retailTraffic: retailTrafficSensitivity,
-  washPrice: washPriceSensitivity,
-  membership: membershipSensitivity,
-  labor: laborSensitivity,
-  propertyCost: propertyCostSensitivity,
-},
-sensitivityRanking,
-combinedDownsideScenario,
-combinedUpsideScenario,
-customScenario,
-scenarios,
-    };
-  }, [
-    retailCarsPerDay,
-    operatingDays,
-    averageWashPrice,
-    members,
-    membershipPrice,
-    memberWashesPerMonth,
-    upsellRevenue,
-    otherRevenue,
-    waterCostPerWash,
-    chemicalCostPerWash,
-    otherVariableCostPerWash,
-    cardProcessingRate,
-    labor,
-    rentProperty,
-    electricityGas,
-    maintenance,
-    insurance,
-    marketing,
-    loanPayment,
-    otherExpenses,
-    startupInvestment,
-    renovationInvestment,
-    customRetailCarsPerDay,
-customAverageWashPrice,
-customMembers,
-customLabor,
-customRentProperty,
-  ]);
+  const results = useMemo(
+    () =>
+      calculateCarWashProfitRoi({
+        retailCarsPerDay,
+        operatingDays,
+        averageWashPrice,
+        members,
+        membershipPrice,
+        memberWashesPerMonth,
+        upsellRevenue,
+        otherRevenue,
+        waterCostPerWash,
+        chemicalCostPerWash,
+        otherVariableCostPerWash,
+        cardProcessingRate,
+        labor,
+        rentProperty,
+        electricityGas,
+        maintenance,
+        insurance,
+        marketing,
+        loanPayment,
+        otherExpenses,
+        startupInvestment,
+        renovationInvestment,
+        customRetailCarsPerDay,
+        customAverageWashPrice,
+        customMembers,
+        customLabor,
+        customRentProperty,
+      }),
+    [
+      retailCarsPerDay,
+      operatingDays,
+      averageWashPrice,
+      members,
+      membershipPrice,
+      memberWashesPerMonth,
+      upsellRevenue,
+      otherRevenue,
+      waterCostPerWash,
+      chemicalCostPerWash,
+      otherVariableCostPerWash,
+      cardProcessingRate,
+      labor,
+      rentProperty,
+      electricityGas,
+      maintenance,
+      insurance,
+      marketing,
+      loanPayment,
+      otherExpenses,
+      startupInvestment,
+      renovationInvestment,
+      customRetailCarsPerDay,
+      customAverageWashPrice,
+      customMembers,
+      customLabor,
+      customRentProperty,
+    ]
+  );
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
