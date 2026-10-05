@@ -2,11 +2,15 @@
 
 import AIAnalysisPanel from "@/components/ai/AIAnalysisPanel";
 import { useAIAnalysis } from "@/hooks/useAIAnalysis";
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   calculateCarWashProfitRoi,
   carWashProfitRoiDefaultInputs,
 } from "./calculateCarWashProfitRoi";
+import {
+  commitCarWashNumberInput,
+  parseCompleteCarWashNumber,
+} from "./carWashNumberInput";
 
 type NumberInputProps = {
   label: string;
@@ -27,6 +31,46 @@ function NumberInput({
   step = 1,
   help,
 }: NumberInputProps) {
+  const [draft, setDraft] = useState(() => String(value));
+  const [seenValue, setSeenValue] = useState(value);
+  const [isEditing, setIsEditing] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  if (!isEditing && value !== seenValue) {
+    setSeenValue(value);
+    setDraft(String(value));
+  } else if (value !== seenValue) {
+    setSeenValue(value);
+  }
+
+  useLayoutEffect(() => {
+    if (isEditing) {
+      return;
+    }
+
+    const input = inputRef.current;
+
+    if (input && input.value !== draft) {
+      input.value = draft;
+    }
+  }, [draft, isEditing]);
+
+  function commitDisplayedValue(raw: string) {
+    const committed = commitCarWashNumberInput(raw);
+    const nextDraft = String(committed);
+
+    setDraft(nextDraft);
+    setSeenValue(committed);
+
+    if (inputRef.current) {
+      inputRef.current.value = nextDraft;
+    }
+
+    if (committed !== value) {
+      onChange(committed);
+    }
+  }
+
   return (
     <label className="block">
       <span className="text-sm font-semibold text-slate-700">
@@ -47,18 +91,35 @@ function NumberInput({
         )}
 
         <input
+          ref={inputRef}
           type="number"
           min="0"
           step={step}
-          defaultValue={value}
-          onBlur={(event) => {
-            const newValue = Math.max(
-              0,
-              Number(event.target.value) || 0
-            );
+          defaultValue={draft}
+          onFocus={() => {
+            setIsEditing(true);
+          }}
+          onChange={(event) => {
+            const next = event.currentTarget.value;
 
-            onChange(newValue);
-            event.target.value = String(newValue);
+            if (
+              next === "" &&
+              event.currentTarget.validity.badInput
+            ) {
+              return;
+            }
+
+            setDraft(next);
+
+            const parsed = parseCompleteCarWashNumber(next);
+
+            if (parsed !== null && parsed !== value) {
+              onChange(parsed);
+            }
+          }}
+          onBlur={(event) => {
+            setIsEditing(false);
+            commitDisplayedValue(event.currentTarget.value);
           }}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
