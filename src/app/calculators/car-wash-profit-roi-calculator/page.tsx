@@ -149,7 +149,7 @@ const faqs = [
   {
     question: "How does the car wash ROI calculation work?",
     answer:
-      "Annual ROI is calculated by dividing estimated annual profit by the total purchase, startup, renovation, and equipment investment entered. It is a simplified planning estimate and does not account for every tax, financing, depreciation, or cash-flow factor.",
+      "Annual ROI divides estimated annualized monthly profit by the full purchase/startup plus renovation investment. Monthly loan payments reduce that profit but do not reduce the investment amount. This simplified cash-flow-based planning estimate is not accounting profit or return on equity. It does not separate loan principal from interest or account for taxes and depreciation.",
   },
   {
     question: "Can I use this calculator before buying a car wash?",
@@ -580,6 +580,7 @@ export default function CarWashProfitROICalculator() {
                 value={loanPayment}
                 onChange={setLoanPayment}
                 prefix="$"
+                help="This payment is included in monthly expenses and reduces the calculator's estimated monthly profit. Annual ROI and payback still use the full purchase/startup plus renovation investment, without subtracting the financed amount. This is a simplified planning calculation, not an equity-return calculation."
               />
 
               <NumberInput
