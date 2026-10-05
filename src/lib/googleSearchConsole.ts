@@ -164,7 +164,8 @@ export async function querySearchConsole(
   startDate: string,
   endDate: string,
   dimensions?: string[],
-  rowLimit = 25
+  rowLimit = 25,
+  pageEquals?: string
 ) {
   const endpoint =
     `https://www.googleapis.com/webmasters/v3/sites/` +
@@ -178,6 +179,20 @@ export async function querySearchConsole(
 
   if (dimensions?.length) {
     body.dimensions = dimensions;
+  }
+
+  if (pageEquals) {
+    body.dimensionFilterGroups = [
+      {
+        filters: [
+          {
+            dimension: "page",
+            operator: "equals",
+            expression: pageEquals,
+          },
+        ],
+      },
+    ];
   }
 
   const response = await fetch(endpoint, {

@@ -55,6 +55,8 @@ When actual Search Console data is available, evaluate:
 
 Distinguish observed evidence from hypotheses. A metric that was queried and recorded is evidence. An explanation of why that metric moved is a hypothesis until the data supports it. Never invent metrics, and never assume access to live Search Console data. If current data is not in hand, say so and do not fill the gap with estimated numbers.
 
+Recorded evidence for 2026-09-06 through 2026-10-03: the Car Wash calculator returned 32 query rows, and the Vending Machine calculator returned 18 query rows. The returned query rows had zero clicks. Page-filtered query rows and page-level impression totals come from separate Search Analytics requests and are not additive. This note records that observation. It does not set a standing target.
+
 ## 3. SEO and Monetization Readiness
 
 SEO and AdSense are permanent strategic priorities. They are not the primary focus of every engineering sprint.

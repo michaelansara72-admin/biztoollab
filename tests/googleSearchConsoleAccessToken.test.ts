@@ -1,7 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { getGoogleAccessToken } from "../src/lib/googleSearchConsole";
+import {
+  getGoogleAccessToken,
+  querySearchConsole,
+} from "../src/lib/googleSearchConsole";
 
 const credentialKeys = [
   "GOOGLE_SEARCH_CONSOLE_CLIENT_ID",
@@ -203,4 +206,95 @@ test("missing Search Console credentials do not call Google", async () => {
   }
 
   assert.equal(fetchCalls, 0);
+});
+
+test("an omitted pageEquals preserves the existing request body", async () => {
+  const originalFetch = globalThis.fetch;
+  let body: Record<string, unknown> | undefined;
+
+  globalThis.fetch = (async (_url, init) => {
+    body = JSON.parse(String(init?.body));
+
+    return new Response(JSON.stringify({ rows: [] }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }) as typeof fetch;
+
+  try {
+    await querySearchConsole(
+      accessToken,
+      "2026-09-06",
+      "2026-10-03",
+      ["page"]
+    );
+
+    assert.deepEqual(body, {
+      startDate: "2026-09-06",
+      endDate: "2026-10-03",
+      rowLimit: 25,
+      dimensions: ["page"],
+    });
+    assert.equal(
+      body !== undefined &&
+        "dimensionFilterGroups" in body,
+      false
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("a provided pageEquals adds one exact page filter", async () => {
+  const originalFetch = globalThis.fetch;
+  let requestUrl = "";
+  let body: Record<string, unknown> | undefined;
+  const page =
+    "https://biztoollab.com/calculators/car-wash-profit-roi-calculator";
+
+  globalThis.fetch = (async (url, init) => {
+    requestUrl = String(url);
+    body = JSON.parse(String(init?.body));
+
+    return new Response(JSON.stringify({ rows: [] }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }) as typeof fetch;
+
+  try {
+    await querySearchConsole(
+      accessToken,
+      "2026-09-06",
+      "2026-10-03",
+      ["query"],
+      25,
+      page
+    );
+
+    assert.deepEqual(body, {
+      startDate: "2026-09-06",
+      endDate: "2026-10-03",
+      rowLimit: 25,
+      dimensions: ["query"],
+      dimensionFilterGroups: [
+        {
+          filters: [
+            {
+              dimension: "page",
+              operator: "equals",
+              expression: page,
+            },
+          ],
+        },
+      ],
+    });
+    assert.match(requestUrl, /searchAnalytics\/query$/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
