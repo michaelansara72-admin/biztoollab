@@ -16,6 +16,10 @@ import {
   saveImplementationPlan,
 } from "@/lib/implementationPlanRepository";
 
+import {
+  implementationPlanCreateFailure,
+} from "@/lib/mysqlDuplicateEntryError";
+
 export const runtime = "nodejs";
 
 type CreateImplementationPlanRequest = {
@@ -389,14 +393,16 @@ export async function POST(
       error
     );
 
+    const failure =
+      implementationPlanCreateFailure(error);
+
     return NextResponse.json(
       {
         success: false,
-        error:
-          "The implementation plan could not be created.",
+        error: failure.error,
       },
       {
-        status: 500,
+        status: failure.status,
       }
     );
   }
