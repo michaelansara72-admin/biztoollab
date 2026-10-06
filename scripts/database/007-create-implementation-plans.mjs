@@ -1,67 +1,7 @@
-﻿import mysql from "mysql2/promise";
-import fs from "node:fs";
-
-function loadLocalEnvironment() {
-  const envText = fs.readFileSync(
-    ".env.local",
-    "utf8"
-  );
-
-  for (const line of envText.split(/\r?\n/)) {
-    const trimmed = line.trim();
-
-    if (
-      !trimmed ||
-      trimmed.startsWith("#")
-    ) {
-      continue;
-    }
-
-    const separator =
-      trimmed.indexOf("=");
-
-    if (separator === -1) {
-      continue;
-    }
-
-    const key =
-      trimmed.slice(0, separator).trim();
-
-    let value =
-      trimmed.slice(separator + 1).trim();
-
-    if (
-      (
-        value.startsWith('"') &&
-        value.endsWith('"')
-      ) ||
-      (
-        value.startsWith("'") &&
-        value.endsWith("'")
-      )
-    ) {
-      value = value.slice(1, -1);
-    }
-
-    if (!process.env[key]) {
-      process.env[key] = value;
-    }
-  }
-}
-
-loadLocalEnvironment();
+﻿import { createMigrationConnection } from "./migrationConnection.mjs";
 
 const connection =
-  await mysql.createConnection({
-    host: process.env.MYSQL_HOST,
-    port: Number(
-      process.env.MYSQL_PORT ?? 3306
-    ),
-    database: process.env.MYSQL_DATABASE,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    connectTimeout: 10000,
-  });
+  await createMigrationConnection();
 
 try {
   console.log(
