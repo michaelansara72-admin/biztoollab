@@ -422,6 +422,49 @@ test("successful expected schema passes", async () => {
   );
 });
 
+test("quoted information_schema string defaults match the migration literals", async () => {
+  const snapshot = passingSnapshot();
+
+  for (const row of snapshot.columns) {
+    if (row.column_name === "status") {
+      row.column_default = "'draft'";
+    }
+
+    if (row.column_name === "created_by") {
+      row.column_default = "'admin'";
+    }
+  }
+
+  const report = await checkGovernanceSchema(
+    createHarness(snapshot).connection
+  );
+
+  assert.equal(checkById(report, "006", "experiments").pass, true);
+  assert.equal(checkById(report, "007", "implementation_plans").pass, true);
+  assert.equal(governanceDiagnosticExitCode(report), 0);
+});
+
+test("a different string default still fails", async () => {
+  const snapshot = passingSnapshot();
+  const createdBy = snapshot.columns.find(
+    (row) =>
+      row.table_name === "experiments" &&
+      row.column_name === "created_by"
+  );
+
+  assert.ok(createdBy);
+  createdBy.column_default = "'owner'";
+
+  const report = await checkGovernanceSchema(
+    createHarness(snapshot).connection
+  );
+  const experiments = checkById(report, "006", "experiments");
+
+  assert.equal(experiments.pass, false);
+  assert.match(experiments.detail, /created_by default is 'owner'/);
+  assert.equal(checkById(report, "007", "implementation_plans").pass, true);
+});
+
 test("missing table fails", async () => {
   const snapshot = passingSnapshot();
   snapshot.columns = snapshot.columns.filter(

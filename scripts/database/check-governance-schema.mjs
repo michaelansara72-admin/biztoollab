@@ -284,6 +284,20 @@ function normalizeType(value) {
     .replace(/\s+/g, "");
 }
 
+export function normalizeInformationSchemaStringDefault(value) {
+  let text = String(value ?? "").trim().toLowerCase();
+
+  if (
+    text.length >= 2 &&
+    text.startsWith("'") &&
+    text.endsWith("'")
+  ) {
+    text = text.slice(1, -1).replace(/''/g, "'");
+  }
+
+  return text;
+}
+
 function isCurrentTimestamp(value) {
   return /^current_timestamp(?:\(\))?$/i.test(
     String(value ?? "").trim()
@@ -372,7 +386,8 @@ function columnProblems(row, expected) {
 
   if (
     expected.defaultValue != null &&
-    !same(row.column_default, expected.defaultValue)
+    normalizeInformationSchemaStringDefault(row.column_default) !==
+      normalizeInformationSchemaStringDefault(expected.defaultValue)
   ) {
     problems.push(
       `${expected.name} default is ${row.column_default}`
