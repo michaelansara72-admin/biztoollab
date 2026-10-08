@@ -9,6 +9,7 @@ import CreateImplementationPlanControl from "./components/CreateImplementationPl
 import SavedImplementationPlan from "./components/SavedImplementationPlan";
 import RecommendationEvidence from "./components/RecommendationEvidence";
 import SearchConsoleComparisonPanel from "./components/SearchConsoleComparisonPanel";
+import SearchConsoleCredentialNotice from "./components/SearchConsoleCredentialNotice";
 import { getSearchConsoleSnapshots } from "@/lib/searchConsoleSnapshotRepository";
 import { describeSeoEvidenceState } from "@/lib/seoOpportunityEvidence";
 import {
@@ -146,7 +147,19 @@ function formatPageName(page: string) {
   }
 }
 
-async function getSearchConsoleData() {
+type SearchConsoleLoad =
+  | {
+      status: "ready";
+      data: SearchConsoleResponse;
+    }
+  | {
+      status: "session-rejected";
+    }
+  | {
+      status: "unavailable";
+    };
+
+async function getSearchConsoleData(): Promise<SearchConsoleLoad> {
   const headerStore = await headers();
 
   const host = headerStore.get("host") ?? "localhost:3000";
@@ -166,21 +179,43 @@ async function getSearchConsoleData() {
     )
     .join("; ");
 
-  const response = await fetch(
-    `${protocol}://${host}/api/admin/google/performance`,
-    {
-      headers: {
-        cookie: cookieHeader,
-      },
-      cache: "no-store",
+  try {
+    const response = await fetch(
+      `${protocol}://${host}/api/admin/google/performance`,
+      {
+        headers: {
+          cookie: cookieHeader,
+        },
+        cache: "no-store",
+      }
+    );
+
+    if (response.status === 401) {
+      return {
+        status: "session-rejected",
+      };
     }
-  );
 
-  if (!response.ok) {
-    return null;
+    if (!response.ok) {
+      return {
+        status: "unavailable",
+      };
+    }
+
+    return {
+      status: "ready",
+      data: (await response.json()) as SearchConsoleResponse,
+    };
+  } catch (error) {
+    console.error(
+      "Unable to load Search Console performance:",
+      error
+    );
+
+    return {
+      status: "unavailable",
+    };
   }
-
-  return (await response.json()) as SearchConsoleResponse;
 }
 async function getSeoOpportunityData() {
   const headerStore = await headers();
@@ -219,7 +254,20 @@ async function getSeoOpportunityData() {
 
   return (await response.json()) as SeoOpportunityResponse;
 }
-export default async function AdminPage() {
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{
+    google?: string | string[];
+  }>;
+}) {
+  const googleParameter = searchParams
+    ? (await searchParams).google
+    : undefined;
+  const googleFlag =
+    typeof googleParameter === "string"
+      ? googleParameter
+      : undefined;
   const cookieStore = await cookies();
 
   const sessionToken = cookieStore.get(
@@ -234,12 +282,17 @@ export default async function AdminPage() {
   }
 
   const [
-  searchConsoleData,
+  searchConsoleLoad,
   seoOpportunityData,
 ] = await Promise.all([
   getSearchConsoleData(),
   getSeoOpportunityData(),
 ]);
+
+const searchConsoleData =
+  searchConsoleLoad.status === "ready"
+    ? searchConsoleLoad.data
+    : null;
 
 const topQueries =
   searchConsoleData?.queries?.slice(0, 10) ?? [];
@@ -256,6 +309,7 @@ let searchConsoleSnapshots: Array<{
   evidenceEnd: string;
   collectedAt: string;
 }> = [];
+let snapshotLoad: "ready" | "unavailable" = "ready";
 
 try {
   const snapshotRecords = await getSearchConsoleSnapshots(20);
@@ -277,6 +331,7 @@ try {
         : String(snapshot.collected_at),
   }));
 } catch (error) {
+  snapshotLoad = "unavailable";
   console.error("Unable to load Search Console snapshots:", error);
 }
 // Retrieve the latest saved governance history.
@@ -375,6 +430,10 @@ try {
           <SignOutButton />
         </div>
 
+        <SearchConsoleCredentialNotice
+          googleFlag={googleFlag}
+        />
+
         {searchConsoleData ? (
           <>
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -459,6 +518,7 @@ try {
 
             <SearchConsoleComparisonPanel
   snapshots={searchConsoleSnapshots}
+  snapshotLoad={snapshotLoad}
 />
 <div className="mt-8 grid gap-6 lg:grid-cols-2">
               <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -549,12 +609,15 @@ try {
         ) : (
           <section className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
             <p className="font-bold text-amber-900">
-              Search Console data is currently unavailable.
+              {searchConsoleLoad.status === "session-rejected"
+                ? "Search Console could not verify this admin session."
+                : "Search Console data is currently unavailable."}
             </p>
 
             <p className="mt-2 text-sm text-amber-800">
-              Reconnect Google Search Console to restore live
-              SEO performance data.
+              {searchConsoleLoad.status === "session-rejected"
+                ? "Sign in again to retry the live performance request. Stored evidence was not changed."
+                : "Live performance could not be retrieved. Stored evidence was not changed."}
             </p>
           </section>
         )}
@@ -767,6 +830,7 @@ try {
 
         <SearchConsoleComparisonPanel
   snapshots={searchConsoleSnapshots}
+  snapshotLoad={snapshotLoad}
 />
 <div className="mt-8 grid gap-6 lg:grid-cols-2">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

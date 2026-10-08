@@ -10,6 +10,8 @@ import {
 import {
   handoffGoogleSearchConsoleRefreshToken,
   localRefreshInstallFailureMessage,
+  localRefreshInstalledGoogleFlag,
+  serverConfiguredGoogleFlag,
 } from "@/lib/googleSearchConsoleLocalRefreshInstall";
 
 
@@ -197,25 +199,17 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const googleFlag =
+    handoff.action === "installed"
+      ? localRefreshInstalledGoogleFlag
+      : serverConfiguredGoogleFlag;
+
   const response = NextResponse.redirect(
     new URL(
-      "/admin?google=refresh-token-ready",
+      `/admin?google=${googleFlag}`,
       request.url
     )
   );
-
-  if (handoff.action === "cookie") {
-    response.cookies.set({
-      name: "biztoollab_google_refresh_token_temp",
-      value: tokenData.refresh_token,
-      httpOnly: true,
-      secure:
-        process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 10,
-    });
-  }
 
   response.cookies.set({
     name: "biztoollab_google_oauth_state",

@@ -9,6 +9,11 @@ import {
   installLocalGoogleSearchConsoleRefreshToken,
   isLoopbackRedirectUri,
   localRefreshInstallFailureMessage,
+  localRefreshInstalledGoogleFlag,
+  localSearchConsoleCredentialNotice,
+  productionSearchConsoleCredentialNotice,
+  searchConsoleCredentialNotice,
+  serverConfiguredGoogleFlag,
 } from "../src/lib/googleSearchConsoleLocalRefreshInstall";
 
 const previousRefreshToken = "previous-local-refresh";
@@ -334,7 +339,7 @@ test("opted-in loopback development uses the installer", async () => {
   });
 });
 
-test("development without the opt-in keeps cookie handoff and does not install", async () => {
+test("development without the opt-in stays server-configured and does not install", async () => {
   const original = `GOOGLE_SEARCH_CONSOLE_REFRESH_TOKEN=${previousRefreshToken}\n`;
   let installerCalls = 0;
 
@@ -349,7 +354,7 @@ test("development without the opt-in keeps cookie handoff and does not install",
         },
       });
 
-    assert.equal(handoff.action, "cookie");
+    assert.equal(handoff.action, "server-configured");
     assert.equal(installerCalls, 0);
     assert.equal(
       await fs.readFile(envFilePath, "utf8"),
@@ -358,7 +363,7 @@ test("development without the opt-in keeps cookie handoff and does not install",
   });
 });
 
-test("production keeps cookie handoff and never invokes the installer", async () => {
+test("production stays server-configured and never invokes the installer", async () => {
   const original = `GOOGLE_SEARCH_CONSOLE_REFRESH_TOKEN=${previousRefreshToken}\n`;
   let installerCalls = 0;
 
@@ -375,7 +380,7 @@ test("production keeps cookie handoff and never invokes the installer", async ()
         },
       });
 
-    assert.equal(handoff.action, "cookie");
+    assert.equal(handoff.action, "server-configured");
     assert.equal(installerCalls, 0);
     assert.equal(
       await fs.readFile(envFilePath, "utf8"),
@@ -439,7 +444,45 @@ test("installer failure leaves the env file unchanged", async () => {
   });
 });
 
-test("the callback keeps the previous cookie path outside local install", async () => {
+test("credential notices stay fixed and do not echo a supplied flag", () => {
+  assert.equal(
+    searchConsoleCredentialNotice(
+      serverConfiguredGoogleFlag
+    ),
+    productionSearchConsoleCredentialNotice
+  );
+  assert.equal(
+    searchConsoleCredentialNotice(
+      localRefreshInstalledGoogleFlag
+    ),
+    localSearchConsoleCredentialNotice
+  );
+  assert.equal(
+    searchConsoleCredentialNotice(
+      "refresh-token-ready"
+    ),
+    null
+  );
+  assert.equal(
+    searchConsoleCredentialNotice(nextRefreshToken),
+    null
+  );
+  assert.equal(
+    searchConsoleCredentialNotice(undefined),
+    null
+  );
+
+  for (const notice of [
+    productionSearchConsoleCredentialNotice,
+    localSearchConsoleCredentialNotice,
+  ]) {
+    assertSecretNotLeaked(notice);
+    assert.equal(notice.includes("GOOGLE_"), false);
+    assert.equal(notice.includes(".env"), false);
+  }
+});
+
+test("the production callback does not store a refresh token cookie", async () => {
   const source = await fs.readFile(
     path.join(
       process.cwd(),
@@ -448,9 +491,15 @@ test("the callback keeps the previous cookie path outside local install", async 
     "utf8"
   );
 
-  assert.match(
-    source,
-    /biztoollab_google_refresh_token_temp/
+  assert.equal(
+    source.includes(
+      "biztoollab_google_refresh_token_temp"
+    ),
+    false
+  );
+  assert.equal(
+    source.includes("refresh-token-ready"),
+    false
   );
   assert.match(
     source,
@@ -464,8 +513,13 @@ test("the callback keeps the previous cookie path outside local install", async 
   );
   assert.match(
     source,
-    /new URL\(\s*"\/admin\?google=refresh-token-ready",\s*request\.url\s*\)/
+    /serverConfiguredGoogleFlag/
   );
+  assert.match(
+    source,
+    /localRefreshInstalledGoogleFlag/
+  );
+  assert.match(source, /request\.url/);
   assert.equal(source.includes(nextRefreshToken), false);
   assert.equal(
     source.includes(previousRefreshToken),

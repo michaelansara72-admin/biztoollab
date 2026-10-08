@@ -58,8 +58,11 @@ type CompareApiResponse =
       error: string;
     };
 
+export type SnapshotLoadStatus = "ready" | "unavailable";
+
 type Props = {
   snapshots: SnapshotOption[];
+  snapshotLoad?: SnapshotLoadStatus;
 };
 
 function formatDate(value: string) {
@@ -179,6 +182,7 @@ function MetricCard({
 
 export default function SearchConsoleComparisonPanel({
   snapshots,
+  snapshotLoad = "ready",
 }: Props) {
   const [baselineId, setBaselineId] =
     useState("");
@@ -194,6 +198,26 @@ export default function SearchConsoleComparisonPanel({
 
   const [loading, setLoading] =
     useState(false);
+
+  if (snapshotLoad === "unavailable") {
+    return (
+      <section className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-6 shadow-sm">
+        <p className="text-sm font-bold uppercase tracking-[0.14em] text-amber-700">
+          Historical Comparison
+        </p>
+
+        <h2 className="mt-2 text-xl font-bold text-amber-950">
+          Historical comparison is unavailable.
+        </h2>
+
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-amber-900">
+          Stored Search Console snapshots could not be
+          loaded. This does not mean the evidence table
+          is empty, and no stored evidence was changed.
+        </p>
+      </section>
+    );
+  }
 
   if (snapshots.length < 2) {
     const snapshot = snapshots[0];

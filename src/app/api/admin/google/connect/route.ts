@@ -1,12 +1,14 @@
 import crypto from "crypto";
 
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import {
   adminSessionCookie,
   verifyAdminSessionToken,
 } from "@/lib/adminAuth";
+
+import { resolveApplicationOrigin } from "@/lib/applicationOrigin";
 
 export const runtime = "nodejs";
 
@@ -16,7 +18,7 @@ const GOOGLE_AUTH_URL =
 const SEARCH_CONSOLE_SCOPE =
   "https://www.googleapis.com/auth/webmasters.readonly";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const cookieStore = await cookies();
 
   const sessionToken = cookieStore.get(
@@ -25,7 +27,19 @@ export async function GET() {
 
   if (!verifyAdminSessionToken(sessionToken)) {
     return NextResponse.redirect(
-      new URL("/admin/login", "http://localhost:3000")
+      new URL(
+        "/admin/login",
+        resolveApplicationOrigin({
+          forwardedHost: request.headers.get(
+            "x-forwarded-host"
+          ),
+          forwardedProto: request.headers.get(
+            "x-forwarded-proto"
+          ),
+          host: request.headers.get("host"),
+          requestUrl: request.url,
+        })
+      )
     );
   }
 

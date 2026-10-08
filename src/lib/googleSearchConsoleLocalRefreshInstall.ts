@@ -21,16 +21,42 @@ type InstallLocalRefreshTokenInput = {
   redirectUri?: string;
 };
 
+export const serverConfiguredGoogleFlag =
+  "server-configured";
+
+export const localRefreshInstalledGoogleFlag =
+  "local-refresh-installed";
+
+export const productionSearchConsoleCredentialNotice =
+  "Production Search Console credentials are configured on the server. This sign-in did not change them.";
+
+export const localSearchConsoleCredentialNotice =
+  "The local Search Console credential was installed for development. The credential was not displayed.";
+
 export type RefreshTokenHandoff =
   | {
       action: "installed";
     }
   | {
-      action: "cookie";
+      action: "server-configured";
     }
   | {
       action: "failed";
     };
+
+export function searchConsoleCredentialNotice(
+  flag: string | undefined
+) {
+  if (flag === serverConfiguredGoogleFlag) {
+    return productionSearchConsoleCredentialNotice;
+  }
+
+  if (flag === localRefreshInstalledGoogleFlag) {
+    return localSearchConsoleCredentialNotice;
+  }
+
+  return null;
+}
 
 export function isLoopbackRedirectUri(
   value: string | undefined
@@ -381,7 +407,7 @@ export async function handoffGoogleSearchConsoleRefreshToken(
 
   if (!shouldUseLocalRefreshInstall(input)) {
     return {
-      action: "cookie",
+      action: "server-configured",
     };
   }
 
