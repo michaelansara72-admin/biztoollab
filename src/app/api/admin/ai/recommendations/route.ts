@@ -17,15 +17,15 @@ import {
 
 import {
   getSearchConsoleSnapshotById,
-  type SavedSearchConsoleSnapshot,
 } from "@/lib/searchConsoleSnapshotRepository";
 
 import {
   createSeoEvidenceFingerprint,
-  type SeoEvidence,
-  type SeoEvidencePage,
-  type SeoEvidenceQuery,
 } from "@/lib/seoEvidence";
+
+import {
+  createEvidenceFromSnapshot,
+} from "@/lib/seoOpportunityEvidence";
 
 import { db } from "@/lib/db";
 
@@ -100,177 +100,6 @@ function isGovernanceStatus(
     value === "monitor-longer" ||
     value === "candidate-experiment"
   );
-}
-
-function formatDatabaseDate(
-  value: Date | string
-): string {
-  if (value instanceof Date) {
-    return value.toISOString().slice(0, 10);
-  }
-
-  return String(value).slice(0, 10);
-}
-
-function parseJsonArray(
-  value: string | object | null
-): unknown[] {
-  if (value === null) {
-    return [];
-  }
-
-  if (Array.isArray(value)) {
-    return value;
-  }
-
-  if (typeof value === "string") {
-    const parsed: unknown = JSON.parse(value);
-
-    if (!Array.isArray(parsed)) {
-      throw new Error(
-        "Snapshot JSON evidence must contain an array."
-      );
-    }
-
-    return parsed;
-  }
-
-  throw new Error(
-    "Snapshot JSON evidence has an invalid structure."
-  );
-}
-
-function isEvidenceQuery(
-  value: unknown
-): value is SeoEvidenceQuery {
-  if (
-    typeof value !== "object" ||
-    value === null
-  ) {
-    return false;
-  }
-
-  const row = value as Record<string, unknown>;
-
-  return (
-    typeof row.query === "string" &&
-    Number.isFinite(Number(row.clicks)) &&
-    Number.isFinite(Number(row.impressions)) &&
-    Number.isFinite(Number(row.ctr)) &&
-    Number.isFinite(Number(row.position))
-  );
-}
-
-function isEvidencePage(
-  value: unknown
-): value is SeoEvidencePage {
-  if (
-    typeof value !== "object" ||
-    value === null
-  ) {
-    return false;
-  }
-
-  const row = value as Record<string, unknown>;
-
-  return (
-    typeof row.page === "string" &&
-    Number.isFinite(Number(row.clicks)) &&
-    Number.isFinite(Number(row.impressions)) &&
-    Number.isFinite(Number(row.ctr)) &&
-    Number.isFinite(Number(row.position))
-  );
-}
-
-function normalizeQueries(
-  values: unknown[]
-): SeoEvidenceQuery[] {
-  return values.map((value) => {
-    if (!isEvidenceQuery(value)) {
-      throw new Error(
-        "Stored Search Console query evidence is invalid."
-      );
-    }
-
-    return {
-      query: value.query,
-      clicks: Number(value.clicks),
-      impressions: Number(value.impressions),
-      ctr: Number(value.ctr),
-      position: Number(value.position),
-    };
-  });
-}
-
-function normalizePages(
-  values: unknown[]
-): SeoEvidencePage[] {
-  return values.map((value) => {
-    if (!isEvidencePage(value)) {
-      throw new Error(
-        "Stored Search Console page evidence is invalid."
-      );
-    }
-
-    return {
-      page: value.page,
-      clicks: Number(value.clicks),
-      impressions: Number(value.impressions),
-      ctr: Number(value.ctr),
-      position: Number(value.position),
-    };
-  });
-}
-
-function createEvidenceFromSnapshot(
-  snapshot: SavedSearchConsoleSnapshot
-): SeoEvidence {
-  const queries = normalizeQueries(
-    parseJsonArray(snapshot.queries_json)
-  );
-
-  const pages = normalizePages(
-    parseJsonArray(snapshot.pages_json)
-  );
-
-  const clicks = Number(snapshot.clicks);
-  const impressions = Number(snapshot.impressions);
-  const ctr = Number(snapshot.ctr);
-  const position = Number(snapshot.position);
-
-  if (
-    !Number.isFinite(clicks) ||
-    !Number.isFinite(impressions) ||
-    !Number.isFinite(ctr) ||
-    !Number.isFinite(position)
-  ) {
-    throw new Error(
-      "Stored Search Console snapshot metrics are invalid."
-    );
-  }
-
-  return {
-    siteUrl: snapshot.site_url,
-
-    period: {
-      startDate: formatDatabaseDate(
-        snapshot.evidence_start
-      ),
-      endDate: formatDatabaseDate(
-        snapshot.evidence_end
-      ),
-    },
-
-    metrics: {
-      clicks,
-      impressions,
-      ctr,
-      position,
-    },
-
-    queries,
-    pages,
-  };
 }
 
 export async function POST(request: Request) {

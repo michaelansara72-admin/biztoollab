@@ -10,6 +10,7 @@ import SavedImplementationPlan from "./components/SavedImplementationPlan";
 import RecommendationEvidence from "./components/RecommendationEvidence";
 import SearchConsoleComparisonPanel from "./components/SearchConsoleComparisonPanel";
 import { getSearchConsoleSnapshots } from "@/lib/searchConsoleSnapshotRepository";
+import { describeSeoEvidenceState } from "@/lib/seoOpportunityEvidence";
 import {
   getSnapshotsForRecommendation,
 } from "@/lib/recommendationSnapshotRepository";
@@ -74,6 +75,11 @@ type SeoOpportunityResponse = {
   siteUrl: string;
   snapshotId: number;
   evidenceFingerprint: string;
+  evidenceState?: "fresh-capture" | "stored-snapshot";
+  collectedAt?: string | null;
+  evidenceCoverage?: {
+    description: string;
+  };
   period: {
     startDate: string;
     endDate: string;
@@ -647,6 +653,24 @@ try {
 
   {seoAnalysis ? (
     <>
+      {seoOpportunityData?.evidenceState && (
+        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <p className="text-sm leading-6 text-slate-700">
+            {describeSeoEvidenceState({
+              evidenceState: seoOpportunityData.evidenceState,
+              collectedAt:
+                seoOpportunityData.collectedAt ?? null,
+            })}
+          </p>
+
+          {seoOpportunityData.evidenceCoverage?.description && (
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {seoOpportunityData.evidenceCoverage.description}
+            </p>
+          )}
+        </div>
+      )}
+
       <p className="mt-4 text-sm leading-6 text-slate-600">
         {seoAnalysis.summary}
       </p>
