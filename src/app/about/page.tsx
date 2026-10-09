@@ -35,6 +35,10 @@ export default function AboutPage() {
 
         <div className="mt-8 space-y-6 text-lg leading-8 text-slate-600">
           <p>
+            BizToolLab is operated by Synergy Media & Tech LLC.
+          </p>
+
+          <p>
             BizToolLab is a growing collection of free business calculators and
             practical decision-making tools designed for entrepreneurs,
             small-business owners, side hustlers, and people evaluating new

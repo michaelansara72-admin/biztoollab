@@ -1,3 +1,4 @@
+import SiteFooter from "./components/SiteFooter";
 import ToolSearch from "./components/ToolSearch";
 
 const tools = [
@@ -266,45 +267,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="bg-slate-950 text-slate-300">
-        <div className="mx-auto max-w-7xl px-6 py-10">
-          <div className="flex flex-col justify-between gap-6 sm:flex-row">
-            <div>
-              <div className="text-lg font-semibold text-white">
-                BizToolLab
-              </div>
-              <p className="mt-2 text-sm text-slate-400">
-                Smart tools for smarter business decisions.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-6 text-sm">
-              <a
-                href="/calculators"
-                className="hover:text-white"
-              >
-                Calculators
-              </a>
-              <a href="/about" className="hover:text-white">
-                About
-              </a>
-              <a href="/privacy" className="hover:text-white">
-                Privacy
-              </a>
-              <a href="/terms" className="hover:text-white">
-                Terms
-              </a>
-              <a href="/contact" className="hover:text-white">
-                Contact
-              </a>
-            </div>
-          </div>
-
-          <div className="mt-8 border-t border-slate-800 pt-6 text-sm text-slate-500">
-            © 2026 BizToolLab. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

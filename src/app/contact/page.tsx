@@ -44,13 +44,14 @@ export default function ContactPage() {
           </h2>
 
           <p className="mt-4 leading-7 text-slate-600">
-            A dedicated BizToolLab contact email is being prepared and will be
-            published here soon.
-          </p>
-
-          <p className="mt-4 text-sm leading-6 text-slate-500">
-            We recommend using a dedicated business email address rather than a
-            personal email address for public website communications.
+            Email{" "}
+            <a
+              href="mailto:support@biztoollab.com"
+              className="font-semibold text-slate-900 underline"
+            >
+              support@biztoollab.com
+            </a>
+            .
           </p>
         </div>
 
@@ -62,7 +63,14 @@ export default function ContactPage() {
           <p className="mt-4 leading-7 text-slate-600">
             If there is a business calculation, industry-specific tool, or
             financial planning utility you would like to see added to
-            BizToolLab, we plan to provide a way to submit suggestions here.
+            BizToolLab, email{" "}
+            <a
+              href="mailto:support@biztoollab.com"
+              className="font-semibold text-slate-900 underline"
+            >
+              support@biztoollab.com
+            </a>
+            .
           </p>
         </div>
       </section>

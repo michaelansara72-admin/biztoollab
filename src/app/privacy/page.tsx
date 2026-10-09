@@ -34,7 +34,11 @@ export default function PrivacyPage() {
         </h1>
 
         <p className="mt-4 text-sm text-slate-500">
-          Last updated: September 8, 2026
+          Last updated: October 9, 2026
+        </p>
+
+        <p className="mt-6 leading-7 text-slate-600">
+          BizToolLab is operated by Synergy Media & Tech LLC.
         </p>
 
         <div className="mt-10 space-y-10 leading-7 text-slate-600">
@@ -124,8 +128,14 @@ export default function PrivacyPage() {
             </h2>
 
             <p className="mt-3">
-              Questions regarding this Privacy Policy may be submitted through
-              the BizToolLab Contact page.
+              Questions regarding this Privacy Policy may be sent to{" "}
+              <a
+                href="mailto:support@biztoollab.com"
+                className="font-semibold text-slate-900 underline"
+              >
+                support@biztoollab.com
+              </a>
+              .
             </p>
           </section>
         </div>
