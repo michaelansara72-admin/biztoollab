@@ -2,6 +2,10 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import {
+  calculateBreakEven,
+  formatContributionMargin,
+} from "./calculateBreakEven";
 
 export default function BreakEvenCalculator() {
   const [fixedCosts, setFixedCosts] = useState(10000);
@@ -9,41 +13,16 @@ export default function BreakEvenCalculator() {
   const [variableCost, setVariableCost] = useState(20);
   const [targetProfit, setTargetProfit] = useState(5000);
 
-  const results = useMemo(() => {
-    const contributionMarginPerUnit = sellingPrice - variableCost;
-
-    const contributionMarginRatio =
-      sellingPrice > 0 ? contributionMarginPerUnit / sellingPrice : 0;
-
-    const breakEvenUnits =
-      contributionMarginPerUnit > 0
-        ? fixedCosts / contributionMarginPerUnit
-        : null;
-
-    const breakEvenRevenue =
-      contributionMarginRatio > 0
-        ? fixedCosts / contributionMarginRatio
-        : null;
-
-    const targetProfitUnits =
-      contributionMarginPerUnit > 0
-        ? (fixedCosts + targetProfit) / contributionMarginPerUnit
-        : null;
-
-    const targetProfitRevenue =
-      contributionMarginRatio > 0
-        ? (fixedCosts + targetProfit) / contributionMarginRatio
-        : null;
-
-    return {
-      contributionMarginPerUnit,
-      contributionMarginRatio,
-      breakEvenUnits,
-      breakEvenRevenue,
-      targetProfitUnits,
-      targetProfitRevenue,
-    };
-  }, [fixedCosts, sellingPrice, variableCost, targetProfit]);
+  const results = useMemo(
+    () =>
+      calculateBreakEven({
+        fixedCosts,
+        sellingPrice,
+        variableCost,
+        targetProfit,
+      }),
+    [fixedCosts, sellingPrice, variableCost, targetProfit],
+  );
 
   const currency = (value: number) =>
     new Intl.NumberFormat("en-US", {
@@ -58,8 +37,7 @@ export default function BreakEvenCalculator() {
       maximumFractionDigits: 1,
     })}%`;
 
-  const wholeNumber = (value: number) =>
-    Math.ceil(value).toLocaleString("en-US");
+  const wholeNumber = (value: number) => value.toLocaleString("en-US");
 
   const NumberField = ({
     label,
@@ -240,17 +218,19 @@ export default function BreakEvenCalculator() {
               {isValid ? (
                 <>
                   <div className="mt-5">
-                    <p className="text-sm text-slate-400">Break-Even Units</p>
+                    <p className="text-sm text-slate-400">
+                      Break-Even Units (Rounded Up)
+                    </p>
                     <p className="mt-1 text-4xl font-bold">
-                      {results.breakEvenUnits !== null
-                        ? wholeNumber(results.breakEvenUnits)
+                      {results.breakEvenUnitsRoundedUp !== null
+                        ? wholeNumber(results.breakEvenUnitsRoundedUp)
                         : "—"}
                     </p>
                   </div>
 
                   <div className="mt-5">
                     <p className="text-sm text-slate-400">
-                      Break-Even Revenue
+                      Theoretical Break-Even Revenue
                     </p>
                     <p className="mt-1 text-2xl font-semibold">
                       {results.breakEvenRevenue !== null
@@ -258,6 +238,14 @@ export default function BreakEvenCalculator() {
                         : "—"}
                     </p>
                   </div>
+
+                  <p className="mt-4 text-sm leading-6 text-slate-400">
+                    Units are rounded up to the next whole unit. Revenue is
+                    calculated at the theoretical break-even point, so it may
+                    differ from rounded units multiplied by selling price. The
+                    same distinction applies to target-profit units and
+                    theoretical target-profit revenue.
+                  </p>
                 </>
               ) : (
                 <div className="mt-5 rounded-xl border border-amber-700 bg-amber-950/40 p-4">
@@ -277,7 +265,9 @@ export default function BreakEvenCalculator() {
                 <div className="space-y-4 p-6">
                   <ResultRow
                     label="Contribution Margin / Unit"
-                    value={currency(results.contributionMarginPerUnit)}
+                    value={formatContributionMargin(
+                      results.contributionMarginPerUnit,
+                    )}
                   />
 
                   <ResultRow
@@ -287,17 +277,17 @@ export default function BreakEvenCalculator() {
 
                   <div className="border-t border-slate-800 pt-4">
                     <ResultRow
-                      label="Break-Even Units"
+                      label="Break-Even Units (Rounded Up)"
                       value={
-                        results.breakEvenUnits !== null
-                          ? wholeNumber(results.breakEvenUnits)
+                        results.breakEvenUnitsRoundedUp !== null
+                          ? wholeNumber(results.breakEvenUnitsRoundedUp)
                           : "—"
                       }
                     />
                   </div>
 
                   <ResultRow
-                    label="Break-Even Revenue"
+                    label="Theoretical Break-Even Revenue"
                     value={
                       results.breakEvenRevenue !== null
                         ? currency(results.breakEvenRevenue)
@@ -307,17 +297,17 @@ export default function BreakEvenCalculator() {
 
                   <div className="border-t border-slate-800 pt-4">
                     <ResultRow
-                      label={`Units for ${currency(targetProfit)} Profit`}
+                      label="Target Profit Units (Rounded Up)"
                       value={
-                        results.targetProfitUnits !== null
-                          ? wholeNumber(results.targetProfitUnits)
+                        results.targetProfitUnitsRoundedUp !== null
+                          ? wholeNumber(results.targetProfitUnitsRoundedUp)
                           : "—"
                       }
                     />
                   </div>
 
                   <ResultRow
-                    label={`Revenue for ${currency(targetProfit)} Profit`}
+                    label="Theoretical Target Profit Revenue"
                     value={
                       results.targetProfitRevenue !== null
                         ? currency(results.targetProfitRevenue)
@@ -330,11 +320,12 @@ export default function BreakEvenCalculator() {
                   <p className="text-sm font-semibold">Quick interpretation</p>
 
                   <p className="mt-2 text-sm leading-6 text-slate-300">
-                    At these assumptions, you need to sell approximately{" "}
-                    {results.breakEvenUnits !== null
-                      ? wholeNumber(results.breakEvenUnits)
+                    At these assumptions, you need to sell{" "}
+                    {results.breakEvenUnitsRoundedUp !== null
+                      ? wholeNumber(results.breakEvenUnitsRoundedUp)
                       : "0"}{" "}
-                    units to cover your estimated fixed and variable costs.
+                    whole units, rounded up, to cover your estimated fixed and
+                    variable costs.
                   </p>
                 </div>
               </>
@@ -356,18 +347,24 @@ export default function BreakEvenCalculator() {
             </p>
 
             <p>
-              Break-even units are calculated by dividing total fixed costs by
-              contribution margin per unit.
+              Exact break-even units are calculated by dividing total fixed
+              costs by contribution margin per unit. The displayed unit count
+              is that result rounded up to the next whole unit.
             </p>
 
             <p>
-              Break-even revenue uses the contribution margin ratio to estimate
-              the total sales dollars required to cover fixed costs.
+              Theoretical break-even revenue uses the contribution margin ratio
+              to estimate the total sales dollars required to cover fixed costs.
+              It is the exact unit count multiplied by the selling price, so it
+              can differ from the rounded-up unit count multiplied by the
+              selling price.
             </p>
 
             <p>
               The target-profit calculation adds your desired profit to fixed
-              costs before calculating the required unit sales and revenue.
+              costs before calculating the required unit sales and theoretical
+              revenue. Target-profit units are also rounded up, and theoretical
+              target-profit revenue stays at the exact point.
             </p>
           </div>
           {/* HOW TO USE */}
@@ -425,16 +422,24 @@ export default function BreakEvenCalculator() {
             </p>
 
             <p className="mt-4 text-sm leading-7 text-slate-600">
-              The contribution margin is $30 per unit. Dividing $10,000 in
-              fixed costs by the $30 contribution margin means the business
-              needs to sell approximately 334 units to break even.
+              The contribution margin is $30 per unit. Dividing $10,000 by $30
+              gives exact break-even units of 333.333. Rounded up, the business
+              needs to sell 334 whole units. Revenue from those 334 units would
+              be $16,700.
             </p>
 
             <p className="mt-4 text-sm leading-7 text-slate-600">
-              At a $50 selling price, break-even revenue would be about
-              $16,667. If the business wants to earn a $5,000 target profit,
-              it would need to sell approximately 500 units, producing about
-              $25,000 in revenue.
+              Theoretical break-even revenue is about $16,666.67, the sales
+              dollars at the exact break-even point. It differs from $16,700
+              because the unit count is rounded up and the revenue is not the
+              revenue of those rounded units. The results round displayed
+              dollar amounts to the nearest dollar.
+            </p>
+
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              If the business wants to earn a $5,000 target profit, exact
+              target-profit units are 500, so the rounded-up count is also 500.
+              Theoretical target-profit revenue is $25,000.
             </p>
           </section>
 
@@ -605,9 +610,11 @@ function ResultRow({
   value: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="text-sm text-slate-400">{label}</span>
-      <span className="text-right font-semibold text-white">{value}</span>
+    <div className="flex items-start justify-between gap-4">
+      <span className="min-w-0 text-sm text-slate-400">{label}</span>
+      <span className="shrink-0 text-right font-semibold text-white">
+        {value}
+      </span>
     </div>
   );
 }
