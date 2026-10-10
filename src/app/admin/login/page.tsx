@@ -29,6 +29,14 @@ export default function AdminLoginPage() {
 
       const data = await response.json();
 
+      if (response.status === 429) {
+        setError(
+          "Too many login attempts. Please wait and try again."
+        );
+        setLoading(false);
+        return;
+      }
+
       if (!response.ok || !data.success) {
         setError("Invalid password.");
         setLoading(false);
