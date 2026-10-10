@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { calculateRoi } from "./calculateRoi";
 
 type NumberFieldProps = {
   label: string;
@@ -104,35 +105,15 @@ export default function RoiCalculatorPage() {
   const [totalReturn, setTotalReturn] = useState(65000);
   const [holdingPeriodYears, setHoldingPeriodYears] = useState(3);
 
-  const results = useMemo(() => {
-    const netProfit = totalReturn - initialInvestment;
-
-    const roi =
-      initialInvestment > 0
-        ? (netProfit / initialInvestment) * 100
-        : 0;
-
-    const returnMultiple =
-      initialInvestment > 0
-        ? totalReturn / initialInvestment
-        : 0;
-
-    const annualizedReturn =
-      initialInvestment > 0 &&
-      totalReturn > 0 &&
-      holdingPeriodYears > 0
-        ? (Math.pow(totalReturn / initialInvestment, 1 / holdingPeriodYears) -
-            1) *
-          100
-        : 0;
-
-    return {
-      netProfit,
-      roi,
-      returnMultiple,
-      annualizedReturn,
-    };
-  }, [initialInvestment, totalReturn, holdingPeriodYears]);
+  const results = useMemo(
+    () =>
+      calculateRoi({
+        initialInvestment,
+        finalValue: totalReturn,
+        holdingPeriodYears,
+      }),
+    [initialInvestment, totalReturn, holdingPeriodYears]
+  );
 
   const currency = (value: number) =>
     new Intl.NumberFormat("en-US", {
@@ -146,11 +127,6 @@ export default function RoiCalculatorPage() {
 
   const multiple = (value: number) =>
     `${value.toFixed(2)}x`;
-
-  const isValid =
-    initialInvestment > 0 &&
-    totalReturn >= 0 &&
-    holdingPeriodYears > 0;
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -272,7 +248,7 @@ export default function RoiCalculatorPage() {
                 Estimated Results
               </p>
 
-              {!isValid ? (
+              {results === null ? (
                 <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-5 text-amber-200">
                   <p className="font-bold">
                     ROI cannot be calculated.
@@ -290,7 +266,7 @@ export default function RoiCalculatorPage() {
 
                   <ResultRow
                     label="ROI"
-                    value={percent(results.roi)}
+                    value={percent(results.roiPercent)}
                     emphasized
                   />
 
@@ -301,7 +277,7 @@ export default function RoiCalculatorPage() {
 
                   <ResultRow
                     label="Annualized Return"
-                    value={percent(results.annualizedReturn)}
+                    value={percent(results.annualizedReturnPercent)}
                   />
                 </div>
               )}
