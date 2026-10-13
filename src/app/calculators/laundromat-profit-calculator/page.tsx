@@ -189,7 +189,7 @@ export default function LaundromatProfitCalculator() {
 
           <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-600">
             Estimate laundromat revenue, expenses, profit,
-            return on investment, and break-even time using
+            return on investment, and investment payback using
             machine activity, additional services, operating
             costs, and financing.
           </p>
@@ -492,7 +492,7 @@ export default function LaundromatProfitCalculator() {
               />
 
               <Result
-                label="Estimated break-even"
+                label="Estimated Investment Payback (Months)"
                 value={
                   results.breakEvenMonths !== null
                     ? `${results.breakEvenMonths.toFixed(
@@ -503,7 +503,7 @@ export default function LaundromatProfitCalculator() {
               />
 
               <Result
-                label="Estimated payback period"
+                label="Estimated Investment Payback (Years)"
                 value={
                   results.breakEvenYears !== null
                     ? `${results.breakEvenYears.toFixed(
