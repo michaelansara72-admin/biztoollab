@@ -40,7 +40,7 @@ const tools = [
   {
     title: "Profit Margin Calculator",
     description:
-      "Quickly calculate gross profit, margin percentage, markup, and selling price.",
+      "Calculate gross profit, net profit, and how much of your revenue remains after costs.",
     category: "Business Calculator",
     href: "/calculators/profit-margin-calculator",
   },

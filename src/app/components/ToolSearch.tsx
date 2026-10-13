@@ -34,7 +34,6 @@ const searchableTools = [
     keywords: [
       "profit margin",
       "margin",
-      "markup",
       "gross profit",
     ],
   },
