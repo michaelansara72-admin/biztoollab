@@ -34,7 +34,7 @@ export default function PrivacyPage() {
         </h1>
 
         <p className="mt-4 text-sm text-slate-500">
-          Last updated: October 9, 2026
+          Last updated: October 13, 2026
         </p>
 
         <p className="mt-6 leading-7 text-slate-600">
@@ -107,6 +107,21 @@ export default function PrivacyPage() {
               BizToolLab may use third-party hosting, analytics, advertising,
               or other technology providers. Those services may process
               information according to their own privacy policies and terms.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-slate-900">
+              Optional AI-assisted analysis
+            </h2>
+
+            <p className="mt-3">
+              When you choose optional AI analysis, BizToolLab sends your
+              calculator inputs and calculated results to OpenAI to generate
+              the analysis displayed to you. BizToolLab does not save these AI
+              requests or responses in its application database. OpenAI
+              processes information according to its applicable terms and
+              policies.
             </p>
           </section>
 

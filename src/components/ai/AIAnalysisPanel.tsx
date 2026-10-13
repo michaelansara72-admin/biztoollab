@@ -1,3 +1,4 @@
+import Link from "next/link";
 import AIInsight from "./AIInsight";
 
 type AIAnalysis = {
@@ -33,6 +34,19 @@ export default function AIAnalysisPanel({
       <p className="mt-2 text-sm leading-6 text-slate-600">
         Get an AI-powered analysis of your current assumptions and estimated
         results.
+      </p>
+
+      <p className="mt-3 text-sm leading-6 text-slate-600">
+        This sends your calculator inputs and results to OpenAI for
+        AI-assisted analysis. The response may be inaccurate and is for
+        educational and planning purposes only—not financial, tax, legal, or
+        investment advice.{" "}
+        <Link
+          href="/privacy"
+          className="font-semibold text-slate-900 underline"
+        >
+          Privacy Policy
+        </Link>
       </p>
 
       <button
