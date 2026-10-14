@@ -137,7 +137,7 @@ export default function RoiCalculatorPage() {
           </Link>
 
           <Link
-            href="/"
+            href="/calculators"
             className="text-sm font-semibold text-slate-600 transition hover:text-slate-900"
           >
             Back to calculators
@@ -235,10 +235,6 @@ export default function RoiCalculatorPage() {
                   holding period.
                 </p>
               </div>
-            </section>
-
-            <section className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-400">
-              Advertisement space
             </section>
           </div>
 
