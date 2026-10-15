@@ -1,6 +1,15 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   calculateOperatingResilience,
   type OperatingResilienceMarginOfSafety,
@@ -22,6 +31,20 @@ import {
   undefinedOperatingMarginMessage,
   type OperatingOutlookField,
 } from "@/lib/finance/operatingOutlookMessages";
+import {
+  consumeOperatingInputHandoff,
+  writeOperatingInputHandoff,
+  type OperatingInputHandoffFields,
+} from "@/lib/finance/operatingInputHandoff";
+
+const EXAMPLE_AMOUNTS = {
+  monthlyRevenue: "10000",
+  variableCostRatePercent: "30",
+  monthlyFixedCosts: "5000",
+};
+
+const CARRY_FAILURE_MESSAGE =
+  "These amounts could not be carried in this browser. Your entries are still here.";
 
 const currency = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -308,9 +331,111 @@ function FindingCard({ finding }: { finding: OperatingResilienceFinding }) {
 }
 
 export default function OperatingResilienceCalculator() {
-  const [monthlyRevenue, setMonthlyRevenue] = useState("10000");
-  const [variableCostRatePercent, setVariableCostRatePercent] = useState("30");
-  const [monthlyFixedCosts, setMonthlyFixedCosts] = useState("5000");
+  const router = useRouter();
+  const restoredHandoff = useRef<{
+    status: "pending" | "restored" | "absent";
+    fields: OperatingInputHandoffFields | null;
+  }>({ status: "pending", fields: null });
+  const wroteTransfer = useRef(false);
+  const carriedNoticeRef = useRef<HTMLParagraphElement>(null);
+  const [monthlyRevenue, setMonthlyRevenue] = useState(
+    EXAMPLE_AMOUNTS.monthlyRevenue,
+  );
+  const [variableCostRatePercent, setVariableCostRatePercent] = useState(
+    EXAMPLE_AMOUNTS.variableCostRatePercent,
+  );
+  const [monthlyFixedCosts, setMonthlyFixedCosts] = useState(
+    EXAMPLE_AMOUNTS.monthlyFixedCosts,
+  );
+  const [carriedNotice, setCarriedNotice] = useState(false);
+  const [carryError, setCarryError] = useState("");
+
+  useEffect(() => {
+    const saved = restoredHandoff.current;
+
+    if (saved.status === "restored" && saved.fields) {
+      setMonthlyRevenue(saved.fields.monthlyRevenue);
+      setVariableCostRatePercent(saved.fields.variableCostRatePercent);
+      setMonthlyFixedCosts(saved.fields.monthlyFixedCosts);
+      setCarriedNotice(true);
+      return;
+    }
+
+    if (saved.status === "absent") {
+      return;
+    }
+
+    const result = consumeOperatingInputHandoff("operating-resilience");
+
+    if (result.ok) {
+      restoredHandoff.current = { status: "restored", fields: result.fields };
+      setMonthlyRevenue(result.fields.monthlyRevenue);
+      setVariableCostRatePercent(result.fields.variableCostRatePercent);
+      setMonthlyFixedCosts(result.fields.monthlyFixedCosts);
+      setCarriedNotice(true);
+      return;
+    }
+
+    restoredHandoff.current = { status: "absent", fields: null };
+  }, []);
+
+  useEffect(() => {
+    if (!carriedNotice) {
+      return;
+    }
+
+    carriedNoticeRef.current?.focus();
+  }, [carriedNotice]);
+
+  function clearCarryStatus() {
+    setCarryError("");
+    setCarriedNotice(false);
+  }
+
+  function restoreExampleAmounts() {
+    if (!wroteTransfer.current) {
+      consumeOperatingInputHandoff("operating-resilience");
+    }
+
+    setMonthlyRevenue(EXAMPLE_AMOUNTS.monthlyRevenue);
+    setVariableCostRatePercent(EXAMPLE_AMOUNTS.variableCostRatePercent);
+    setMonthlyFixedCosts(EXAMPLE_AMOUNTS.monthlyFixedCosts);
+    clearCarryStatus();
+  }
+
+  function carryInputs(event: MouseEvent<HTMLAnchorElement>) {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.shiftKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (!view.result) {
+      return;
+    }
+
+    wroteTransfer.current = true;
+    const written = writeOperatingInputHandoff("operating-resilience", {
+      monthlyRevenue,
+      variableCostRatePercent,
+      monthlyFixedCosts,
+    });
+
+    if (!written.ok) {
+      wroteTransfer.current = false;
+      setCarryError(CARRY_FAILURE_MESSAGE);
+      return;
+    }
+
+    setCarryError("");
+    router.push("/calculators/operating-outlook");
+  }
 
   const values: Record<OperatingOutlookField, string> = {
     monthlyRevenue,
@@ -415,9 +540,10 @@ export default function OperatingResilienceCalculator() {
                   value={values[field.field]}
                   aria-invalid={error ? true : undefined}
                   aria-describedby={error ? errorId : helpId}
-                  onChange={(event) =>
-                    setters[field.field](event.target.value)
-                  }
+                  onChange={(event) => {
+                    clearCarryStatus();
+                    setters[field.field](event.target.value);
+                  }}
                   className="w-full min-w-0 px-4 py-3 text-slate-900 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
                 />
                 {field.suffix ? (
@@ -446,6 +572,25 @@ export default function OperatingResilienceCalculator() {
           );
         })}
       </form>
+
+      <button
+        type="button"
+        onClick={restoreExampleAmounts}
+        className="mt-5 text-sm font-semibold text-slate-700 underline decoration-slate-300 underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+      >
+        Use the example amounts
+      </button>
+
+      {carriedNotice ? (
+        <p
+          ref={carriedNoticeRef}
+          tabIndex={-1}
+          className="mt-4 max-w-3xl text-sm leading-6 text-slate-700 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+        >
+          These fields use amounts carried from Operating Outlook. You can edit
+          them or use the example amounts.
+        </p>
+      ) : null}
 
       <section aria-live="polite" className="mt-8">
         {view.formError ? (
@@ -476,6 +621,29 @@ export default function OperatingResilienceCalculator() {
               {view.findings.map((finding) => (
                 <FindingCard key={finding.id} finding={finding} />
               ))}
+            </div>
+            <div className="mt-8 max-w-3xl">
+              <Link
+                href="/calculators/operating-outlook"
+                onClick={carryInputs}
+                aria-describedby="outlook-handoff-help"
+                className="inline-flex rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+              >
+                Return to Operating Outlook
+              </Link>
+              <p
+                id="outlook-handoff-help"
+                className="mt-3 text-sm leading-6 text-slate-600"
+              >
+                Carries the monthly revenue, variable-cost percentage, and
+                fixed costs now in these fields back to Operating Outlook in
+                this tab. They stay in this tab until that page reads them.
+              </p>
+              {carryError ? (
+                <p role="alert" className="mt-3 text-sm leading-6 text-red-700">
+                  {carryError}
+                </p>
+              ) : null}
             </div>
           </>
         ) : null}
