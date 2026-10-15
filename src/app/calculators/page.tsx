@@ -56,6 +56,13 @@ const calculators = [
     href: "/calculators/roi-calculator",
     category: "Financial Analysis",
   },
+  {
+    title: "Operating Outlook",
+    description:
+      "Analyze monthly operating profit, operating margin, and break-even revenue across clearly defined base, downside, and upside scenarios.",
+    href: "/calculators/operating-outlook",
+    category: "Financial Analysis",
+  },
 ];
 
 export default function CalculatorsPage() {

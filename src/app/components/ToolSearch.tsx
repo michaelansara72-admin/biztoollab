@@ -45,6 +45,18 @@ const searchableTools = [
       "investment return",
     ],
   },
+  {
+    href: "/calculators/operating-outlook",
+    keywords: [
+      "operating outlook",
+      "operating profit",
+      "operating margin",
+      "fixed costs",
+      "variable costs",
+      "break even",
+      "scenario analysis",
+    ],
+  },
 ];
 
 function normalizeSearch(value: string) {

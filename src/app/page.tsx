@@ -51,6 +51,13 @@ const tools = [
     category: "Finance Tool",
     href: "/calculators/roi-calculator",
   },
+  {
+    title: "Operating Outlook",
+    description:
+      "Explore monthly operating profit and break-even revenue across three illustrative business scenarios.",
+    category: "Finance Tool",
+    href: "/calculators/operating-outlook",
+  },
 ];
 
 const categories = [
