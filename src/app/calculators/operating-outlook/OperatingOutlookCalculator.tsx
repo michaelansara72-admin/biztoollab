@@ -20,6 +20,12 @@ import {
   writeOperatingInputHandoff,
   type OperatingInputHandoffFields,
 } from "@/lib/finance/operatingInputHandoff";
+import {
+  readOperatingInputHistory,
+  resolveOperatingInputInitialization,
+  writeOperatingInputHistory,
+  type OperatingInputHistoryFields,
+} from "@/lib/finance/operatingInputHistory";
 
 const EXAMPLE_AMOUNTS = {
   monthlyRevenue: "10000",
@@ -162,10 +168,11 @@ function ScenarioCard({
 
 export default function OperatingOutlookCalculator() {
   const router = useRouter();
-  const restoredHandoff = useRef<{
-    status: "pending" | "restored" | "absent";
+  const restoredInputs = useRef<{
+    status: "pending" | "ready";
     fields: OperatingInputHandoffFields | null;
-  }>({ status: "pending", fields: null });
+    carried: boolean;
+  }>({ status: "pending", fields: null, carried: false });
   const wroteTransfer = useRef(false);
   const carriedNoticeRef = useRef<HTMLParagraphElement>(null);
   const [monthlyRevenue, setMonthlyRevenue] = useState(
@@ -181,32 +188,46 @@ export default function OperatingOutlookCalculator() {
   const [carryError, setCarryError] = useState("");
 
   useEffect(() => {
-    const saved = restoredHandoff.current;
+    const saved = restoredInputs.current;
 
-    if (saved.status === "restored" && saved.fields) {
-      setMonthlyRevenue(saved.fields.monthlyRevenue);
-      setVariableCostRatePercent(saved.fields.variableCostRatePercent);
-      setMonthlyFixedCosts(saved.fields.monthlyFixedCosts);
-      setCarriedNotice(true);
+    if (saved.status === "ready") {
+      if (saved.fields) {
+        applyFields(saved.fields);
+        setCarriedNotice(saved.carried);
+      }
       return;
     }
 
-    if (saved.status === "absent") {
+    // A one-time handoff wins. Otherwise restore this history entry.
+    // Examples stay in place when neither is usable. The ref keeps the
+    // first result so a Strict Mode replay does not consume the handoff
+    // again or replace a restored draft with the examples.
+    const handoff = consumeOperatingInputHandoff("operating-outlook");
+    const history = handoff.ok
+      ? { ok: false as const }
+      : readOperatingInputHistory("operating-outlook");
+    const selected = resolveOperatingInputInitialization(
+      handoff.ok ? { ok: true, fields: handoff.fields } : { ok: false },
+      history.ok ? { ok: true, fields: history.fields } : { ok: false },
+      EXAMPLE_AMOUNTS,
+    );
+
+    restoredInputs.current = {
+      status: "ready",
+      fields: selected.source === "example" ? null : selected.fields,
+      carried: selected.carried,
+    };
+
+    if (selected.source === "example") {
       return;
     }
 
-    const result = consumeOperatingInputHandoff("operating-outlook");
+    applyFields(selected.fields);
+    setCarriedNotice(selected.carried);
 
-    if (result.ok) {
-      restoredHandoff.current = { status: "restored", fields: result.fields };
-      setMonthlyRevenue(result.fields.monthlyRevenue);
-      setVariableCostRatePercent(result.fields.variableCostRatePercent);
-      setMonthlyFixedCosts(result.fields.monthlyFixedCosts);
-      setCarriedNotice(true);
-      return;
+    if (selected.writeHistory) {
+      writeOperatingInputHistory("operating-outlook", selected.fields);
     }
-
-    restoredHandoff.current = { status: "absent", fields: null };
   }, []);
 
   useEffect(() => {
@@ -222,15 +243,33 @@ export default function OperatingOutlookCalculator() {
     setCarriedNotice(false);
   }
 
+  function applyFields(fields: OperatingInputHistoryFields) {
+    setMonthlyRevenue(fields.monthlyRevenue);
+    setVariableCostRatePercent(fields.variableCostRatePercent);
+    setMonthlyFixedCosts(fields.monthlyFixedCosts);
+  }
+
+  function fieldsWith(
+    field: OperatingOutlookField,
+    value: string,
+  ): OperatingInputHistoryFields {
+    return {
+      monthlyRevenue: field === "monthlyRevenue" ? value : monthlyRevenue,
+      variableCostRatePercent:
+        field === "variableCostRatePercent" ? value : variableCostRatePercent,
+      monthlyFixedCosts:
+        field === "monthlyFixedCosts" ? value : monthlyFixedCosts,
+    };
+  }
+
   function restoreExampleAmounts() {
     if (!wroteTransfer.current) {
       consumeOperatingInputHandoff("operating-outlook");
     }
 
-    setMonthlyRevenue(EXAMPLE_AMOUNTS.monthlyRevenue);
-    setVariableCostRatePercent(EXAMPLE_AMOUNTS.variableCostRatePercent);
-    setMonthlyFixedCosts(EXAMPLE_AMOUNTS.monthlyFixedCosts);
+    applyFields(EXAMPLE_AMOUNTS);
     clearCarryStatus();
+    writeOperatingInputHistory("operating-outlook", EXAMPLE_AMOUNTS);
   }
 
   function carryInputs(event: MouseEvent<HTMLAnchorElement>) {
@@ -264,6 +303,11 @@ export default function OperatingOutlookCalculator() {
     }
 
     setCarryError("");
+    writeOperatingInputHistory("operating-outlook", {
+      monthlyRevenue,
+      variableCostRatePercent,
+      monthlyFixedCosts,
+    });
     router.push("/calculators/operating-resilience");
   }
 
@@ -360,7 +404,12 @@ export default function OperatingOutlookCalculator() {
                   aria-describedby={error ? errorId : undefined}
                   onChange={(event) => {
                     clearCarryStatus();
-                    setters[field.field](event.target.value);
+                    const nextValue = event.target.value;
+                    setters[field.field](nextValue);
+                    writeOperatingInputHistory(
+                      "operating-outlook",
+                      fieldsWith(field.field, nextValue),
+                    );
                   }}
                   className="w-full px-4 py-3 text-slate-900 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
                 />
