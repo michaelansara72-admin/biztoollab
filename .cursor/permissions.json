@@ -1,0 +1,14 @@
+{
+  "terminalAllowlist": [
+    "git status",
+    "git diff",
+    "git log",
+    "git show",
+    "git rev-parse",
+    "git branch --show-current",
+    "npm test",
+    "npm run lint",
+    "npm audit --json",
+    "npm audit --omit=dev --json"
+  ]
+}

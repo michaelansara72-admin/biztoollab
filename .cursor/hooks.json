@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .cursor/hooks/command-safety.ps1",
+        "failClosed": true,
+        "timeout": 15
+      }
+    ]
+  }
+}
