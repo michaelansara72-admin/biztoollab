@@ -175,15 +175,10 @@ export default function OperatingOutlookCalculator() {
   }>({ status: "pending", fields: null, carried: false });
   const wroteTransfer = useRef(false);
   const carriedNoticeRef = useRef<HTMLParagraphElement>(null);
-  const [monthlyRevenue, setMonthlyRevenue] = useState(
-    EXAMPLE_AMOUNTS.monthlyRevenue,
-  );
-  const [variableCostRatePercent, setVariableCostRatePercent] = useState(
-    EXAMPLE_AMOUNTS.variableCostRatePercent,
-  );
-  const [monthlyFixedCosts, setMonthlyFixedCosts] = useState(
-    EXAMPLE_AMOUNTS.monthlyFixedCosts,
-  );
+  const [inputsReady, setInputsReady] = useState(false);
+  const [monthlyRevenue, setMonthlyRevenue] = useState("");
+  const [variableCostRatePercent, setVariableCostRatePercent] = useState("");
+  const [monthlyFixedCosts, setMonthlyFixedCosts] = useState("");
   const [carriedNotice, setCarriedNotice] = useState(false);
   const [carryError, setCarryError] = useState("");
 
@@ -195,13 +190,14 @@ export default function OperatingOutlookCalculator() {
         applyFields(saved.fields);
         setCarriedNotice(saved.carried);
       }
+      setInputsReady(true);
       return;
     }
 
     // A one-time handoff wins. Otherwise restore this history entry.
-    // Examples stay in place when neither is usable. The ref keeps the
-    // first result so a Strict Mode replay does not consume the handoff
-    // again or replace a restored draft with the examples.
+    // Otherwise use the example amounts. The ref keeps the first result
+    // so a Strict Mode replay does not consume the handoff again.
+    // Values and results stay blank until this effect finishes.
     const handoff = consumeOperatingInputHandoff("operating-outlook");
     const history = handoff.ok
       ? { ok: false as const }
@@ -214,16 +210,13 @@ export default function OperatingOutlookCalculator() {
 
     restoredInputs.current = {
       status: "ready",
-      fields: selected.source === "example" ? null : selected.fields,
+      fields: selected.fields,
       carried: selected.carried,
     };
 
-    if (selected.source === "example") {
-      return;
-    }
-
     applyFields(selected.fields);
     setCarriedNotice(selected.carried);
+    setInputsReady(true);
 
     if (selected.writeHistory) {
       writeOperatingInputHistory("operating-outlook", selected.fields);
@@ -377,17 +370,23 @@ export default function OperatingOutlookCalculator() {
     <div className="mt-10">
       <form
         className="grid gap-5 md:grid-cols-3"
+        aria-busy={inputsReady ? undefined : true}
         onSubmit={(event) => event.preventDefault()}
       >
         {fields.map((field) => {
-          const error = view.fieldErrors[field.field];
+          const error = inputsReady ? view.fieldErrors[field.field] : undefined;
           const errorId = `${field.field}-error`;
+          const helpId = `${field.field}-help`;
+          const inputId = `${field.field}-input`;
 
           return (
-            <label key={field.field} className="block">
-              <span className="mb-2 block text-sm font-semibold text-slate-700">
+            <div key={field.field} className="min-w-0">
+              <label
+                htmlFor={inputId}
+                className="mb-2 block text-sm font-semibold text-slate-700"
+              >
                 {field.label}
-              </span>
+              </label>
               <span className="flex overflow-hidden rounded-xl border border-slate-300 bg-white focus-within:border-slate-500">
                 {field.prefix ? (
                   <span className="flex items-center border-r border-slate-200 bg-slate-50 px-4 text-slate-500">
@@ -395,13 +394,15 @@ export default function OperatingOutlookCalculator() {
                   </span>
                 ) : null}
                 <input
+                  id={inputId}
                   type="text"
                   inputMode="decimal"
                   autoComplete="off"
                   spellCheck={false}
+                  disabled={!inputsReady}
                   value={values[field.field]}
                   aria-invalid={error ? true : undefined}
-                  aria-describedby={error ? errorId : undefined}
+                  aria-describedby={error ? errorId : helpId}
                   onChange={(event) => {
                     clearCarryStatus();
                     const nextValue = event.target.value;
@@ -411,7 +412,7 @@ export default function OperatingOutlookCalculator() {
                       fieldsWith(field.field, nextValue),
                     );
                   }}
-                  className="w-full px-4 py-3 text-slate-900 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+                  className="w-full min-w-0 px-4 py-3 text-slate-900 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500"
                 />
                 {field.suffix ? (
                   <span className="flex items-center border-l border-slate-200 bg-slate-50 px-4 text-slate-500">
@@ -428,11 +429,14 @@ export default function OperatingOutlookCalculator() {
                   {error}
                 </span>
               ) : (
-                <span className="mt-2 block text-xs leading-5 text-slate-500">
+                <span
+                  id={helpId}
+                  className="mt-2 block text-xs leading-5 text-slate-500"
+                >
                   {field.helper}
                 </span>
               )}
-            </label>
+            </div>
           );
         })}
       </form>
@@ -440,12 +444,22 @@ export default function OperatingOutlookCalculator() {
       <button
         type="button"
         onClick={restoreExampleAmounts}
-        className="mt-5 text-sm font-semibold text-slate-700 underline decoration-slate-300 underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+        disabled={!inputsReady}
+        className="mt-5 text-sm font-semibold text-slate-700 underline decoration-slate-300 underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:text-slate-400 disabled:no-underline"
       >
         Use the example amounts
       </button>
 
-      {carriedNotice ? (
+      {inputsReady ? null : (
+        <p
+          role="status"
+          className="mt-4 max-w-3xl text-sm leading-6 text-slate-600"
+        >
+          Preparing these fields.
+        </p>
+      )}
+
+      {inputsReady && carriedNotice ? (
         <p
           ref={carriedNoticeRef}
           tabIndex={-1}
@@ -456,7 +470,8 @@ export default function OperatingOutlookCalculator() {
         </p>
       ) : null}
 
-      <section aria-live="polite" className="mt-8">
+      {inputsReady ? (
+      <section className="mt-8">
         {view.formError ? (
           <p role="alert" className="text-sm leading-6 text-red-700">
             {view.formError}
@@ -514,6 +529,7 @@ export default function OperatingOutlookCalculator() {
           </>
         ) : null}
       </section>
+      ) : null}
     </div>
   );
 }
