@@ -58,6 +58,13 @@ const tools = [
     category: "Finance Tool",
     href: "/calculators/operating-outlook",
   },
+  {
+    title: "Operating Resilience Assessment",
+    description:
+      "Evaluate a business's ability to withstand changes in revenue, costs, or operating conditions.",
+    category: "Finance Tool",
+    href: "/calculators/operating-resilience",
+  },
 ];
 
 const categories = [

@@ -63,6 +63,13 @@ const calculators = [
     href: "/calculators/operating-outlook",
     category: "Financial Analysis",
   },
+  {
+    title: "Operating Resilience Assessment",
+    description:
+      "Evaluate a business's ability to withstand changes in revenue, costs, or operating conditions. Results are planning estimates, not a guaranteed outcome.",
+    href: "/calculators/operating-resilience",
+    category: "Financial Analysis",
+  },
 ];
 
 export default function CalculatorsPage() {

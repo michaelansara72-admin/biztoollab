@@ -57,6 +57,18 @@ const searchableTools = [
       "scenario analysis",
     ],
   },
+  {
+    href: "/calculators/operating-resilience",
+    keywords: [
+      "operating resilience",
+      "operating resilience assessment",
+      "business resilience",
+      "financial resilience",
+      "operating risk",
+      "cost pressure",
+      "revenue changes",
+    ],
+  },
 ];
 
 function normalizeSearch(value: string) {
@@ -65,6 +77,33 @@ function normalizeSearch(value: string) {
     .trim()
     .replace(/[^a-z0-9]+/g, " ")
     .replace(/\s+/g, " ");
+}
+
+export function findCalculatorSearchMatch(query: string) {
+  const normalizedQuery = normalizeSearch(query);
+
+  if (!normalizedQuery) {
+    return null;
+  }
+
+  const exactMatch = searchableTools.find((tool) =>
+    tool.keywords.some(
+      (keyword) => normalizeSearch(keyword) === normalizedQuery
+    )
+  );
+
+  const partialMatch = searchableTools.find((tool) =>
+    tool.keywords.some((keyword) => {
+      const normalizedKeyword = normalizeSearch(keyword);
+
+      return (
+        normalizedKeyword.includes(normalizedQuery) ||
+        normalizedQuery.includes(normalizedKeyword)
+      );
+    })
+  );
+
+  return exactMatch ?? partialMatch ?? null;
 }
 
 export default function ToolSearch() {
@@ -76,32 +115,12 @@ export default function ToolSearch() {
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const normalizedQuery = normalizeSearch(query);
+    const match = findCalculatorSearchMatch(query);
 
-    if (!normalizedQuery) {
+    if (!normalizeSearch(query)) {
       setMessage("Enter a calculator or business topic to search.");
       return;
     }
-
-    const exactMatch = searchableTools.find((tool) =>
-      tool.keywords.some(
-        (keyword) =>
-          normalizeSearch(keyword) === normalizedQuery
-      )
-    );
-
-    const partialMatch = searchableTools.find((tool) =>
-      tool.keywords.some((keyword) => {
-        const normalizedKeyword = normalizeSearch(keyword);
-
-        return (
-          normalizedKeyword.includes(normalizedQuery) ||
-          normalizedQuery.includes(normalizedKeyword)
-        );
-      })
-    );
-
-    const match = exactMatch ?? partialMatch;
 
     if (match) {
       setMessage("");
