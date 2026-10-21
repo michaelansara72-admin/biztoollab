@@ -1,3 +1,4 @@
+import Link from "next/link";
 import SiteFooter from "./components/SiteFooter";
 import ToolSearch from "./components/ToolSearch";
 
@@ -74,11 +75,21 @@ const categories = [
   "Finance Tools",
 ];
 
+const headerLinks = [
+  { href: "/calculators", label: "All Calculators" },
+  { href: "#tools", label: "Tools" },
+  { href: "#categories", label: "Categories" },
+  { href: "#about", label: "About" },
+] as const;
+
+const headerLinkClassName =
+  "inline-flex min-h-11 items-center rounded-md px-2 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 md:min-h-0 md:px-0";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-5 md:flex-row md:items-center md:justify-between md:gap-8">
           <div>
             <div className="text-2xl font-bold tracking-tight">
               BizToolLab
@@ -88,25 +99,29 @@ export default function Home() {
             </div>
           </div>
 
-          <nav className="hidden items-center gap-8 text-sm font-medium text-slate-700 md:flex">
-            <a
-              href="/calculators"
-              className="hover:text-slate-950"
-            >
-              All Calculators
-            </a>
-            <a href="#tools" className="hover:text-slate-950">
-              Tools
-            </a>
-            <a
-              href="#categories"
-              className="hover:text-slate-950"
-            >
-              Categories
-            </a>
-            <a href="#about" className="hover:text-slate-950">
-              About
-            </a>
+          <nav
+            aria-label="Primary"
+            className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium text-slate-700 md:gap-8"
+          >
+            {headerLinks.map((link) =>
+              link.href.startsWith("/") ? (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={headerLinkClassName}
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className={headerLinkClassName}
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
           </nav>
         </div>
       </header>
@@ -173,9 +188,10 @@ export default function Home() {
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {categories.map((category) => (
-            <div
+            <Link
               key={category}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+              href="/calculators"
+              className="block rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
             >
               <h3 className="text-lg font-semibold">
                 {category}
@@ -184,7 +200,7 @@ export default function Home() {
                 Practical tools designed to help you evaluate business
                 opportunities and financial decisions.
               </p>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
