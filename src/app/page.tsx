@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import SiteFooter from "./components/SiteFooter";
 import ToolSearch from "./components/ToolSearch";
@@ -89,19 +90,25 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-5 md:flex-row md:items-center md:justify-between md:gap-8">
-          <div>
-            <div className="text-2xl font-bold tracking-tight">
-              BizToolLab
-            </div>
-            <div className="text-sm text-slate-500">
-              Smart tools for smarter business decisions
-            </div>
-          </div>
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-3 md:flex-row md:items-center md:justify-between md:gap-8 md:py-4">
+          <Link
+            href="/"
+            className="inline-flex shrink-0 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+          >
+            <Image
+              src="/BizToolLab Growth Logo.png"
+              alt="BizToolLab. Practical tools. Real business growth."
+              width={2103}
+              height={748}
+              loading="eager"
+              sizes="(max-width: 639px) 216px, (max-width: 1023px) 256px, 320px"
+              className="h-auto w-[13.5rem] max-w-full sm:w-64 lg:w-80"
+            />
+          </Link>
 
           <nav
             aria-label="Primary"
-            className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium text-slate-700 md:gap-8"
+            className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium text-slate-700 md:gap-8 md:text-[15px] md:leading-6"
           >
             {headerLinks.map((link) =>
               link.href.startsWith("/") ? (
