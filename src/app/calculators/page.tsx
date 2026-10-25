@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import { publicCanonicalUrl } from "@/lib/publicCanonical";
 
 export const metadata: Metadata = {
   title: "Free Business Calculators & Tools",
   description:
     "Browse free business calculators for profit, startup costs, break-even analysis, ROI, vending machines, laundromats, car washes, and more.",
+  alternates: {
+    canonical: publicCanonicalUrl("/calculators"),
+  },
 };
 
 const calculators = [

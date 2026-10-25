@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import { publicCanonicalUrl } from "@/lib/publicCanonical";
 
 export const metadata: Metadata = {
   title: "Contact",
   description:
     "Contact BizToolLab with questions, feedback, corrections, or suggestions for new business calculators and tools.",
+  alternates: {
+    canonical: publicCanonicalUrl("/contact"),
+  },
 };
 
 export default function ContactPage() {

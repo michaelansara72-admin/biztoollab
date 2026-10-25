@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import { publicCanonicalUrl } from "@/lib/publicCanonical";
 
 export const metadata: Metadata = {
   title: "Terms of Use",
   description:
     "Read the terms governing use of BizToolLab business calculators, information, and website services.",
+  alternates: {
+    canonical: publicCanonicalUrl("/terms"),
+  },
 };
 
 export default function TermsPage() {

@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import OperatingResilienceCalculator from "./OperatingResilienceCalculator";
+import { publicCanonicalUrl } from "@/lib/publicCanonical";
 
 export const metadata: Metadata = {
   title: "Operating Resilience Assessment",
   description:
     "See monthly operating profit, the signed gap between revenue and break-even, and one stated downside illustration. Results are before financing and taxes and are planning estimates, not forecasts.",
+  alternates: {
+    canonical: publicCanonicalUrl("/calculators/operating-resilience"),
+  },
 };
 
 export default function OperatingResiliencePage() {

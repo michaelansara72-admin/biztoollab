@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import { publicCanonicalUrl } from "@/lib/publicCanonical";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "Read the BizToolLab Privacy Policy and learn how information may be collected and used when visiting the website.",
+  alternates: {
+    canonical: publicCanonicalUrl("/privacy"),
+  },
 };
 
 export default function PrivacyPage() {

@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import SiteFooter from "./components/SiteFooter";
 import ToolSearch from "./components/ToolSearch";
+import { publicCanonicalUrl } from "@/lib/publicCanonical";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: publicCanonicalUrl("/"),
+  },
+};
 
 const tools = [
   {

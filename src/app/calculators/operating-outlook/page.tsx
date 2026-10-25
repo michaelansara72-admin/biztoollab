@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import OperatingOutlookCalculator from "./OperatingOutlookCalculator";
+import { publicCanonicalUrl } from "@/lib/publicCanonical";
 
 export const metadata: Metadata = {
   title: "Operating Outlook",
   description:
     "Estimate monthly operating profit, operating margin, and break-even revenue under base, downside, and upside assumptions. Results are before financing and taxes and are planning estimates, not forecasts.",
+  alternates: {
+    canonical: publicCanonicalUrl("/calculators/operating-outlook"),
+  },
 };
 
 export default function OperatingOutlookPage() {

@@ -135,14 +135,17 @@ test("sitemap includes Operating Resilience once and keeps existing entries", ()
   assert.equal(about?.priority, 0.6);
 });
 
-test("Operating Resilience metadata stays indexable without a page canonical", () => {
+test("Operating Resilience metadata stays indexable and canonicalizes its own URL", () => {
   assert.equal(resilienceMetadata.title, "Operating Resilience Assessment");
   assert.match(
     String(resilienceMetadata.description),
     /planning estimates, not forecasts/,
   );
   assert.equal(resilienceMetadata.robots, undefined);
-  assert.equal(resilienceMetadata.alternates, undefined);
+  assert.equal(
+    resilienceMetadata.alternates?.canonical,
+    "https://biztoollab.com/calculators/operating-resilience",
+  );
 });
 
 test("Financial Journey links remain between Outlook and Resilience", () => {
