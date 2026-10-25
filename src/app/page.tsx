@@ -86,6 +86,7 @@ const categories = [
 
 const headerLinks = [
   { href: "/calculators", label: "All Calculators" },
+  { href: "/blog", label: "Insights" },
   { href: "#tools", label: "Tools" },
   { href: "#categories", label: "Categories" },
   { href: "#about", label: "About" },

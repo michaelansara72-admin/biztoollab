@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { articles, blogUrl } from "@/lib/blog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://biztoollab.com";
@@ -79,5 +80,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.5,
     },
+    {
+      url: blogUrl(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    ...articles.map((article) => ({
+      url: blogUrl(article.slug),
+      changeFrequency: "monthly" as const,
+      priority: 0.65,
+    })),
   ];
 }

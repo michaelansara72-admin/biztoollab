@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Insights
+
+BizToolLab Insights lives at `/blog`. Articles are Markdown files in `content/blog` and are registered in `src/lib/blog.ts`. The renderer accepts headings, paragraphs, bullets, bold text, and internal links only. These pages are local until a release is separately authorized. Do not add publication dates until an article is actually published.
+
 ## Getting Started
 
 First, run the development server:

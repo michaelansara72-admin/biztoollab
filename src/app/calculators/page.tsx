@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { publicCanonicalUrl } from "@/lib/publicCanonical";
 
 export const metadata: Metadata = {
@@ -93,6 +94,17 @@ export default function CalculatorsPage() {
             Explore practical calculators designed to help entrepreneurs,
             small-business owners, and side hustlers estimate costs,
             profitability, break-even points, margins, and investment returns.
+          </p>
+
+          <p className="mt-6 max-w-3xl text-base leading-7 text-slate-700">
+            <Link
+              href="/blog"
+              className="font-semibold text-slate-900 underline underline-offset-4 hover:text-slate-700"
+            >
+              Read BizToolLab Insights
+            </Link>{" "}
+            for guides on break-even points, profit margins, and laundromat
+            profitability.
           </p>
         </div>
       </section>

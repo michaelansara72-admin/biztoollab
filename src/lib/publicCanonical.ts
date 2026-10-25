@@ -3,6 +3,7 @@ import { canonicalApplicationOrigin } from "./applicationOrigin";
 /**
  * Public pages that are listed in src/app/sitemap.ts.
  * The homepage entry is the origin with no path and no trailing slash.
+ * Insights guides are static Markdown pages on the same apex origin.
  */
 export const publicCanonicalPaths = [
   "/",
@@ -20,6 +21,10 @@ export const publicCanonicalPaths = [
   "/privacy",
   "/terms",
   "/contact",
+  "/blog",
+  "/blog/how-to-calculate-business-break-even-point",
+  "/blog/how-much-profit-can-a-laundromat-make",
+  "/blog/understanding-business-profit-margins",
 ] as const;
 
 export type PublicCanonicalPath = (typeof publicCanonicalPaths)[number];

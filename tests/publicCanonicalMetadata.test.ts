@@ -18,6 +18,9 @@ import { metadata as startupMetadata } from "../src/app/calculators/startup-cost
 import { metadata as breakEvenMetadata } from "../src/app/calculators/break-even-calculator/layout";
 import { metadata as profitMarginMetadata } from "../src/app/calculators/profit-margin-calculator/layout";
 import { metadata as roiMetadata } from "../src/app/calculators/roi-calculator/layout";
+import { metadata as blogMetadata } from "../src/app/blog/page";
+import { generateMetadata as generateArticleMetadata } from "../src/app/blog/[slug]/page";
+import { articles, blogUrl } from "../src/lib/blog";
 import {
   publicCanonicalPaths,
   publicCanonicalUrl,
@@ -75,7 +78,26 @@ const canonicalByUrl = new Map<string, string | undefined>([
     publicCanonicalUrl("/contact"),
     canonicalValue(contactMetadata.alternates?.canonical),
   ],
+  [blogUrl(), canonicalValue(blogMetadata.alternates?.canonical)],
 ]);
+
+const originalPublicUrls = [
+  "https://biztoollab.com",
+  "https://biztoollab.com/calculators",
+  "https://biztoollab.com/calculators/laundromat-profit-calculator",
+  "https://biztoollab.com/calculators/vending-machine-profit-calculator",
+  "https://biztoollab.com/calculators/car-wash-profit-roi-calculator",
+  "https://biztoollab.com/calculators/startup-cost-calculator",
+  "https://biztoollab.com/calculators/break-even-calculator",
+  "https://biztoollab.com/calculators/profit-margin-calculator",
+  "https://biztoollab.com/calculators/roi-calculator",
+  "https://biztoollab.com/calculators/operating-outlook",
+  "https://biztoollab.com/calculators/operating-resilience",
+  "https://biztoollab.com/about",
+  "https://biztoollab.com/privacy",
+  "https://biztoollab.com/terms",
+  "https://biztoollab.com/contact",
+];
 
 function canonicalValue(canonical: unknown): string | undefined {
   if (typeof canonical === "string") {
@@ -89,16 +111,31 @@ function canonicalValue(canonical: unknown): string | undefined {
   return undefined;
 }
 
-test("each public sitemap URL canonicalizes only itself", () => {
+test("each public sitemap URL canonicalizes only itself", async () => {
   const entries = sitemap();
   const urls = entries.map((entry) => entry.url);
+
+  for (const article of articles) {
+    const articleMetadata = await generateArticleMetadata({
+      params: Promise.resolve({ slug: article.slug }),
+    });
+    canonicalByUrl.set(
+      blogUrl(article.slug),
+      canonicalValue(articleMetadata.alternates?.canonical),
+    );
+  }
 
   assert.deepEqual(
     urls,
     publicCanonicalPaths.map((path) => publicCanonicalUrl(path)),
   );
   assert.equal(new Set(urls).size, urls.length);
-  assert.equal(urls.length, 15);
+  assert.equal(urls.length, 19);
+  assert.deepEqual(urls.slice(0, originalPublicUrls.length), originalPublicUrls);
+  assert.deepEqual(urls.slice(originalPublicUrls.length), [
+    blogUrl(),
+    ...articles.map((article) => blogUrl(article.slug)),
+  ]);
 
   for (const url of urls) {
     assert.equal(canonicalByUrl.get(url), url);
@@ -126,6 +163,15 @@ test("sitemap omits lastModified and keeps the existing change signals", () => {
   assert.equal(byUrl.get("https://biztoollab.com/privacy")?.priority, 0.4);
   assert.equal(byUrl.get("https://biztoollab.com/terms")?.priority, 0.4);
   assert.equal(byUrl.get("https://biztoollab.com/contact")?.priority, 0.5);
+  assert.equal(byUrl.get(blogUrl())?.changeFrequency, "weekly");
+  assert.equal(byUrl.get(blogUrl())?.priority, 0.7);
+
+  for (const article of articles) {
+    const entry = byUrl.get(blogUrl(article.slug));
+    assert.equal(entry?.changeFrequency, "monthly");
+    assert.equal(entry?.priority, 0.65);
+    assert.equal(entry?.lastModified, undefined);
+  }
 });
 
 test("the root and admin layouts do not publish a canonical", () => {
