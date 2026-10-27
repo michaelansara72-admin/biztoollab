@@ -3,9 +3,9 @@ import fs from 'node:fs';
 import test from 'node:test';
 import { articles, blogUrl, getArticle, readArticle } from '../src/lib/blog';
 
-test('three unique articles with valid calculator links and content', () => {
-  assert.equal(articles.length, 3);
-  assert.equal(new Set(articles.map(a => a.slug)).size, 3);
+test('each article has a unique slug, calculator link, and content', () => {
+  assert.equal(articles.length, 4);
+  assert.equal(new Set(articles.map(a => a.slug)).size, 4);
   for (const a of articles) {
     assert.equal(getArticle(a.slug), a);
     assert.match(blogUrl(a.slug), /^https:\/\/biztoollab\.com\/blog\//);
@@ -22,6 +22,7 @@ test("worked examples, disclaimers, and internal links stay accurate", () => {
     ...articles.map((article) => `/blog/${article.slug}`),
     "/calculators/profit-margin-calculator",
     "/calculators/break-even-calculator",
+    "/calculators/operating-outlook",
   ]);
 
   for (const article of articles) {
@@ -63,6 +64,21 @@ test("worked examples, disclaimers, and internal links stay accurate", () => {
   assert.match(laundromat ?? "", /\*\*Owner compensation\*\*/);
   assert.match(laundromat ?? "", /\*\*Cash flow\*\*/);
   assert.match(laundromat ?? "", /not an additional profit on top of that figure/);
+
+  const profitable = readArticle("is-your-business-actually-profitable");
+  assert.match(profitable ?? "", /400 × \$50 = \*\*\$20,000\*\*/);
+  assert.match(profitable ?? "", /400 × \$18 = \*\*\$7,200\*\*/);
+  assert.match(profitable ?? "", /Gross profit: \$20,000 − \$7,200 = \*\*\$12,800\*\*/);
+  assert.match(profitable ?? "", /Operating profit is \*\*\$6,200\*\*/);
+  assert.match(profitable ?? "", /Net profit is \*\*\$4,720\*\*/);
+  assert.match(profitable ?? "", /cash decreased by \*\*\$2,580\*\*/);
+  assert.match(profitable ?? "", /\$6,600 ÷ \$32 = \*\*206\.25 units\*\*/);
+  assert.match(profitable ?? "", /206 units are not sufficient/);
+  assert.match(profitable ?? "", /minimum whole-unit sales required is \*\*207 units\*\*/);
+  assert.match(profitable ?? "", /Theoretical break-even revenue is \$6,600 ÷ 0\.64 = \*\*\$10,312\.50\*\*/);
+  assert.match(profitable ?? "", /Revenue at 207 units is 207 × \$50 = \*\*\$10,350\*\*/);
+  assert.match(profitable ?? "", /not an industry average/);
+  assert.match(profitable ?? "", /do not replace professional financial or accounting advice/);
 });
 
 test("article pages name BizToolLab and calculators link back to the guides", () => {

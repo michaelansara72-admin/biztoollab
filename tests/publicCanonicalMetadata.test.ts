@@ -130,7 +130,7 @@ test("each public sitemap URL canonicalizes only itself", async () => {
     publicCanonicalPaths.map((path) => publicCanonicalUrl(path)),
   );
   assert.equal(new Set(urls).size, urls.length);
-  assert.equal(urls.length, 19);
+  assert.equal(urls.length, 20);
   assert.deepEqual(urls.slice(0, originalPublicUrls.length), originalPublicUrls);
   assert.deepEqual(urls.slice(originalPublicUrls.length), [
     blogUrl(),

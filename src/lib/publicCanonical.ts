@@ -25,6 +25,7 @@ export const publicCanonicalPaths = [
   "/blog/how-to-calculate-business-break-even-point",
   "/blog/how-much-profit-can-a-laundromat-make",
   "/blog/understanding-business-profit-margins",
+  "/blog/is-your-business-actually-profitable",
 ] as const;
 
 export type PublicCanonicalPath = (typeof publicCanonicalPaths)[number];
