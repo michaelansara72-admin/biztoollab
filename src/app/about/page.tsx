@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { publicCanonicalUrl } from "@/lib/publicCanonical";
 
 export const metadata: Metadata = {
@@ -15,16 +16,16 @@ export default function AboutPage() {
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
-          <a href="/" className="text-2xl font-bold">
+          <Link href="/" className="text-2xl font-bold">
             BizToolLab
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/"
             className="text-sm font-medium text-slate-600 hover:text-slate-950"
           >
             Back to Home
-          </a>
+          </Link>
         </div>
       </header>
 
@@ -39,43 +40,86 @@ export default function AboutPage() {
 
         <div className="mt-8 space-y-6 text-lg leading-8 text-slate-600">
           <p>
-            BizToolLab is operated by Synergy Media & Tech LLC.
+            BizToolLab is owned and operated by Synergy Media & Tech LLC.
           </p>
 
           <p>
-            BizToolLab is a growing collection of free business calculators and
-            practical decision-making tools designed for entrepreneurs,
-            small-business owners, side hustlers, and people evaluating new
-            business opportunities.
+            The mission is to give entrepreneurs, small-business owners, side
+            hustlers, and people evaluating a business idea clear calculators
+            and short guides for everyday financial questions.
           </p>
 
           <p>
-            Our goal is to make common business calculations easier to
-            understand without requiring complicated spreadsheets or expensive
-            software.
+            The tools help users estimate costs, model revenue, look at
+            profitability, compare opportunities, and calculate returns. They
+            are meant to make those calculations understandable without a
+            complicated spreadsheet.
           </p>
 
           <p>
-            BizToolLab tools are designed to help users estimate costs, model
-            revenue, evaluate profitability, compare opportunities, calculate
-            returns, and better understand the financial assumptions behind a
-            business decision.
-          </p>
-
-          <p>
-            We are continuing to expand the site with additional calculators,
-            industry-specific tools, startup resources, and educational
-            information.
+            BizToolLab is continuing to add calculators, industry-specific
+            tools, and educational guides.
           </p>
         </div>
 
         <div className="mt-12 rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="text-xl font-semibold">Our approach</h2>
 
+          <div className="mt-3 space-y-4 leading-7 text-slate-600">
+            <p>
+              Each calculator starts from the assumptions you enter, such as
+              prices, costs, volume, or other operating figures. The result is
+              the estimate those inputs produce.
+            </p>
+
+            <p>
+              Where a calculator explains a formula or walks through an
+              example, that explanation shows how the estimate is calculated
+              from the assumptions. The inputs stay visible so you can see
+              what the result depends on.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+          <h2 className="text-xl font-semibold">Estimates, not advice</h2>
+
+          <div className="mt-3 space-y-4 leading-7 text-slate-600">
+            <p>
+              Calculator results and guide examples are educational planning
+              estimates. They are only as useful as the assumptions behind
+              them, and real revenue, costs, and operating conditions can
+              differ.
+            </p>
+
+            <p>
+              These estimates are not financial, accounting, tax, legal, or
+              investment advice, and they are not a prediction or a guarantee
+              of business results. Review the assumptions and check the
+              figures before you rely on them.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+          <h2 className="text-xl font-semibold">Corrections and suggestions</h2>
+
           <p className="mt-3 leading-7 text-slate-600">
-            We aim to keep our tools simple, transparent, and useful. Whenever
-            possible, we explain how calculations are performed so users can
-            understand the assumptions behind the results.
+            If you find an error or want to suggest an improvement, use the{" "}
+            <Link
+              href="/contact"
+              className="font-semibold text-slate-900 underline"
+            >
+              contact page
+            </Link>{" "}
+            or email{" "}
+            <a
+              href="mailto:support@biztoollab.com"
+              className="font-semibold text-slate-900 underline"
+            >
+              support@biztoollab.com
+            </a>
+            .
           </p>
         </div>
       </section>
