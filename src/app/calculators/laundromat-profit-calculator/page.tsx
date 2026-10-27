@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import AIAnalysisPanel from "@/components/ai/AIAnalysisPanel";
 import { useAIAnalysis } from "@/hooks/useAIAnalysis";
 
@@ -904,6 +905,18 @@ export default function LaundromatProfitCalculator() {
               </a>
 
             </div>
+
+            <p className="mt-6 text-sm leading-6 text-slate-600">
+              Read{" "}
+              <Link
+                href="/blog/how-much-profit-can-a-laundromat-make"
+                className="font-semibold text-slate-900 underline"
+              >
+                How Much Profit Can a Laundromat Make?
+              </Link>{" "}
+              for an example that separates operating profit, owner
+              compensation, and cash flow.
+            </p>
 
           </section>
           {/* IMPORTANT NOTE */}

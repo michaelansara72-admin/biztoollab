@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import test from 'node:test';
 import { articles, blogUrl, getArticle, readArticle } from '../src/lib/blog';
 
@@ -58,4 +59,25 @@ test("worked examples, disclaimers, and internal links stay accurate", () => {
   assert.match(laundromat ?? "", /approximately \*\*27\.6%\*\*/);
   assert.match(laundromat ?? "", /not an industry average/);
   assert.match(laundromat ?? "", /not a guaranteed take-home amount/);
+  assert.match(laundromat ?? "", /\*\*Operating profit\*\*/);
+  assert.match(laundromat ?? "", /\*\*Owner compensation\*\*/);
+  assert.match(laundromat ?? "", /\*\*Cash flow\*\*/);
+  assert.match(laundromat ?? "", /not an additional profit on top of that figure/);
+});
+
+test("article pages name BizToolLab and calculators link back to the guides", () => {
+  const template = fs.readFileSync("src/app/blog/[slug]/page.tsx", "utf8");
+  assert.match(template, /Published by/);
+  assert.match(template, /href="\/about"/);
+  assert.match(template, /href="\/contact"/);
+  assert.match(template, /publisher: \{ '@type': 'Organization', name: 'BizToolLab'/);
+
+  const pairs = [
+    ["src/app/calculators/break-even-calculator/page.tsx", "/blog/how-to-calculate-business-break-even-point"],
+    ["src/app/calculators/laundromat-profit-calculator/page.tsx", "/blog/how-much-profit-can-a-laundromat-make"],
+    ["src/app/calculators/profit-margin-calculator/page.tsx", "/blog/understanding-business-profit-margins"],
+  ] as const;
+  for (const [file, href] of pairs) {
+    assert.match(fs.readFileSync(file, "utf8"), new RegExp(href.replaceAll("/", "\\/")));
+  }
 });

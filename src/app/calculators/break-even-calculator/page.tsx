@@ -585,6 +585,17 @@ export default function BreakEvenCalculator() {
                 </div>
               </a>
             </div>
+
+            <p className="mt-6 text-sm leading-6 text-slate-600">
+              Read{" "}
+              <Link
+                href="/blog/how-to-calculate-business-break-even-point"
+                className="font-semibold text-slate-900 underline"
+              >
+                How to Calculate Your Business Break-Even Point
+              </Link>{" "}
+              for a worked example of the formula.
+            </p>
           </section>
           <div className="mt-10 rounded-2xl bg-slate-100 p-6">
             <h3 className="font-semibold">Important</h3>

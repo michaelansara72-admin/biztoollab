@@ -524,8 +524,19 @@ export default function ProfitMarginCalculatorPage() {
               <div className="mt-1 text-sm text-slate-500">
                 Estimate vending route revenue, expenses, and profit.
               </div>
-            </a>
+              </a>
           </div>
+
+          <p className="mt-6 text-sm leading-6 text-slate-600">
+            Read{" "}
+            <Link
+              href="/blog/understanding-business-profit-margins"
+              className="font-semibold text-slate-900 underline"
+            >
+              Understanding Business Profit Margins
+            </Link>{" "}
+            for how gross, operating, and net margins differ.
+          </p>
         </section>
         <section className="mt-8 rounded-2xl border border-slate-200 bg-slate-100 p-6 text-sm leading-6 text-slate-500">
           This calculator is provided for general informational and planning

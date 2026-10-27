@@ -22,9 +22,9 @@ Suppose the example location earns another $1,200 from wash-dry-fold and $300 fr
 
 ## Subtract the actual operating expenses
 
-Common expenses include rent, utilities, labor, maintenance, insurance, cleaning, payment processing, and supplies. Debt payments can affect cash flow and should be examined separately from accounting operating profit when making investment decisions.
+Common expenses include rent, utilities, labor, maintenance, insurance, cleaning, payment processing, and supplies. The list below is an illustrative monthly estimate of those operating costs. It does not include income taxes, depreciation, loan payments, or a wage for an owner who also works in the business.
 
-For an illustrative monthly cash-oriented estimate, suppose costs are:
+For this example, suppose the costs are:
 
 - Rent: $3,200.
 - Utilities: $3,600.
@@ -33,15 +33,19 @@ For an illustrative monthly cash-oriented estimate, suppose costs are:
 - Insurance and other overhead: $600.
 - Payment processing and supplies: $500.
 
-These total **$10,600**, leaving **$4,040** before taxes, depreciation, financing costs not listed above, and owner-specific adjustments. It is not a guaranteed take-home amount. If the owner performs unpaid work, the estimate can overstate economic profit unless a fair labor cost is included.
+These total **$10,600**, leaving **$4,040**. That remainder is revenue minus the listed operating costs. It is not a guaranteed take-home amount.
+
+**Operating profit** is what remains after the costs of running the location, including a reasonable cost for the work required to operate it. The $2,000 labor line covers only the paid labor and cleaning in this example. If the owner performs unpaid work, the estimate can overstate operating profit unless a fair labor cost is included.
+
+**Owner compensation** is separate from that remainder. A wage paid to the owner belongs with labor and would reduce the $4,040. A draw taken from the remainder is the owner taking cash that is already in the $4,040. It is not an additional profit on top of that figure.
 
 Use the [Laundromat Profit Calculator](/calculators/laundromat-profit-calculator) to enter your own machine counts, usage, revenue, and expenses.
 
 ## Profit margin versus cash flow
 
-In this example, $4,040 divided by $14,640 gives an illustrative margin of approximately **27.6%** before the exclusions described above. That percentage should not be compared directly with a net profit margin calculated after all financing and tax effects.
+In this example, $4,040 divided by $14,640 gives an illustrative margin of approximately **27.6%** before income taxes, depreciation, financing, and any unpaid owner labor. That percentage should not be compared directly with a net profit margin calculated after all financing and tax effects.
 
-Cash flow also depends on when bills are paid, whether equipment needs replacement, and how loans are structured. A profitable location can still face a cash shortage if major repairs or debt payments come due.
+**Cash flow** is the money that actually moves in and out of the business. It can differ from the $4,040 remainder. Loan payments reduce cash but are not operating expenses in this example. Depreciation can reduce accounting profit without a matching monthly cash payment. Equipment replacement, tax payments, and the timing of bills can also reduce cash. A location can show this remainder and still face a cash shortage when those items come due.
 
 ## Questions to ask before buying or opening
 
