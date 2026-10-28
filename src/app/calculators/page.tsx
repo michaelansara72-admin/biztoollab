@@ -50,7 +50,7 @@ const calculators = [
   {
     title: "Profit Margin Calculator",
     description:
-      "Calculate gross profit, net profit, gross margin, net margin, and operating expense percentages.",
+      "Calculate gross profit, operating profit, gross margin, operating margin, and operating expense percentages.",
     href: "/calculators/profit-margin-calculator",
     category: "Financial Analysis",
   },

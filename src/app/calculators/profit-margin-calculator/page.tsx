@@ -170,8 +170,10 @@ export default function ProfitMarginCalculatorPage() {
           </h1>
 
           <p className="mt-5 text-lg leading-8 text-slate-600">
-            Estimate your gross profit margin, net profit margin,
-            gross profit, and net profit based on your revenue and business costs.
+            Estimate gross profit, gross profit margin, operating profit,
+            and operating profit margin from revenue, cost of goods sold,
+            and operating expenses. Interest, income taxes, and any other
+            costs you do not enter are excluded.
           </p>
         </div>
 
@@ -234,16 +236,18 @@ export default function ProfitMarginCalculatorPage() {
                 </p>
 
                 <p>
-                  <strong className="text-slate-900">Net profit</strong>{" "}
-                  subtracts both direct costs and operating expenses from revenue.
+                  <strong className="text-slate-900">Operating profit</strong>{" "}
+                  subtracts both direct costs and the operating expenses you
+                  enter from revenue. It excludes interest, income taxes, and
+                  any other costs not entered.
                 </p>
 
                 <p>
                   <strong className="text-slate-900">
-                    Net profit margin
+                    Operating profit margin
                   </strong>{" "}
-                  shows how much of each revenue dollar remains as profit
-                  after the included expenses.
+                  shows how much of each revenue dollar remains after those
+                  entered costs.
                 </p>
               </div>
             </section>
@@ -267,12 +271,12 @@ export default function ProfitMarginCalculatorPage() {
                 />
 
                 <ResultRow
-                  label="Net Profit"
+                  label="Operating Profit"
                   value={currency(results.netProfit)}
                 />
 
                 <ResultRow
-                  label="Net Profit Margin"
+                  label="Operating Profit Margin"
                   value={percent(results.netMargin)}
                   emphasized
                 />
@@ -287,6 +291,11 @@ export default function ProfitMarginCalculatorPage() {
                   value={percent(results.operatingExpensePercentage)}
                 />
               </div>
+
+              <p className="mt-5 text-sm leading-6 text-slate-300">
+                Operating profit excludes interest, income taxes, and any
+                costs you did not enter.
+              </p>
             </section>
           </aside>
         </div>
@@ -306,11 +315,11 @@ export default function ProfitMarginCalculatorPage() {
             </p>
 
             <p>
-              Net Profit = Revenue − Cost of Goods Sold − Operating Expenses
+              Operating Profit = Revenue − Cost of Goods Sold − Operating Expenses
             </p>
 
             <p>
-              Net Profit Margin = Net Profit ÷ Revenue × 100
+              Operating Profit Margin = Operating Profit ÷ Revenue × 100
             </p>
           </div>
         </section>
@@ -340,9 +349,10 @@ export default function ProfitMarginCalculatorPage() {
 
             <p>
               The calculator will estimate gross profit, gross profit margin,
-              net profit, and net profit margin. It will also show what
-              percentage of revenue is being used for direct costs and
-              operating expenses.
+              operating profit, and operating profit margin. It will also show
+              what percentage of revenue is being used for direct costs and
+              operating expenses. Interest, income taxes, and any other costs
+              you do not enter stay outside the result.
             </p>
 
             <p>
@@ -371,8 +381,9 @@ export default function ProfitMarginCalculatorPage() {
           </p>
 
           <p className="mt-4 text-sm leading-7 text-slate-600">
-            After subtracting the $5,000 in operating expenses, net profit
-            would be $8,000. That produces a net profit margin of 32%.
+            After subtracting the $5,000 in operating expenses, operating
+            profit would be $8,000. That produces an operating profit margin
+            of 32%. Interest and income taxes are not included.
           </p>
 
           <p className="mt-4 text-sm leading-7 text-slate-600">
@@ -415,12 +426,30 @@ export default function ProfitMarginCalculatorPage() {
 
             <div>
               <h3 className="font-semibold text-slate-900">
-                What is net profit margin?
+                What is operating profit margin?
               </h3>
               <p className="mt-2 text-sm leading-7 text-slate-600">
-                Net profit margin shows the percentage of revenue remaining
-                after subtracting both cost of goods sold and the operating
-                expenses included in the calculator.
+                Operating profit margin shows the percentage of revenue
+                remaining after subtracting cost of goods sold and the
+                operating expenses you enter. It excludes interest, income
+                taxes, and any other costs not entered.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-slate-900">
+                How is operating profit different from net profit?
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Net profit also subtracts interest, income taxes, and other
+                costs this calculator does not estimate.{" "}
+                <Link
+                  href="/blog/understanding-business-profit-margins"
+                  className="font-semibold text-slate-900 underline"
+                >
+                  Understanding Business Profit Margins
+                </Link>{" "}
+                explains how gross, operating, and net margins differ.
               </p>
             </div>
 
@@ -455,9 +484,10 @@ export default function ProfitMarginCalculatorPage() {
                 Can a business have a positive gross margin but lose money?
               </h3>
               <p className="mt-2 text-sm leading-7 text-slate-600">
-                Yes. A business can earn a positive gross profit but still have
-                a net loss if operating expenses are greater than the gross
-                profit generated.
+                Yes. A business can earn a positive gross profit and still have
+                an operating loss when the operating expenses entered are
+                greater than that gross profit. Interest and income taxes are
+                separate and are not part of this result.
               </p>
             </div>
           </div>
@@ -540,8 +570,9 @@ export default function ProfitMarginCalculatorPage() {
         </section>
         <section className="mt-8 rounded-2xl border border-slate-200 bg-slate-100 p-6 text-sm leading-6 text-slate-500">
           This calculator is provided for general informational and planning
-          purposes only. Actual business results may vary based on taxes,
-          financing, accounting methods, and expenses not included here.
+          purposes only. Operating profit excludes interest, income taxes,
+          and expenses you do not enter. Actual results may also vary with
+          accounting methods.
         </section>
       </section>
     </main>

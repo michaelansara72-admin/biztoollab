@@ -50,7 +50,7 @@ const tools = [
   {
     title: "Profit Margin Calculator",
     description:
-      "Calculate gross profit, net profit, and how much of your revenue remains after costs.",
+      "Calculate gross profit, operating profit, and how much of your revenue remains after the costs you enter.",
     category: "Business Calculator",
     href: "/calculators/profit-margin-calculator",
   },
