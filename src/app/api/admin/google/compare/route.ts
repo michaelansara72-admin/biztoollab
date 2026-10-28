@@ -14,6 +14,7 @@ import {
   parseSnapshotIds,
   compareStoredSnapshots,
 } from "@/lib/searchConsoleComparisonRequest";
+import { compareHistoricalSearchConsoleEvidence } from "@/lib/searchConsoleHistoricalBreakdown";
 
 export const runtime = "nodejs";
 
@@ -92,12 +93,22 @@ export async function GET(request: Request) {
       );
     }
 
+    const breakdown = compareHistoricalSearchConsoleEvidence({
+      baselinePages: baselineRecord.pages_json,
+      comparisonPages: comparisonRecord.pages_json,
+      baselineQueries: baselineRecord.queries_json,
+      comparisonQueries: comparisonRecord.queries_json,
+      baselineImpressions: result.metrics.impressions.before,
+      comparisonImpressions: result.metrics.impressions.after,
+    });
+
     // Step 7: Return the comparison results.
     return NextResponse.json({
       success: true,
       baselineId,
       comparisonId,
       result,
+      breakdown,
     });
   } catch (error) {
     console.error(

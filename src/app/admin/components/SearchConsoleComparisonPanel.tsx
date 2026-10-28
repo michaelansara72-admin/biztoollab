@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 
+import type {
+  HistoricalImpressionRow,
+  HistoricalSearchConsoleBreakdown,
+} from "@/lib/searchConsoleHistoricalBreakdown";
+
 type SnapshotOption = {
   id: number;
   siteUrl: string;
@@ -52,6 +57,7 @@ type CompareApiResponse =
       baselineId: number;
       comparisonId: number;
       result: ComparisonResult;
+      breakdown?: HistoricalSearchConsoleBreakdown;
     }
   | {
       success: false;
@@ -180,6 +186,143 @@ function MetricCard({
   );
 }
 
+function formatStoredImpressions(value: number | null) {
+  if (value === null) {
+    return "Not stored";
+  }
+
+  return value.toLocaleString();
+}
+
+function ImpressionChangeTable({
+  title,
+  rows,
+  emptyLabel,
+}: {
+  title: string;
+  rows: HistoricalImpressionRow[];
+  emptyLabel: string;
+}) {
+  return (
+    <div className="rounded-xl border border-slate-200 p-4">
+      <h3 className="text-sm font-bold text-slate-900">
+        {title}
+      </h3>
+
+      {rows.length === 0 ? (
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          {emptyLabel}
+        </p>
+      ) : (
+        <div className="mt-3 overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="text-xs uppercase tracking-[0.08em] text-slate-400">
+                <th className="pb-2 pr-3 font-bold">
+                  Record
+                </th>
+                <th className="pb-2 pr-3 font-bold">
+                  Baseline
+                </th>
+                <th className="pb-2 pr-3 font-bold">
+                  Comparison
+                </th>
+                <th className="pb-2 font-bold">
+                  Change
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr
+                  key={row.label}
+                  className="border-t border-slate-100"
+                >
+                  <td className="max-w-[10rem] break-all py-2 pr-3 align-top font-medium text-slate-900 sm:max-w-xs">
+                    {row.label}
+                  </td>
+                  <td className="whitespace-nowrap py-2 pr-3 align-top text-slate-700">
+                    {formatStoredImpressions(
+                      row.baselineImpressions
+                    )}
+                  </td>
+                  <td className="whitespace-nowrap py-2 pr-3 align-top text-slate-700">
+                    {formatStoredImpressions(
+                      row.comparisonImpressions
+                    )}
+                  </td>
+                  <td className="whitespace-nowrap py-2 align-top font-semibold text-slate-900">
+                    {formatSignedNumber(row.change)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function HistoricalImpressionBreakdown({
+  breakdown,
+}: {
+  breakdown: HistoricalSearchConsoleBreakdown | null;
+}) {
+  if (!breakdown) {
+    return (
+      <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <p className="text-sm leading-6 text-amber-900">
+          Historical page and query rows were not
+          included in this comparison.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6">
+      <h3 className="text-lg font-bold text-slate-900">
+        Stored page and query changes
+      </h3>
+
+      <div className="mt-3 space-y-2">
+        {breakdown.messages.map((message) => (
+          <p
+            key={message}
+            className="text-sm leading-6 text-slate-600"
+          >
+            {message}
+          </p>
+        ))}
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <ImpressionChangeTable
+          title="Largest page impression losses"
+          rows={breakdown.pages.losses}
+          emptyLabel="No page impression losses are available from the stored rows."
+        />
+        <ImpressionChangeTable
+          title="Largest page impression gains"
+          rows={breakdown.pages.gains}
+          emptyLabel="No page impression gains are available from the stored rows."
+        />
+        <ImpressionChangeTable
+          title="Largest query impression losses"
+          rows={breakdown.queries.losses}
+          emptyLabel="No query impression losses are available from the stored rows."
+        />
+        <ImpressionChangeTable
+          title="Largest query impression gains"
+          rows={breakdown.queries.gains}
+          emptyLabel="No query impression gains are available from the stored rows."
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function SearchConsoleComparisonPanel({
   snapshots,
   snapshotLoad = "ready",
@@ -192,6 +335,11 @@ export default function SearchConsoleComparisonPanel({
 
   const [result, setResult] =
     useState<ComparisonResult | null>(null);
+
+  const [breakdown, setBreakdown] =
+    useState<HistoricalSearchConsoleBreakdown | null>(
+      null
+    );
 
   const [error, setError] =
     useState<string | null>(null);
@@ -276,6 +424,7 @@ export default function SearchConsoleComparisonPanel({
   async function runComparison() {
     setError(null);
     setResult(null);
+    setBreakdown(null);
 
     if (!baselineId || !comparisonId) {
       setError(
@@ -319,6 +468,7 @@ export default function SearchConsoleComparisonPanel({
       }
 
       setResult(data.result);
+      setBreakdown(data.breakdown ?? null);
     } catch {
       setError(
         "The comparison request could not be completed."
@@ -358,6 +508,7 @@ export default function SearchConsoleComparisonPanel({
             onChange={(event) => {
               setBaselineId(event.target.value);
               setResult(null);
+              setBreakdown(null);
               setError(null);
             }}
             className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900"
@@ -388,6 +539,7 @@ export default function SearchConsoleComparisonPanel({
             onChange={(event) => {
               setComparisonId(event.target.value);
               setResult(null);
+              setBreakdown(null);
               setError(null);
             }}
             className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900"
@@ -504,6 +656,10 @@ export default function SearchConsoleComparisonPanel({
               kind="position"
             />
           </div>
+
+          <HistoricalImpressionBreakdown
+            breakdown={breakdown}
+          />
 
           <div className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-4">
             <p className="font-semibold text-blue-950">
