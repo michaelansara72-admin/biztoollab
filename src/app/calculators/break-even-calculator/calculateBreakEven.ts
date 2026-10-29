@@ -22,6 +22,8 @@ export type BreakEvenResults = {
  * Exact units are fixed costs, or fixed costs plus target profit, divided by
  * contribution margin per unit. Revenue is that exact unit count times the
  * selling price. Rounded-up units are a separate whole-unit count.
+ * A result that is only floating-point noise away from a whole number
+ * stays on that whole number.
  *
  * Units and revenue are null when contribution margin is not positive.
  */
@@ -60,13 +62,29 @@ export function calculateBreakEven(
     contributionMarginRatio,
     breakEvenUnits,
     breakEvenUnitsRoundedUp:
-      breakEvenUnits === null ? null : Math.ceil(breakEvenUnits),
+      breakEvenUnits === null ? null : unitsRoundedUp(breakEvenUnits),
     breakEvenRevenue,
     targetProfitUnits,
     targetProfitUnitsRoundedUp:
-      targetProfitUnits === null ? null : Math.ceil(targetProfitUnits),
+      targetProfitUnits === null ? null : unitsRoundedUp(targetProfitUnits),
     targetProfitRevenue,
   };
+}
+
+/**
+ * Double-precision division can land a few units in the last place above
+ * an exact integer, where Math.ceil would add a whole unit. One billionth
+ * of the unit count is far below a genuine fraction such as 0.333.
+ */
+function unitsRoundedUp(exactUnits: number): number {
+  const nearestWholeUnit = Math.round(exactUnits);
+  const tolerance = Math.max(1, Math.abs(exactUnits)) * 1e-9;
+
+  if (Math.abs(exactUnits - nearestWholeUnit) <= tolerance) {
+    return nearestWholeUnit;
+  }
+
+  return Math.ceil(exactUnits);
 }
 
 /**

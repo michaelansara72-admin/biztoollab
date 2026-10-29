@@ -1,10 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 import {
   calculateBreakEven,
   formatContributionMargin,
 } from "../src/app/calculators/break-even-calculator/calculateBreakEven";
+import BreakEvenCalculator from "../src/app/calculators/break-even-calculator/page";
+import { metadata } from "../src/app/calculators/break-even-calculator/layout";
 
 function assertNear(actual: number | null, expected: number) {
   assert.ok(actual !== null);
@@ -108,4 +112,82 @@ test("a fractional contribution margin keeps its cents", () => {
 
 test("a whole-dollar contribution margin stays in dollars", () => {
   assert.equal(formatContributionMargin(19), "$19");
+});
+
+test("exact, near-integer, fractional, and invalid unit counts stay distinct", () => {
+  const exact = calculateBreakEven({
+    fixedCosts: 100,
+    sellingPrice: 2,
+    variableCost: 1,
+    targetProfit: 0,
+  });
+  assert.equal(exact.breakEvenUnits, 100);
+  assert.equal(exact.breakEvenUnitsRoundedUp, 100);
+
+  const nearInteger = calculateBreakEven({
+    fixedCosts: 2,
+    sellingPrice: 0.03,
+    variableCost: 0.01,
+    targetProfit: 0,
+  });
+  assert.ok(nearInteger.breakEvenUnits !== null);
+  assert.ok(nearInteger.breakEvenUnits > 100);
+  assert.equal(nearInteger.breakEvenUnitsRoundedUp, 100);
+  assert.equal(nearInteger.targetProfitUnitsRoundedUp, 100);
+
+  const genuineFraction = calculateBreakEven({
+    fixedCosts: 100.1,
+    sellingPrice: 1,
+    variableCost: 0,
+    targetProfit: 0,
+  });
+  assert.equal(genuineFraction.breakEvenUnitsRoundedUp, 101);
+
+  const oneThird = calculateBreakEven({
+    fixedCosts: 10000,
+    sellingPrice: 50,
+    variableCost: 20,
+    targetProfit: 0,
+  });
+  assert.equal(oneThird.breakEvenUnitsRoundedUp, 334);
+
+  const repeating = calculateBreakEven({
+    fixedCosts: 1000,
+    sellingPrice: 30,
+    variableCost: 11,
+    targetProfit: 0,
+  });
+  assert.equal(repeating.breakEvenUnitsRoundedUp, 53);
+
+  const invalid = calculateBreakEven({
+    fixedCosts: 2,
+    sellingPrice: 0.03,
+    variableCost: 0.03,
+    targetProfit: 0,
+  });
+  assert.equal(invalid.breakEvenUnits, null);
+  assert.equal(invalid.breakEvenUnitsRoundedUp, null);
+  assert.equal(invalid.breakEvenRevenue, null);
+});
+
+test("the default break-even results show theoretical revenue and revenue at 334 units", () => {
+  const html = renderToStaticMarkup(createElement(BreakEvenCalculator));
+
+  assert.match(html, /Minimum Whole Units/);
+  assert.match(html, />334</);
+  assert.match(html, /Theoretical Break-Even Revenue/);
+  assert.match(html, /\$16,666\.67/);
+  assert.match(html, /Revenue at 334 Units/);
+  assert.match(html, /produce \$16,700\.00\. The exact break-even sales amount is \$16,666\.67\./);
+  assert.match(html, /same time period/);
+  assert.match(html, /operating profit margins/);
+  assert.doesNotMatch(html, /net profit margins/);
+  assert.match(
+    html,
+    /href="\/blog\/how-to-calculate-business-break-even-point"/,
+  );
+  assert.equal(
+    metadata.alternates?.canonical,
+    "https://biztoollab.com/calculators/break-even-calculator",
+  );
 });

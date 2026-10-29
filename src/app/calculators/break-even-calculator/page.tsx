@@ -7,6 +7,62 @@ import {
   formatContributionMargin,
 } from "./calculateBreakEven";
 
+function NumberField({
+  label,
+  value,
+  onChange,
+  prefix,
+  suffix,
+  step = "1",
+}: {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  prefix?: string;
+  suffix?: string;
+  step?: string;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-sm font-medium text-slate-700">
+        {label}
+      </span>
+
+      <div className="flex overflow-hidden rounded-xl border border-slate-300 bg-white focus-within:border-slate-500">
+        {prefix && (
+          <span className="flex items-center border-r border-slate-200 bg-slate-50 px-3 text-slate-500">
+            {prefix}
+          </span>
+        )}
+
+        <input
+          type="number"
+          min="0"
+          step={step}
+          defaultValue={value}
+          onBlur={(event) => {
+            const newValue = Math.max(0, Number(event.target.value) || 0);
+            onChange(newValue);
+            event.target.value = String(newValue);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.currentTarget.blur();
+            }
+          }}
+          className="w-full px-4 py-3 text-slate-900 outline-none"
+        />
+
+        {suffix && (
+          <span className="flex items-center border-l border-slate-200 bg-slate-50 px-3 text-slate-500">
+            {suffix}
+          </span>
+        )}
+      </div>
+    </label>
+  );
+}
+
 export default function BreakEvenCalculator() {
   const [fixedCosts, setFixedCosts] = useState(10000);
   const [sellingPrice, setSellingPrice] = useState(50);
@@ -31,6 +87,14 @@ export default function BreakEvenCalculator() {
       maximumFractionDigits: 0,
     }).format(value);
 
+  const currencyCents = (value: number) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+
   const percent = (value: number) =>
     `${(value * 100).toLocaleString("en-US", {
       minimumFractionDigits: 1,
@@ -39,61 +103,10 @@ export default function BreakEvenCalculator() {
 
   const wholeNumber = (value: number) => value.toLocaleString("en-US");
 
-  const NumberField = ({
-    label,
-    value,
-    onChange,
-    prefix,
-    suffix,
-    step = "1",
-  }: {
-    label: string;
-    value: number;
-    onChange: (value: number) => void;
-    prefix?: string;
-    suffix?: string;
-    step?: string;
-  }) => (
-    <label className="block">
-      <span className="mb-2 block text-sm font-medium text-slate-700">
-        {label}
-      </span>
-
-      <div className="flex overflow-hidden rounded-xl border border-slate-300 bg-white focus-within:border-slate-500">
-        {prefix && (
-          <span className="flex items-center border-r border-slate-200 bg-slate-50 px-3 text-slate-500">
-            {prefix}
-          </span>
-        )}
-
-        <input
-  type="number"
-  min="0"
-  step={step}
-  defaultValue={value}
-  onBlur={(event) => {
-    const newValue = Math.max(0, Number(event.target.value) || 0);
-    onChange(newValue);
-    event.target.value = String(newValue);
-  }}
-  onKeyDown={(event) => {
-    if (event.key === "Enter") {
-      event.currentTarget.blur();
-    }
-  }}
-  className="w-full px-4 py-3 text-slate-900 outline-none"
-/>
-
-        {suffix && (
-          <span className="flex items-center border-l border-slate-200 bg-slate-50 px-3 text-slate-500">
-            {suffix}
-          </span>
-        )}
-      </div>
-    </label>
-  );
-
   const isValid = results.contributionMarginPerUnit > 0;
+  const minimumWholeUnits = results.breakEvenUnitsRoundedUp;
+  const revenueAtMinimumWholeUnits =
+    minimumWholeUnits === null ? null : minimumWholeUnits * sellingPrice;
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -139,8 +152,10 @@ export default function BreakEvenCalculator() {
         <div className="space-y-6">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold">Business Costs and Pricing</h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm leading-6 text-slate-500">
               Enter your fixed costs, selling price, and variable cost per unit.
+              Use the same time period for every amount, and the same unit for
+              the price and variable cost.
             </p>
 
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
@@ -219,11 +234,11 @@ export default function BreakEvenCalculator() {
                 <>
                   <div className="mt-5">
                     <p className="text-sm text-slate-400">
-                      Break-Even Units (Rounded Up)
+                      Minimum Whole Units
                     </p>
                     <p className="mt-1 text-4xl font-bold">
-                      {results.breakEvenUnitsRoundedUp !== null
-                        ? wholeNumber(results.breakEvenUnitsRoundedUp)
+                      {minimumWholeUnits !== null
+                        ? wholeNumber(minimumWholeUnits)
                         : "—"}
                     </p>
                   </div>
@@ -234,17 +249,29 @@ export default function BreakEvenCalculator() {
                     </p>
                     <p className="mt-1 text-2xl font-semibold">
                       {results.breakEvenRevenue !== null
-                        ? currency(results.breakEvenRevenue)
+                        ? currencyCents(results.breakEvenRevenue)
+                        : "—"}
+                    </p>
+                  </div>
+
+                  <div className="mt-5">
+                    <p className="text-sm text-slate-400">
+                      {minimumWholeUnits !== null
+                        ? `Revenue at ${wholeNumber(minimumWholeUnits)} Units`
+                        : "Revenue at Minimum Whole Units"}
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold">
+                      {revenueAtMinimumWholeUnits !== null
+                        ? currencyCents(revenueAtMinimumWholeUnits)
                         : "—"}
                     </p>
                   </div>
 
                   <p className="mt-4 text-sm leading-6 text-slate-400">
-                    Units are rounded up to the next whole unit. Revenue is
-                    calculated at the theoretical break-even point, so it may
-                    differ from rounded units multiplied by selling price. The
-                    same distinction applies to target-profit units and
-                    theoretical target-profit revenue.
+                    Minimum whole units is the smallest whole quantity that
+                    covers the costs entered. Theoretical revenue is the exact
+                    break-even sales amount. Revenue at those whole units is
+                    what that quantity actually sells for.
                   </p>
                 </>
               ) : (
@@ -277,10 +304,10 @@ export default function BreakEvenCalculator() {
 
                   <div className="border-t border-slate-800 pt-4">
                     <ResultRow
-                      label="Break-Even Units (Rounded Up)"
+                      label="Minimum Whole Units"
                       value={
-                        results.breakEvenUnitsRoundedUp !== null
-                          ? wholeNumber(results.breakEvenUnitsRoundedUp)
+                        minimumWholeUnits !== null
+                          ? wholeNumber(minimumWholeUnits)
                           : "—"
                       }
                     />
@@ -290,7 +317,20 @@ export default function BreakEvenCalculator() {
                     label="Theoretical Break-Even Revenue"
                     value={
                       results.breakEvenRevenue !== null
-                        ? currency(results.breakEvenRevenue)
+                        ? currencyCents(results.breakEvenRevenue)
+                        : "—"
+                    }
+                  />
+
+                  <ResultRow
+                    label={
+                      minimumWholeUnits !== null
+                        ? `Revenue at ${wholeNumber(minimumWholeUnits)} Units`
+                        : "Revenue at Minimum Whole Units"
+                    }
+                    value={
+                      revenueAtMinimumWholeUnits !== null
+                        ? currencyCents(revenueAtMinimumWholeUnits)
                         : "—"
                     }
                   />
@@ -320,12 +360,18 @@ export default function BreakEvenCalculator() {
                   <p className="text-sm font-semibold">Quick interpretation</p>
 
                   <p className="mt-2 text-sm leading-6 text-slate-300">
-                    At these assumptions, you need to sell{" "}
-                    {results.breakEvenUnitsRoundedUp !== null
-                      ? wholeNumber(results.breakEvenUnitsRoundedUp)
+                    At these assumptions, sell{" "}
+                    {minimumWholeUnits !== null
+                      ? wholeNumber(minimumWholeUnits)
                       : "0"}{" "}
-                    whole units, rounded up, to cover your estimated fixed and
-                    variable costs.
+                    whole units to cover the costs entered. Those units produce{" "}
+                    {revenueAtMinimumWholeUnits !== null
+                      ? `${currencyCents(revenueAtMinimumWholeUnits)}.`
+                      : "—."}{" "}
+                    The exact break-even sales amount is{" "}
+                    {results.breakEvenRevenue !== null
+                      ? `${currencyCents(results.breakEvenRevenue)}.`
+                      : "—."}
                   </p>
                 </div>
               </>
@@ -355,9 +401,9 @@ export default function BreakEvenCalculator() {
             <p>
               Theoretical break-even revenue uses the contribution margin ratio
               to estimate the total sales dollars required to cover fixed costs.
-              It is the exact unit count multiplied by the selling price, so it
-              can differ from the rounded-up unit count multiplied by the
-              selling price.
+              It is the exact unit count multiplied by the selling price. The
+              results also show the revenue from the minimum whole-unit
+              quantity, which can be higher.
             </p>
 
             <p>
@@ -424,16 +470,15 @@ export default function BreakEvenCalculator() {
             <p className="mt-4 text-sm leading-7 text-slate-600">
               The contribution margin is $30 per unit. Dividing $10,000 by $30
               gives exact break-even units of 333.333. Rounded up, the business
-              needs to sell 334 whole units. Revenue from those 334 units would
-              be $16,700.
+              needs to sell 334 whole units. Revenue from those 334 units is
+              $16,700.00.
             </p>
 
             <p className="mt-4 text-sm leading-7 text-slate-600">
-              Theoretical break-even revenue is about $16,666.67, the sales
-              dollars at the exact break-even point. It differs from $16,700
-              because the unit count is rounded up and the revenue is not the
-              revenue of those rounded units. The results round displayed
-              dollar amounts to the nearest dollar.
+              Theoretical break-even revenue is $16,666.67, the sales dollars
+              at the exact break-even point. It is lower than $16,700.00
+              because 333.333 units is not a whole sale. The results show both
+              amounts.
             </p>
 
             <p className="mt-4 text-sm leading-7 text-slate-600">
@@ -545,7 +590,7 @@ export default function BreakEvenCalculator() {
                   Profit Margin Calculator
                 </div>
                 <div className="mt-1 text-sm text-slate-500">
-                  Calculate gross profit and net profit margins.
+                  Calculate gross profit and operating profit margins.
                 </div>
               </a>
 
