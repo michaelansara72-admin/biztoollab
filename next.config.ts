@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
+import { wwwHostRedirects } from "./src/lib/wwwHostRedirects";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async redirects() {
+    return wwwHostRedirects();
+  },
 };
 
 export default nextConfig;
