@@ -4,6 +4,14 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import AIAnalysisPanel from "@/components/ai/AIAnalysisPanel";
 import { useAIAnalysis } from "@/hooks/useAIAnalysis";
+import {
+  calculateLaundromatProfit,
+  defaultLaundromatProfitInput,
+  illustrativeLaundromatExample,
+  illustrativeLaundromatExampleInput,
+  illustrativeLaundromatLowerTurns,
+  revenuePerMachine,
+} from "./calculateLaundromatProfit";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
@@ -23,105 +31,75 @@ export default function LaundromatProfitCalculator() {
   } = useAIAnalysis();
     
 
-  const [washers, setWashers] = useState(30);
-  const [dryers, setDryers] = useState(24);
+  const [washers, setWashers] = useState(defaultLaundromatProfitInput.washers);
+  const [dryers, setDryers] = useState(defaultLaundromatProfitInput.dryers);
 
-  const [washPrice, setWashPrice] = useState(3.5);
-  const [dryPrice, setDryPrice] = useState(2.25);
+  const [washPrice, setWashPrice] = useState(defaultLaundromatProfitInput.washPrice);
+  const [dryPrice, setDryPrice] = useState(defaultLaundromatProfitInput.dryPrice);
 
-  const [washerTurns, setWasherTurns] = useState(4);
-  const [dryerTurns, setDryerTurns] = useState(4);
+  const [washerTurns, setWasherTurns] = useState(
+    defaultLaundromatProfitInput.washerTurns
+  );
+  const [dryerTurns, setDryerTurns] = useState(
+    defaultLaundromatProfitInput.dryerTurns
+  );
 
-  const [daysOpen, setDaysOpen] = useState(30);
+  const [daysOpen, setDaysOpen] = useState(defaultLaundromatProfitInput.daysOpen);
 
-  const [washFoldRevenue, setWashFoldRevenue] = useState(0);
-  const [vendingRevenue, setVendingRevenue] = useState(0);
-  const [otherRevenue, setOtherRevenue] = useState(0);
+  const [washFoldRevenue, setWashFoldRevenue] = useState(
+    defaultLaundromatProfitInput.washFoldRevenue
+  );
+  const [vendingRevenue, setVendingRevenue] = useState(
+    defaultLaundromatProfitInput.vendingRevenue
+  );
+  const [otherRevenue, setOtherRevenue] = useState(
+    defaultLaundromatProfitInput.otherRevenue
+  );
 
-  const [rent, setRent] = useState(5000);
-  const [utilities, setUtilities] = useState(4200);
-  const [labor, setLabor] = useState(2500);
-  const [maintenance, setMaintenance] = useState(1000);
-  const [insurance, setInsurance] = useState(400);
-  const [otherExpenses, setOtherExpenses] = useState(500);
+  const [rent, setRent] = useState(defaultLaundromatProfitInput.rent);
+  const [utilities, setUtilities] = useState(defaultLaundromatProfitInput.utilities);
+  const [labor, setLabor] = useState(defaultLaundromatProfitInput.labor);
+  const [maintenance, setMaintenance] = useState(
+    defaultLaundromatProfitInput.maintenance
+  );
+  const [insurance, setInsurance] = useState(defaultLaundromatProfitInput.insurance);
+  const [otherExpenses, setOtherExpenses] = useState(
+    defaultLaundromatProfitInput.otherExpenses
+  );
 
-  const [processingRate, setProcessingRate] = useState(3);
-  const [monthlyLoanPayment, setMonthlyLoanPayment] = useState(0);
+  const [processingRate, setProcessingRate] = useState(
+    defaultLaundromatProfitInput.processingRate
+  );
+  const [monthlyLoanPayment, setMonthlyLoanPayment] = useState(
+    defaultLaundromatProfitInput.monthlyLoanPayment
+  );
 
-  const [startupInvestment, setStartupInvestment] = useState(300000);
+  const [startupInvestment, setStartupInvestment] = useState(
+    defaultLaundromatProfitInput.startupInvestment
+  );
 
   const results = useMemo(() => {
-    const washerRevenue =
-      washers * washerTurns * washPrice * daysOpen;
-
-    const dryerRevenue =
-      dryers * dryerTurns * dryPrice * daysOpen;
-
-    const machineRevenue =
-      washerRevenue + dryerRevenue;
-
-    const ancillaryRevenue =
-      washFoldRevenue +
-      vendingRevenue +
-      otherRevenue;
-
-    const monthlyRevenue =
-      machineRevenue + ancillaryRevenue;
-
-    const processingFees =
-      monthlyRevenue * (processingRate / 100);
-
-    const monthlyExpenses =
-      rent +
-      utilities +
-      labor +
-      maintenance +
-      insurance +
-      otherExpenses +
-      processingFees +
-      monthlyLoanPayment;
-
-    const monthlyProfit =
-      monthlyRevenue - monthlyExpenses;
-
-    const annualProfit =
-      monthlyProfit * 12;
-
-    const profitMargin =
-      monthlyRevenue > 0
-        ? (monthlyProfit / monthlyRevenue) * 100
-        : 0;
-
-    const annualROI =
-      startupInvestment > 0
-        ? (annualProfit / startupInvestment) * 100
-        : 0;
-
-    const breakEvenMonths =
-      monthlyProfit > 0
-        ? startupInvestment / monthlyProfit
-        : null;
-
-    const breakEvenYears =
-      breakEvenMonths !== null
-        ? breakEvenMonths / 12
-        : null;
-
-    return {
-      washerRevenue,
-      dryerRevenue,
-      machineRevenue,
-      ancillaryRevenue,
-      monthlyRevenue,
-      processingFees,
-      monthlyExpenses,
-      monthlyProfit,
-      annualProfit,
-      profitMargin,
-      annualROI,
-      breakEvenMonths,
-      breakEvenYears,
-    };
+    return calculateLaundromatProfit({
+      washers,
+      dryers,
+      washPrice,
+      dryPrice,
+      washerTurns,
+      dryerTurns,
+      daysOpen,
+      washFoldRevenue,
+      vendingRevenue,
+      otherRevenue,
+      rent,
+      utilities,
+      labor,
+      maintenance,
+      insurance,
+      otherExpenses,
+      processingRate,
+      monthlyLoanPayment,
+      startupInvestment,
+    });
   }, [
     washers,
     dryers,
@@ -212,7 +190,10 @@ export default function LaundromatProfitCalculator() {
 
             <p className="mt-2 text-sm leading-6 text-slate-500">
               Enter your machine count, average cycle pricing,
-              estimated usage, and operating days.
+              estimated usage, and operating days. A turn is one
+              paid cycle. The same daily turns and price are
+              applied to every washer, and separately to every
+              dryer.
             </p>
 
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
@@ -570,7 +551,48 @@ export default function LaundromatProfitCalculator() {
                 </strong>
               </p>
 
+              <p>
+                Revenue per washer:
+                <strong className="ml-1 text-slate-900">
+                  {revenuePerMachine(washers, results.washerRevenue) ===
+                  null
+                    ? "Unavailable without a washer count"
+                    : formatCurrency(
+                        revenuePerMachine(
+                          washers,
+                          results.washerRevenue
+                        ) ?? 0
+                      )}
+                </strong>
+              </p>
+
+              <p>
+                Revenue per dryer:
+                <strong className="ml-1 text-slate-900">
+                  {revenuePerMachine(dryers, results.dryerRevenue) ===
+                  null
+                    ? "Unavailable without a dryer count"
+                    : formatCurrency(
+                        revenuePerMachine(
+                          dryers,
+                          results.dryerRevenue
+                        ) ?? 0
+                      )}
+                </strong>
+              </p>
+
             </div>
+
+            <p className="mt-4 text-sm leading-6 text-slate-600">
+              Monthly profit is total monthly revenue minus the
+              expenses entered above. Payment processing is the
+              entered rate applied to total monthly revenue, and
+              any loan payment is included. Income taxes,
+              depreciation, and costs left at zero are not
+              subtracted. Payback counts this same monthly profit
+              forward until it equals the startup investment,
+              assuming the entries do not change.
+            </p>
           </div>
 {/* AI ANALYSIS */}
 
@@ -725,24 +747,71 @@ export default function LaundromatProfitCalculator() {
             </h2>
 
             <p className="mt-4 text-sm leading-7 text-slate-600">
-              Consider a laundromat with 20 washers and 20 dryers. Assume an
-              average wash price of $4.00, an average dry price of $3.00,
-              approximately 4.5 machine turns per day, and 30 operating days
-              per month.
+              This illustration uses{" "}
+              {illustrativeLaundromatExampleInput.washers} washers and{" "}
+              {illustrativeLaundromatExampleInput.dryers} dryers, an average
+              wash price of $4, an average dry price of $3, 4.5 turns per
+              machine per day, and 30 operating days. It is not a measured
+              store and not an industry benchmark. Additional services,
+              expenses, and investment are left out so the machine arithmetic
+              stays visible.
             </p>
 
-            <p className="mt-4 text-sm leading-7 text-slate-600">
-              If the business also earns revenue from wash-dry-fold services
-              and vending, total monthly revenue may be significantly higher
-              than machine revenue alone. After subtracting rent, utilities,
-              labor, maintenance, insurance, processing fees, and financing
-              costs, the remaining amount represents estimated monthly profit.
-            </p>
+            <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-7 text-slate-600">
+              <li>
+                Washer revenue: 20 × 4.5 × $4 × 30 ={" "}
+                <strong className="text-slate-900">
+                  {formatCurrency(illustrativeLaundromatExample.washerRevenue)}
+                </strong>
+                .
+              </li>
+              <li>
+                Dryer revenue: 20 × 4.5 × $3 × 30 ={" "}
+                <strong className="text-slate-900">
+                  {formatCurrency(illustrativeLaundromatExample.dryerRevenue)}
+                </strong>
+                .
+              </li>
+              <li>
+                Machine revenue:{" "}
+                <strong className="text-slate-900">
+                  {formatCurrency(illustrativeLaundromatExample.machineRevenue)}
+                </strong>
+                , or{" "}
+                {formatCurrency(
+                  revenuePerMachine(
+                    illustrativeLaundromatExampleInput.washers,
+                    illustrativeLaundromatExample.washerRevenue
+                  ) ?? 0
+                )}{" "}
+                per washer and{" "}
+                {formatCurrency(
+                  revenuePerMachine(
+                    illustrativeLaundromatExampleInput.dryers,
+                    illustrativeLaundromatExample.dryerRevenue
+                  ) ?? 0
+                )}{" "}
+                per dryer.
+              </li>
+            </ul>
 
             <p className="mt-4 text-sm leading-7 text-slate-600">
-              The calculator then compares that profit with the original
-              startup investment to estimate annual ROI and how long it may
-              take to recover the initial investment.
+              If the same machine counts, prices, and 30 operating days stay
+              in place, but both turn counts are 3.5 instead of 4.5, machine
+              revenue in this illustration is{" "}
+              <strong className="text-slate-900">
+                {formatCurrency(illustrativeLaundromatLowerTurns.machineRevenue)}
+              </strong>
+              . Rent and other fixed costs would not automatically fall by
+              the same amount. A separate illustration that includes expenses
+              is in{" "}
+              <Link
+                href="/blog/how-much-profit-can-a-laundromat-make"
+                className="font-semibold text-slate-900 underline"
+              >
+                How Much Profit Can a Laundromat Make?
+              </Link>
+              .
             </p>
 
           </section>
